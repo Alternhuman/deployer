@@ -1,4 +1,22 @@
 doctype html
 html
+  head
+    //includes
+    title Deployer
   body
-    p Hola
+    h1 Deployer
+    p There are 
+      span#count 
+    | nodes available
+    
+    div#control
+      form(action="/upload", method="post", enctype="multipart/form-data")
+        input(type="file", name="mar", id="mar")
+        input(type="submit", value="Upload file")
+
+    div#listanodos
+
+
+
+
+
