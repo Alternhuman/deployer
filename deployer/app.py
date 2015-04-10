@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from tornado.web import Application, RequestHandler, StaticFileHandler
 import tornado.web
 from tornado import web, websocket
@@ -7,8 +10,16 @@ from pyjade.ext.tornado import patch_tornado
 import os, uuid
 from io import StringIO
 import random, string
-import marco
+
 patch_tornado()
+
+import sys
+sys.path.append('/home/martin/TFG/workspaces/discovery/marcopolo/')
+
+from bindings.marco import marco
+from marco_conf.utils import Node
+
+import json
 
 __UPLOADS__ = "uploads/"
 
@@ -21,7 +32,7 @@ class IndexHandler(RequestHandler):
 
 class UploadAndDeployHandler(RequestHandler):
 	def post(self):
-		file1 = self.request.files['mar'][0]
+		file1 = self.request.files['file'][0]
 		original_fname = file1['filename']
 		extension = os.path.splitext(original_fname)[1]
 		fname = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(6))
@@ -32,11 +43,17 @@ class UploadAndDeployHandler(RequestHandler):
 
 class NodesHandler(websocket.WebSocketHandler):
 	#polo will have events to notify of new nodes. New crazy idea...
-	def check_origin(self):
+	def check_origin(self, origin):
 		return True
 
 	def open(self):
-		pass # call polo
+		m = marco.Marco()
+		try:
+			nodes = m.request_for("statusmonitor")
+			self.write_message(json.dumps({"Nodes":[n.address[0] for n in nodes]}))
+		except marco.MarcoTimeOutException:
+			self.write_message(json.dumps({"Error": "Error in marco detection"}))
+		 		
 
 	def send_data(self):
 		pass

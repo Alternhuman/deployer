@@ -66,3 +66,4 @@ tmp/
 .idea/*
 doc/build/*
 *__pycache__/*
+deployer/uploads/*
