@@ -19,7 +19,7 @@ $(document).ready(function() {
 
                 $("#listanodos").append("<li>" + parsed_data["Nodes"][node] + "</li>")
             }
-        }
+        } 
     };
 });
 
