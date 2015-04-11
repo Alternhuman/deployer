@@ -33,6 +33,7 @@ class IndexHandler(RequestHandler):
 class UploadAndDeployHandler(RequestHandler):
 	def post(self):
 		file1 = self.request.files['file'][0]
+		print("Command: " + self.get_argument('command', ''))
 		original_fname = file1['filename']
 		extension = os.path.splitext(original_fname)[1]
 		fname = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(6))

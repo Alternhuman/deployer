@@ -1,5 +1,13 @@
 'use strict'
 
+function nodo(info){
+    var cadena = "<div class='node not-chosen'>";
+    cadena += "<p class='hostname'>Hostname</p>"
+    cadena += "<p>"+info+"</p>";
+    cadena += "</div>";
+    return cadena + cadena + cadena + cadena;
+}
+
 $(document).ready(function() {
 
     var loc = window.location;
@@ -16,12 +24,17 @@ $(document).ready(function() {
             $("#count").html(parsed_data["Nodes"].length)
 
             for (var node in parsed_data["Nodes"]) {
-
-                $("#listanodos").append("<li>" + parsed_data["Nodes"][node] + "</li>")
+                $("#listanodos").append(nodo(parsed_data["Nodes"][node]))
             }
         } 
     };
+
+    $("#listanodos").delegate('.node','click', function(){
+        $(this).toggleClass("chosen").toggleClass("not-chosen");
+    });
 });
+
+
 
 //http://hayageek.com/drag-and-drop-file-upload-jquery/
 function sendFileToServer2(formData, status) {
@@ -141,8 +154,12 @@ function createStatusbar(obj) {
 
 function handleFileUpload(files, obj) {
     for (var i = 0; i < files.length; i++) {
+
+        files[i].command = $(".upload-item").eq(i).find("input[name=command]").val();
+
         var fd = new FormData();
-        fd.append('file', files[i]);
+        fd.append('file', files[i].file);
+        fd.append('command', files[i].command);
 
         //var status = new createStatusbar(obj); //Using this we can set progress.
         //status.setFileNameSize(files[i].name, files[i].size);
@@ -155,7 +172,13 @@ var fileCount = 0;
 
 function addToList(file){
     var filename = file.name;
-    $("#list").append("<li class='list-group-item'>"+filename+"<input class='pull-right' type='checkbox' value='stahp"+fileCount+"' name='stahp"+fileCount+"' id='stahp"+fileCount+"'></input><label class='pull-right list-group-item-text' for='stahp"+fileCount+"'>Stahp</label></li>");
+    var str = "<li class='list-group-item upload-item'>"
+    str += '<p class="list-group-item-header">'+filename+'</p>';
+    //$("#list").append("<li class='list-group-item'>"+filename+"<input class='pull-right' type='checkbox' value='stahp"+fileCount+"' name='stahp"+fileCount+"' id='stahp"+fileCount+"'></input><label class='pull-right list-group-item-text' for='stahp"+fileCount+"'>Stahp</label></li>");
+    str += '<input class="pull-right" type="checkbox" value="polo" name="polo"></input><label class="pull-right list-group-item-text" for="polo">Deploy in polo?</label><input type="text" name="command" placeholder="Command" maxlength="300"></input>';
+    str +='<br></br><input type="text" placeholder="Deployment folder" maxlength="300"></input><button class="pull-right">Delete</button>'
+    str += "</li>"
+    $("#list").append(str);
 }
 
 $(document).ready(function() {
@@ -178,7 +201,7 @@ $(document).ready(function() {
         e.preventDefault();
         var files = e.originalEvent.dataTransfer.files;
         for (var i = 0; i < files.length; i++) {
-            files_to_upload.push(files[i]);
+            files_to_upload.push({file: files[i]});
             fileCount++;
             addToList(files[i]);
         }

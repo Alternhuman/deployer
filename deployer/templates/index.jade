@@ -40,27 +40,29 @@ html
                 input(type="file", name="mar", id="mar")
                 input(type="checkbox", name="execute") Execute
                 input(type="submit", value="Upload file")
-            div.row.col-sm-12#dragandrophandler Drag and drop files here
+            div.row.col-sm-12
+              div#dragandrophandler Drag and drop files here
             div.row.col-sm-12
               ul.list-group#list
                 li.list-group-item
                   p.list-group-item-header Item
-                  input.pull-right(type="checkbox", name="stahp", value="stahp")
-                  label.pull-right.list-group-item-text(for="stahp") Stop
-                  br
-                  input.pull-right(type="checkbox", name="stahp", value="polo")
-                  label.pull-right.list-group-item-text(for="stahp") Deploy in polo?
+                  form(action="/upload", method="post", enctype="multipart/form-data")
+                    input.pull-right(type="checkbox", name="polo", value="polo")
+                    label.pull-right.list-group-item-text(for="polo") Deploy in polo?
 
-                  input(type="text", maxlength="300", placeholder="Command")
-                  br
-                  input(type="text", maxlength="300", placeholder="Deployment folder")
+                    input(type="text", maxlength="300", placeholder="Command")
+                    br
+                    input(type="text", maxlength="300", placeholder="Deployment folder")
 
-                  button.pull-right Delete
+                    button.pull-right Delete
             div.row.col-sm-12#controls
               button#uploadbutton.btn.btn-info Upload
 
           div.col-sm-6
             div.row#listanodos
+              //div.node.not-chosen
+                p Nodo
+                p 192.168.1.1
           
           //div.col-sm-6#memdiv
             div.panel.panel-primary

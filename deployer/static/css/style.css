@@ -1,4 +1,4 @@
-.navbar {
+/*.navbar {
     .box-shadow(0 2px 5px rgba(0, 0, 0, .125));
 }
 
@@ -18,21 +18,20 @@
 
 .navbar-brand-label {
     margin-left: 35px;
-}
+}*/
 /**/
 
 #dragandrophandler {
-    border: 2px dotted #0B85A1;
-    width: 400px;
+    border: 2px solid #0B85A1;
+    width: 100%;
+    min-height: 200px;
     color: #92AAB0;
-    text-align: left;
+    text-align: center;
     vertical-align: middle;
-    padding: 10px 10px 10 10px;
-    margin-bottom: 10px;
     font-size: 200%;
 }
 
-.progressBar {
+/*.progressBar {
     width: 200px;
     height: 22px;
     border: 1px solid #ddd;
@@ -48,7 +47,6 @@
     color: #fff;
     text-align: right;
     line-height: 22px;
-    /* same as #progressBar height if we want text middle aligned */
     
     width: 0;
     background-color: #0ba1b5;
@@ -95,5 +93,31 @@
     padding: 4px 15px;
     cursor: pointer;
     vertical-align: top
-}
+}*/
 /**/
+
+
+/*Node*/
+
+.node{
+    -moz-border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 3px;
+    margin-bottom: 5px;
+}
+
+.chosen{
+    background-color: rgba(0, 255, 0, 0.4);
+}
+
+.not-chosen{
+    transition: background-color 1s;
+}
+
+.not-chosen:hover{
+    background-color: rgba(0, 255, 0, 0.4);
+}
+
+.hostname{
+    font-weight: bold;
+}
