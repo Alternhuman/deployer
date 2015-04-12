@@ -5,16 +5,26 @@ from tornado.web import Application, RequestHandler
 import tornado.web
 from tornado import ioloop
 import os
-
+from shlex import split
+from subprocess import Popen
 class DeployHandler(RequestHandler):
+	@tornado.web.asynchronous
 	def post(self):
 		file1 = self.request.files['file'][0]
 		
+		
+		command = self.get_argument('command', '')
+		folder = self.get_argument('folder', '')
 		original_fname = file1['filename']
-		output_file = open("/home/martin/Desktop/" + original_fname, 'wb')
+		
+		if folder == ""
+			folder = "/home/martin/Desktop/"
+		
+		output_file = open(folder + original_fname, 'wb')
 		output_file.write(file1['body'])
-		print("The command is: " + self.get_argument('command', ''))
-		self.write('OK')
+		
+		#Popen(shlex.split(command), cwd=)
+		self.finish('OK')
 
 routes =  [(
 	r'/deploy', DeployHandler

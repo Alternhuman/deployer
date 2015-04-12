@@ -29,113 +29,21 @@ html
             li: p.navbar-text 
               span#count 0
               |  nodes available
-            //p 
             
     div.page
       div.container
         div.row
           div.col-sm-6
-            //div#control
-              form(action="/upload", method="post", enctype="multipart/form-data")
-                input(type="file", name="mar", id="mar")
-                input(type="checkbox", name="execute") Execute
-                input(type="submit", value="Upload file")
             div.row.col-sm-12
               div#dragandrophandler Drag and drop files here
             div.row.col-sm-12
               ul.list-group#list
-                //li.list-group-item
-                  p.list-group-item-header Item
-                  form(action="/upload", method="post", enctype="multipart/form-data")
-                    input.pull-right(type="checkbox", name="polo", value="polo")
-                    label.pull-right.list-group-item-text(for="polo") Deploy in polo?
-
-                    input(type="text", maxlength="300", placeholder="Command")
-                    br
-                    input(type="text", maxlength="300", placeholder="Deployment folder")
-
-                    button.pull-right Delete
             div.row.col-sm-12#controls
               button#uploadbutton.btn.btn-info Upload
 
           div.col-sm-6
             div.row#listanodos
-              //div.node.not-chosen
-                p Nodo
-                p 192.168.1.1
-          
-          //div.col-sm-6#memdiv
-            div.panel.panel-primary
-              div.panel-heading
-                h3.panel-title
-              div.panel-body
-                div.col-sm-6
-                  div#memgraph
-                div.col-sm-6"
-                  div#swapgraph
 
-              div(class="col-sm-6")
-                div(class="panel panel-primary")
-                  div(class="panel-heading")
-                    h3(class="panel-title") Top
-                div(class="panel-body")
-                  div#top-processes
-        //div.panel.panel-primary
-          div.panel-heading
-            h3.panel-title#hostname Host
-          br
-          div(class="row")
-              div(class="col-sm-6" id="memdiv")
-                div(class="panel panel-primary")
-                  div(class="panel-heading")
-                    h3(class="panel-title") Memoria
-                div(class="panel-body")
-                  div(class="col-sm-6")
-                    div#memgraph
-                  div(class="col-sm-6")
-                    div#swapgraph
-
-              div(class="col-sm-6")
-                div(class="panel panel-primary")
-                  div(class="panel-heading")
-                    h3(class="panel-title") Top
-                div(class="panel-body")
-                  div#top-processes
-
-            div(class="row")
-
-              div(class="col-sm-6")
-                div(class="panel panel-primary")
-                  div(class="panel-heading")
-                    h3(class="panel-title") Temperatura
-                div(class="panel-body")
-                  div.col-sm-6#temperature-div
-                    p#temperature
-                  div.col-sm-6#cpus
-                    
-
-
-              div(class="col-sm-6")
-                div(class="panel panel-primary")
-                  div(class="panel-heading")
-                    h3(class="panel-title") Fecha
-                div(class="panel-body")
-                  div#clock
-
-        //p#top
-          p#uptime
-          p#kernel-name
-          div#time-div
-          p#time
-
-    
-    
-    //div#control
-      form(action="/upload", method="post", enctype="multipart/form-data")
-        input(type="file", name="mar", id="mar")
-        input(type="submit", value="Upload file")
-
-    //div#listanodos
     
 
 
