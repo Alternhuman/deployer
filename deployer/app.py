@@ -69,7 +69,7 @@ class UploadAndDeployHandler(RequestHandler):
 		def get_content_type (filename):
 			return mimetypes.guess_type (filename)[0] or 'application/octet-stream'
 
-		url ="http://localhost:8080/send_file"
+		url ="http://localhost:1339/deploy"
 		files = {'file': (filename, open("uploads/"+filename, 'rb'), get_content_type(filename))}
 		commands = {'command': command}
 		r = requests.post(url, files=files, data=commands)
