@@ -46,8 +46,7 @@ class UploadAndDeployHandler(RequestHandler):
 		file1 = self.request.files['file'][0] #Only one file at a time
 
 		original_fname = file1['filename']
-		final_filename = original_fname
-		output_file = open("uploads/" + final_filename, 'wb')
+		output_file = open("uploads/" + original_fname, 'wb')
 		output_file.write(file1['body'])
 		nodes = self.get_argument('nodes', '').split(',')[:-1] # The nodes are returned as a comma-separated string
 		
@@ -58,12 +57,12 @@ class UploadAndDeployHandler(RequestHandler):
 		
 		@tornado.gen.coroutine
 		def call_blocking(node):
-			yield thread_pool.submit(self.upload_to_the_net, node=node, request=self, filename=final_filename, command=self.get_argument('command', ''))
+			yield thread_pool.submit(self.upload_to_the_net, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''))
 		
 		for node in nodes:
 			deployment = tornado.gen.Task(call_blocking, node)
 		
-		self.finish("file" + "Patata" + " is uploaded and on deploy")
+		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
 	@tornado.web.asynchronous
 	def upload_to_the_net(self, node, request, filename, command):
@@ -77,8 +76,6 @@ class UploadAndDeployHandler(RequestHandler):
 		commands = {'command': command}
 		r = requests.post(url, files=files, data=commands)
 		
-
-
 
 class NodesHandler(websocket.WebSocketHandler):
 	"""
@@ -107,26 +104,11 @@ class NodesHandler(websocket.WebSocketHandler):
 	def send_update(self):
 		pass
 
-class UploadFile(RequestHandler):
-	def post(self):
-
-		print(self.request.files['file'][0])
-		
-		file1 = self.request.files['file'][0]
-		original_fname = file1['filename']
-		final_filename = original_fname
-		print(original_fname)
-		output_file = open("/home/martin/Desktop/" + final_filename, 'wb')
-		#print(type(file1['body']))
-		output_file.write(file1['body'])
-		self.write('OK')
-
 routes = [
 	(r'/', IndexHandler),
 	(r'/static/(.*)', StaticFileHandler, {"path":"./static"}),
 	(r'/ws/nodes', NodesHandler),
 	(r'/upload', UploadAndDeployHandler),
-	(r'/send_file', UploadFile),
 ]
 
 settings = {
