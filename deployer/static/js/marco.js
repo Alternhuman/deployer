@@ -5,7 +5,7 @@ function nodo(info){
     cadena += "<p class='hostname'>Hostname</p>"
     cadena += "<p class='ip'>"+info+"</p>";
     cadena += "</div>";
-    return cadena + cadena + cadena + cadena;
+    return cadena;
 }
 
 $(document).ready(function() {

@@ -41,30 +41,118 @@ class UploadAndDeployHandler(RequestHandler):
 		#print("Command: " + self.get_argument('command', ''))
 		#print("Nodes: " + self.get_argument('nodes', ''))
 
-		#nodes = self.get_argument('nodes', '').split(',')[:-1]
+		#
 		#print(nodes)
 		original_fname = file1['filename']
 		final_filename = original_fname
 		output_file = open("uploads/" + final_filename, 'wb')
 		output_file.write(file1['body'])
+		nodes = self.get_argument('nodes', '').split(',')[:-1]
 		
-		#inst = ioloop.IOLoop.instance()
 		from concurrent import futures
 		
 		thread_pool = futures.ThreadPoolExecutor(4)
-		#deployment = yield thread_pool.submit(self.longtime, 10)
+		
+		print(self.request.body)
+
 		@tornado.gen.coroutine
 		def call_blocking():
-			yield thread_pool.submit(self.longtime, self)
+			yield thread_pool.submit(self.upload_to_nodes, request=self, nodes=nodes, files=self.request.files['file'][0])
 		
 		deployment = tornado.gen.Task(call_blocking)
-		#print("Uploaded")
 		
 	
-		
+	#@tornado.web.asynchronous
+	def create_body(self, fields, files):
+		import string, random
+		#BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
+		BOUNDARY = ''.join (random.choice (string.letters) for ii in range (30 + 1))
+		CRLF = '\r\n'
+		L = []
+		for (key, value) in fields:
+			L.append('--' + BOUNDARY)
+			L.append('Content-Disposition: form-data; name="%s"' % key)
+			L.append('')
+			L.append(value)
+		for(key, value) in files:
+			filename = value['filename']
+			L.append('--' + BOUNDARY)
+			L.append(
+				'Content-Disposition: form-data; name="%s"; filename="%s"' % (
+					key, filename
+				)
+			)
+			L.append('Content-Type: %s' % value['content_type'])
+			L.append('')
+			L.append(str(value['body']))
+			L.append('--' + BOUNDARY + '--')
+			L.append('')
+		return CRLF.join(L)
+
 
 	@tornado.web.asynchronous
-	def longtime(self, request, callback=None, raise_error=True, **kwargs):
+	def upload_to_nodes(self, request, nodes, files=None, fields=None, callback=None, raise_error=True, **kwargs):
+		
+
+		lista_fields = []
+		lista_fields.append(["command", request.get_argument('command', '')])
+
+		lista_files = []
+		lista_files.append(["file", files])
+		#lista_files.append(["file", request.files['file'][0]])
+		
+		print("\n\n\nLe form:\n\n\n")
+		
+		print(self.create_body(lista_fields, lista_files))
+
+		request.finish("file" + "Patata" + " is uploaded")
+		return
+
+		#http://stackoverflow.com/a/28613273/2628463
+		import mimetypes
+		def encode_multipart_formdata(fields, files):
+			"""
+			fields is a sequence of (name, value) elements for regular form fields.
+			files is a sequence of (name, filename, value) elements for data to be
+			uploaded as files.
+			Return (content_type, body) ready for httplib.HTTP instance
+			"""
+			BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
+			CRLF = '\r\n'
+			L = []
+			"""for (key, value) in fields:
+				L.append('--' + BOUNDARY)
+				L.append('Content-Disposition: form-data; name="%s"' % key)
+				L.append('')
+				L.append(value)"""
+			for (key, filename, value) in files:
+				filename = filename.encode("utf8")
+				L.append('--' + BOUNDARY)
+				L.append(
+					'Content-Disposition: form-data; name="%s"; filename="%s"' % (
+						key, filename
+					)
+				)
+				L.append('Content-Type: %s' % get_content_type(filename))
+				L.append('')
+				L.append(value)
+			L.append('--' + BOUNDARY + '--')
+			L.append('')
+			body = CRLF.join(L)
+			content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
+			return content_type, body
+
+
+		def get_content_type(filename):
+			try:
+				return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+			except TypeError:
+				return 'application/octet-stream'
+		content_type, body = encode_multipart_formdata(fields, files)
+		#headers = {"Content-Type": content_type, 'content-length': str(len(body))}
+		#request = HTTPRequest(url, "POST", headers=headers, body=body, validate_cert=False)
+		print(content_type)
+		print(body)
 		import time
 		time.sleep(10)
 		print("End sleep")
