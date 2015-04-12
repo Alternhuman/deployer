@@ -34,21 +34,42 @@ class IndexHandler(RequestHandler):
   #def initialize(self, db) Example for magic, then in url, dict(db=db)
 
 class UploadAndDeployHandler(RequestHandler):
+	@tornado.web.asynchronous
+	@tornado.gen.engine
 	def post(self):
 		file1 = self.request.files['file'][0]
-		print("Command: " + self.get_argument('command', ''))
-		print("Nodes: " + self.get_argument('nodes', ''))
+		#print("Command: " + self.get_argument('command', ''))
+		#print("Nodes: " + self.get_argument('nodes', ''))
 
-		nodes = self.get_argument('nodes', '').split(',')[:-1]
-		print(nodes)
+		#nodes = self.get_argument('nodes', '').split(',')[:-1]
+		#print(nodes)
 		original_fname = file1['filename']
-		#extension = os.path.splitext(original_fname)[1]
-		#fname = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(6))
-		#final_filename= fname+extension
 		final_filename = original_fname
 		output_file = open("uploads/" + final_filename, 'wb')
 		output_file.write(file1['body'])
-		self.finish("file" + final_filename + " is uploaded")
+		
+		#inst = ioloop.IOLoop.instance()
+		from concurrent import futures
+		
+		thread_pool = futures.ThreadPoolExecutor(4)
+		#deployment = yield thread_pool.submit(self.longtime, 10)
+		@tornado.gen.coroutine
+		def call_blocking():
+			yield thread_pool.submit(self.longtime, self)
+		
+		deployment = tornado.gen.Task(call_blocking)
+		#print("Uploaded")
+		
+	
+		
+
+	@tornado.web.asynchronous
+	def longtime(self, request, callback=None, raise_error=True, **kwargs):
+		import time
+		time.sleep(10)
+		print("End sleep")
+		request.finish("file" + "Patata" + " is uploaded")
+		#callback()
 
 class NodesHandler(websocket.WebSocketHandler):
 	#polo will have events to notify of new nodes. New crazy idea...
