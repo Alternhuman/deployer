@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tornado.web import Application, RequestHandler, StaticFileHandler
 import tornado.web
-from tornado import web, websocket
-from tornado import ioloop, template
+from tornado.web import Application, RequestHandler, StaticFileHandler
+from tornado import web, websocket, ioloop, template
 from pyjade.ext.tornado import patch_tornado
 
-import os, uuid
-from io import StringIO
+import os
 import random, string
 
 patch_tornado()
@@ -29,12 +27,12 @@ __UPLOADS__ = "uploads/"
 open_ws = set()
 
 class IndexHandler(RequestHandler):
-  """
-  In charge of handling GET requests. Provides the client with the .html/css/js necessary
-  """
-  @web.addslash
-  def get(self):
-  	self.render("templates/index.jade")
+	"""
+	In charge of handling GET requests. Provides the client with the .html/css/js necessary
+	"""
+	@web.addslash
+	def get(self):
+		self.render("templates/index.jade")
 
 class UploadAndDeployHandler(RequestHandler):
 	"""
@@ -48,8 +46,9 @@ class UploadAndDeployHandler(RequestHandler):
 		original_fname = file1['filename']
 		output_file = open("uploads/" + original_fname, 'wb')
 		output_file.write(file1['body'])
-		nodes = self.get_argument('nodes', '').split(',')[:-1] # The nodes are returned as a comma-separated string
 		
+		# The nodes are returned as a comma-separated string
+		nodes = self.get_argument('nodes', '').split(',')[:-1] 
 		from concurrent import futures
 		
 		#The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
@@ -68,8 +67,8 @@ class UploadAndDeployHandler(RequestHandler):
 	def upload_to_the_net(self, node, request, filename, command):
 		
 		import requests, mimetypes
-		def get_content_type (filename):
-			return mimetypes.guess_type (filename)[0] or 'application/octet-stream'
+		def get_content_type(filename):
+			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
 		url = "http://"+node+":1339/deploy" #url ="http://localhost:1339/deploy"
 		files = {'file': (filename, open("uploads/"+filename, 'rb'), get_content_type(filename))}
@@ -94,7 +93,6 @@ class NodesHandler(websocket.WebSocketHandler):
 		except marco.MarcoTimeOutException:
 			self.write_message(json.dumps({"Error": "Error in marco detection"}))
 		 		
-
 	def send_data(self):
 		pass
 
