@@ -65,8 +65,8 @@ class UploadAndDeployHandler(RequestHandler):
 	#@tornado.web.asynchronous
 	def create_body(self, fields, files):
 		import string, random
-		#BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
-		BOUNDARY = ''.join (random.choice (string.letters) for ii in range (30 + 1))
+		BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
+		#BOUNDARY = ''.join (random.choice (string.letters) for ii in range (30 + 1))
 		CRLF = '\r\n'
 		L = []
 		for (key, value) in fields:
@@ -87,13 +87,17 @@ class UploadAndDeployHandler(RequestHandler):
 			L.append(str(value['body']))
 			L.append('--' + BOUNDARY + '--')
 			L.append('')
-		return CRLF.join(L)
+
+		body = CRLF.join(L)
+		headers = {'content-type': 'multipart/form-data; boundary=' + BOUNDARY,
+               'content-length': str (len (body))}
+
+		return body, headers
 
 
 	@tornado.web.asynchronous
 	def upload_to_nodes(self, request, nodes, files=None, fields=None, callback=None, raise_error=True, **kwargs):
 		
-
 		lista_fields = []
 		lista_fields.append(["command", request.get_argument('command', '')])
 
@@ -103,8 +107,15 @@ class UploadAndDeployHandler(RequestHandler):
 		
 		print("\n\n\nLe form:\n\n\n")
 		
-		print(self.create_body(lista_fields, lista_files))
-
+		body, headers = self.create_body(lista_fields, lista_files)
+		url ="http://localhost:8080/send_file"
+		import urllib.request
+		import http.client
+		req = urllib.request.Request (url)
+		connection = http.client.HTTPConnection (req.host)
+		connection.request ('POST', req.selector, body, headers)
+		response = connection.getresponse ()
+		print(response)
 		request.finish("file" + "Patata" + " is uploaded")
 		return
 
@@ -183,11 +194,28 @@ class NodesHandler(websocket.WebSocketHandler):
 	def send_update(self):
 		pass
 
+class UploadFile(RequestHandler):
+	def post(self):
+		print(self.request.files['file'][0]['filename'])
+		
+		file1 = self.request.files['file'][0]
+		#print("Command: " + self.get_argument('command', ''))
+		#print("Nodes: " + self.get_argument('nodes', ''))
+
+		#
+		#print(nodes)
+		original_fname = file1['filename']
+		final_filename = original_fname
+		output_file = open("/home/martin/Desktop/" + final_filename, 'wb')
+		output_file.write(file1['body'])
+		self.write('OK')
+
 routes = [
 	(r'/', IndexHandler),
 	(r'/static/(.*)', StaticFileHandler, {"path":"./static"}),
 	(r'/ws/nodes', NodesHandler),
-	(r'/upload', UploadAndDeployHandler)
+	(r'/upload', UploadAndDeployHandler),
+	(r'/send_file', UploadFile),
 ]
 
 settings = {
