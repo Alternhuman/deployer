@@ -53,15 +53,29 @@ class UploadAndDeployHandler(RequestHandler):
 		
 		thread_pool = futures.ThreadPoolExecutor(4)
 		
-		print(self.request.body)
+		#print(self.request.body)
 
 		@tornado.gen.coroutine
 		def call_blocking():
 			#yield thread_pool.submit(self.upload_to_nodes, request=self, nodes=nodes, files=self.request.files['file'][0])
-			yield thread_pool.submit(self.upload_to_minions, request=self, filedata=file1)
+			#yield thread_pool.submit(self.upload_to_minions, request=self, filedata=file1)
+			yield thread_pool.submit(self.upload_to_the_net, request=self, filename=final_filename, command=self.get_argument('command', ''))
 		
 		deployment = tornado.gen.Task(call_blocking)
 		
+	@tornado.web.asynchronous
+	def upload_to_the_net(self, request, filename, command):
+		import requests, mimetypes
+		def get_content_type (filename):
+			return mimetypes.guess_type (filename)[0] or 'application/octet-stream'
+
+		url ="http://localhost:8080/send_file"
+		files = {'file': (filename, open("uploads/"+filename, 'rb'), get_content_type(filename))}
+		commands = {'command': command}
+		r = requests.post(url, files=files, data=commands)
+		#print(r)
+		request.finish("file" + "Patata" + " is uploaded")
+
 	@tornado.web.asynchronous
 	def upload_to_minions(self, request, filedata):
 		lista_fields = []
@@ -312,14 +326,15 @@ class NodesHandler(websocket.WebSocketHandler):
 
 class UploadFile(RequestHandler):
 	def post(self):
-		print(self.request.files['file'][0]['filename'])
+
+		print(self.request.files['file'][0])
 		
 		file1 = self.request.files['file'][0]
 		original_fname = file1['filename']
 		final_filename = original_fname
+		print(original_fname)
 		output_file = open("/home/martin/Desktop/" + final_filename, 'wb')
-		print(type(file1['body']))
-		from io import StringIO
+		#print(type(file1['body']))
 		output_file.write(file1['body'])
 		self.write('OK')
 
