@@ -57,26 +57,28 @@ class UploadAndDeployHandler(RequestHandler):
 		thread_pool = futures.ThreadPoolExecutor(4)
 		
 		@tornado.gen.coroutine
-		def call_blocking():
-			#yield thread_pool.submit(self.upload_to_nodes, request=self, nodes=nodes, files=self.request.files['file'][0])
-			#yield thread_pool.submit(self.upload_to_minions, request=self, filedata=file1)
-			yield thread_pool.submit(self.upload_to_the_net, request=self, filename=final_filename, command=self.get_argument('command', ''))
+		def call_blocking(node):
+			yield thread_pool.submit(self.upload_to_the_net, node=node, request=self, filename=final_filename, command=self.get_argument('command', ''))
 		
-		deployment = tornado.gen.Task(call_blocking)
+		for node in nodes:
+			deployment = tornado.gen.Task(call_blocking, node)
 		
+		self.finish("file" + "Patata" + " is uploaded and on deploy")
+	
 	@tornado.web.asynchronous
-	def upload_to_the_net(self, request, filename, command):
+	def upload_to_the_net(self, node, request, filename, command):
+		
 		import requests, mimetypes
 		def get_content_type (filename):
 			return mimetypes.guess_type (filename)[0] or 'application/octet-stream'
 
-		url ="http://localhost:1339/deploy"
+		url = "http://"+node+":1339/deploy" #url ="http://localhost:1339/deploy"
 		files = {'file': (filename, open("uploads/"+filename, 'rb'), get_content_type(filename))}
 		commands = {'command': command}
 		r = requests.post(url, files=files, data=commands)
-		request.finish("file" + "Patata" + " is uploaded")
+		
 
-	
+
 
 class NodesHandler(websocket.WebSocketHandler):
 	"""
