@@ -57,11 +57,89 @@ class UploadAndDeployHandler(RequestHandler):
 
 		@tornado.gen.coroutine
 		def call_blocking():
-			yield thread_pool.submit(self.upload_to_nodes, request=self, nodes=nodes, files=self.request.files['file'][0])
+			#yield thread_pool.submit(self.upload_to_nodes, request=self, nodes=nodes, files=self.request.files['file'][0])
+			yield thread_pool.submit(self.upload_to_minions, request=self, filedata=file1)
 		
 		deployment = tornado.gen.Task(call_blocking)
 		
-	
+	@tornado.web.asynchronous
+	def upload_to_minions(self, request, filedata):
+		lista_fields = []
+		lista_fields.append(["command", request.get_argument('command', '')])
+
+		lista_files = []
+		#lista_files.append(["file", files])
+		lista_files.append(filedata)
+		
+		print("\n\n\nLe form:\n\n\n")
+		
+		body, headers = self.create_new_body(lista_fields, lista_files)
+		print(body)
+		request.finish("file" + "Patata" + " is uploaded")
+		"""url ="http://localhost:8080/send_file"
+		import urllib.request
+		import http.client
+		req = urllib.request.Request (url)
+		connection = http.client.HTTPConnection (req.host)
+		connection.request ('POST', req.selector, body, headers)
+		response = connection.getresponse ()
+		print(response)
+		request.finish("file" + "Patata" + " is uploaded")
+		return"""
+
+	def create_new_body(self, lista_fields, lista_files):
+		import mimetypes
+		
+		boundary = '----------ThIs_Is_tHe_bouNdaRY_$'
+
+		def get_content_type (filename):
+			return mimetypes.guess_type (filename)[0] or 'application/octet-stream'
+
+		def encode_field (field_name, field_value):
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"' % field_name,
+				'', str (field_value))
+
+		def encode_file(field_name, filename, content_type, file_data):
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"; filename="%s"' % (field_name, filename),
+				'Content-Type: %s' % content_type,
+				'', file_data)
+
+
+		def encode_file2 (field_name):
+			filename = files [field_name]
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"; filename="%s"' % (field_name, filename),
+				'Content-Type: %s' % get_content_type(filename),
+				'', open (filename, 'rb').read ())
+
+		def encode_file3 (filevar):
+			filename = filevar ['filename']
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"; filename="%s"' % ('file', filename),
+				'Content-Type: %s' % get_content_type(filename),
+				'', open ("uploads/" + filename, 'rb').read ())
+
+		lines = []
+		for (name, value) in lista_fields:
+			lines.extend (encode_field (name, value))
+		for name in lista_files:
+			lines.extend (encode_file3 (name))
+		
+		#lines.extend()
+		lines.extend (('--%s--' % boundary, ''))
+		#ba = bytes(lines, 'ascii')
+		bb = bytes('\r\n', 'ascii')
+		bb.join(lines);
+		#body = bytes('\r\n', 'ascii').join(bytes(lines, 'ascii'))
+		#body = lines
+		print(body)
+		headers = {'content-type': 'multipart/form-data; boundary=' + boundary,
+		          'content-length': str (len (body))}
+
+		return body, headers
+
 	#@tornado.web.asynchronous
 	def create_body(self, fields, files):
 		import string, random
@@ -84,7 +162,7 @@ class UploadAndDeployHandler(RequestHandler):
 			)
 			L.append('Content-Type: %s' % value['content_type'])
 			L.append('')
-			L.append(str(value['body']))
+			L.append(value['body'])
 			L.append('--' + BOUNDARY + '--')
 			L.append('')
 
@@ -93,7 +171,45 @@ class UploadAndDeployHandler(RequestHandler):
                'content-length': str (len (body))}
 
 		return body, headers
+	def encode_multipart_data (data, files):
+		boundary = random_string (30)
 
+		def get_content_type (filename):
+			return mimetypes.guess_type (filename)[0] or 'application/octet-stream'
+
+		def encode_field (field_name):
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"' % field_name,
+				'', str (data [field_name]))
+
+		def encode_file(field_name, filename, content_type, file_data):
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"; filename="%s"' % (field_name, filename),
+				'Content-Type: %s' % content_type,
+				'', file_data)
+
+
+		def encode_file2 (field_name):
+			filename = files [field_name]
+			return ('--' + boundary,
+				'Content-Disposition: form-data; name="%s"; filename="%s"' % (field_name, filename),
+				'Content-Type: %s' % get_content_type(filename),
+				'', open (filename, 'rb').read ())
+
+		lines = []
+		for name in data:
+			lines.extend (encode_field (name))
+		#for name in files:
+		#	lines.extend (encode_file (name))
+		
+		lines.extend()
+		lines.extend (('--%s--' % boundary, ''))
+		body = '\r\n'.join (lines)
+
+		headers = {'content-type': 'multipart/form-data; boundary=' + boundary,
+		          'content-length': str (len (body))}
+
+		return body, headers
 
 	@tornado.web.asynchronous
 	def upload_to_nodes(self, request, nodes, files=None, fields=None, callback=None, raise_error=True, **kwargs):
@@ -199,14 +315,11 @@ class UploadFile(RequestHandler):
 		print(self.request.files['file'][0]['filename'])
 		
 		file1 = self.request.files['file'][0]
-		#print("Command: " + self.get_argument('command', ''))
-		#print("Nodes: " + self.get_argument('nodes', ''))
-
-		#
-		#print(nodes)
 		original_fname = file1['filename']
 		final_filename = original_fname
 		output_file = open("/home/martin/Desktop/" + final_filename, 'wb')
+		print(type(file1['body']))
+		from io import StringIO
 		output_file.write(file1['body'])
 		self.write('OK')
 
