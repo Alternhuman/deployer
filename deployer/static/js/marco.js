@@ -3,7 +3,7 @@
 function nodo(info){
     var cadena = "<div class='node not-chosen'>";
     cadena += "<p class='hostname'>Hostname</p>"
-    cadena += "<p>"+info+"</p>";
+    cadena += "<p class='ip'>"+info+"</p>";
     cadena += "</div>";
     return cadena + cadena + cadena + cadena;
 }
@@ -160,10 +160,20 @@ function handleFileUpload(files, obj) {
         var fd = new FormData();
         fd.append('file', files[i].file);
         fd.append('command', files[i].command);
+        var cadena = "";
+        var ips = $(".chosen").children(".ip")
+        if(ips.length > 0){
+            ips.each(function(index){
+                cadena += $(this).html() + ",";
+            });
+            fd.append('nodes', cadena);
+            sendFileToServer(fd);
+        }
+        //
 
         //var status = new createStatusbar(obj); //Using this we can set progress.
         //status.setFileNameSize(files[i].name, files[i].size);
-        sendFileToServer(fd);
+        //
 
     }
 }
