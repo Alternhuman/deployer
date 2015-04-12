@@ -21,11 +21,17 @@ from marco_conf.utils import Node
 
 import json
 
+from tempfile import tempdir
+import tempfile
+__UPLOADS__ = tempfile.gettempdir()
 __UPLOADS__ = "uploads/"
 
 open_ws = set()
 
 class IndexHandler(RequestHandler):
+  """
+  In charge of handling GET requests. Provides the client with the .html/css/js necessary
+  """
   @web.addslash
   def get(self):
   	#self.set_cookie("id", "aaa", domain=None, path="/*", expires_days=1)
@@ -34,10 +40,13 @@ class IndexHandler(RequestHandler):
   #def initialize(self, db) Example for magic, then in url, dict(db=db)
 
 class UploadAndDeployHandler(RequestHandler):
-	@tornado.web.asynchronous
+	"""
+	Listens for POSTs requests and performs the deployment asynchronously
+	"""
+	@tornado.web.asynchronous#The post is asynchronous due to the potencially long deploying response time
 	@tornado.gen.engine
 	def post(self):
-		file1 = self.request.files['file'][0]
+		file1 = self.request.files['file'][0] #Only one file at a time
 		#print("Command: " + self.get_argument('command', ''))
 		#print("Nodes: " + self.get_argument('nodes', ''))
 
@@ -47,10 +56,11 @@ class UploadAndDeployHandler(RequestHandler):
 		final_filename = original_fname
 		output_file = open("uploads/" + final_filename, 'wb')
 		output_file.write(file1['body'])
-		nodes = self.get_argument('nodes', '').split(',')[:-1]
+		nodes = self.get_argument('nodes', '').split(',')[:-1] # The nodes are returned as a comma-separated string
 		
 		from concurrent import futures
 		
+		#The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
 		thread_pool = futures.ThreadPoolExecutor(4)
 		
 		#print(self.request.body)
@@ -301,6 +311,9 @@ class UploadAndDeployHandler(RequestHandler):
 		#callback()
 
 class NodesHandler(websocket.WebSocketHandler):
+	"""
+	Handler for the Polo websocket connection
+	"""
 	#polo will have events to notify of new nodes. New crazy idea...
 	def check_origin(self, origin):
 		return True
