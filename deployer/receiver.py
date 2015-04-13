@@ -7,24 +7,48 @@ from tornado import ioloop
 import os
 from shlex import split
 from subprocess import Popen
+
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
 		file1 = self.request.files['file'][0]
 		
-		
 		command = self.get_argument('command', '')
 		folder = self.get_argument('folder', '')
-		original_fname = file1['filename']
+		fname = file1['filename']
 		
-		if folder == ""
+		if folder == "":
 			folder = "/home/martin/Desktop/"
 		
-		output_file = open(folder + original_fname, 'wb')
+		final_directory = os.path.join(folder, fname)
+		output_file = open(final_directory, 'wb')
 		output_file.write(file1['body'])
-		
-		#Popen(shlex.split(command), cwd=)
+		output_file.close()
+
+		from concurrent import futures
+
+		@tornado.gen.coroutine
+		def call_execute():
+			yield thread_pool.submit(self.execute, command=command, filename=final_directory, directory=folder)
+			
+		thread_pool = futures.ThreadPoolExecutor(max_workers=1)
+		tornado.gen.Task(call_execute)
+
 		self.finish('OK')
+
+	@tornado.web.asynchronous
+	def execute(self, command, filename, directory):
+		Popen(split(command), cwd=directory)
+
+
+		"""import requests, mimetypes
+		def get_content_type(filename):
+			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+
+		url = "http://"+node+":1339/deploy"
+		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
+		commands = {'command': command}
+		r = requests.post(url, files=files, data=commands)"""
 
 routes =  [(
 	r'/deploy', DeployHandler

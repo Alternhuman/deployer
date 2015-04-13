@@ -12,7 +12,7 @@ import random, string
 patch_tornado()
 
 import sys
-sys.path.append('/home/martin/TFG/workspaces/discovery/marcopolo/')
+sys.path.append('/opt/marcopolo/')
 
 from bindings.marco import marco
 from marco_conf.utils import Node
@@ -21,8 +21,8 @@ import json
 
 from tempfile import tempdir
 import tempfile
+
 __UPLOADS__ = tempfile.gettempdir()
-__UPLOADS__ = "uploads/"
 
 open_ws = set()
 
@@ -38,13 +38,13 @@ class UploadAndDeployHandler(RequestHandler):
 	"""
 	Listens for POSTs requests and performs the deployment asynchronously
 	"""
-	@tornado.web.asynchronous#The post is asynchronous due to the potencially long deploying response time
+	@tornado.web.asynchronous #The post is asynchronous due to the potencially long deploying response time
 	@tornado.gen.engine
 	def post(self):
 		file1 = self.request.files['file'][0] #Only one file at a time
 
 		original_fname = file1['filename']
-		output_file = open("uploads/" + original_fname, 'wb')
+		output_file = open(os.path.join(__UPLOADS__, original_fname), 'wb')
 		output_file.write(file1['body'])
 		
 		# The nodes are returned as a comma-separated string
@@ -52,26 +52,26 @@ class UploadAndDeployHandler(RequestHandler):
 		from concurrent import futures
 		
 		#The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
-		thread_pool = futures.ThreadPoolExecutor(4)
+		thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
 		
 		@tornado.gen.coroutine
-		def call_blocking(node):
-			yield thread_pool.submit(self.upload_to_the_net, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''))
+		def call_deploy(node):
+			yield thread_pool.submit(self.deploy, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''))
 		
 		for node in nodes:
-			deployment = tornado.gen.Task(call_blocking, node)
+			deployment = tornado.gen.Task(call_deploy, node)
 		
 		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
 	@tornado.web.asynchronous
-	def upload_to_the_net(self, node, request, filename, command):
+	def deploy(self, node, request, filename, command):
 		
 		import requests, mimetypes
 		def get_content_type(filename):
 			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
-		url = "http://"+node+":1339/deploy" #url ="http://localhost:1339/deploy"
-		files = {'file': (filename, open("uploads/"+filename, 'rb'), get_content_type(filename))}
+		url = "http://"+node+":1339/deploy"
+		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
 		commands = {'command': command}
 		r = requests.post(url, files=files, data=commands)
 		
