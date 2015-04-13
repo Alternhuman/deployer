@@ -3,10 +3,12 @@
 
 from tornado.web import Application, RequestHandler
 import tornado.web
+from tornado.httpserver import HTTPServer 
 from tornado import ioloop
 import os
 from shlex import split
 from subprocess import Popen
+import subprocess
 
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
@@ -38,8 +40,10 @@ class DeployHandler(RequestHandler):
 
 	@tornado.web.asynchronous
 	def execute(self, command, filename, directory):
-		Popen(split(command), cwd=directory)
-
+		process = Popen(split(command), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		out, err = process.communicate()
+		print(out)
+		print(err)
 
 		"""import requests, mimetypes
 		def get_content_type(filename):
@@ -61,5 +65,14 @@ settings = {
 app = Application(routes, **settings)
 
 if __name__ == "__main__":
-	app.listen(1339)
+	import conf, ssl
+
+	httpServer = HTTPServer(app, ssl_options={
+		"certfile": conf.RECEIVERCERT,
+		"keyfile": conf.RECEIVERKEY,
+		"ssl_version": ssl.CERT_OPTIONAL,
+		"cert_reqs": ssl.CERT_OPTIONAL,
+		"ca_certs": conf.APPCERT,
+		})
+	httpServer.listen(1339)
 	ioloop.IOLoop.instance().start()

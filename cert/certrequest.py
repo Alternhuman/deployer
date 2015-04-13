@@ -10,7 +10,6 @@ from os import path
 import os
 
 
-
 current_dir = os.path.dirname(__file__)
 certdir = os.path.join(current_dir, "certs")
 

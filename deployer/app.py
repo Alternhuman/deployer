@@ -4,6 +4,7 @@
 import tornado.web
 from tornado.web import Application, RequestHandler, StaticFileHandler
 from tornado import web, websocket, ioloop, template
+from tornado.httpserver import HTTPServer
 from pyjade.ext.tornado import patch_tornado
 
 import os
@@ -18,12 +19,22 @@ from bindings.marco import marco
 from marco_conf.utils import Node
 
 import json
-
+import requests, mimetypes
 from tempfile import tempdir
 import tempfile
+import ssl, conf
+from requests.adapters import HTTPAdapter 
+
+class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
+	def cert_verify(self, conn, *args, **kwargs):
+		super().cert_verify(conn, *args, **kwargs)
+		conn.assert_hostname = False
+
+websession = requests.session()
+websession.mount('https://', NotCheckingHostnameHTTPAdapter())
 
 __UPLOADS__ = tempfile.gettempdir()
-
+__UPLOADS__ = "/home/martin/Desktop/"
 open_ws = set()
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -95,16 +106,16 @@ class UploadAndDeployHandler(RequestHandler):
 	@tornado.web.asynchronous
 	def deploy(self, node, request, filename, command):
 		
-		import requests, mimetypes
+		
 		def get_content_type(filename):
 			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
-		url = "http://"+node+":1339/deploy"
+		url = "https://"+node+":1339/deploy"
 		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
 		commands = {'command': command}
-		r = requests.post(url, files=files, data=commands)
-		
-
+		#r = requests.post(url, files=files, data=commands, verify=False, cert=(conf.APPCERT, conf.APPKEY))
+		r = websession.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
+		print("Here")
 class NodesHandler(websocket.WebSocketHandler):
 	"""
 	Handler for the Polo websocket connection
@@ -176,7 +187,25 @@ settings = {
 app = Application(routes, **settings)
 
 if __name__ == "__main__":
-	app.listen(8080)
+	
+	"""ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+	ssl_ctx.load_cert_chain(os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "receiver.crt"),
+                        os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "receiver.key"))
+	ssl_ctx.verify_mode = ssl.CERT_OPTIONAL
+	#ssl_ctx.ssl_version = ssl.PROTOCOL_TLSv1
+	#ca_certs = os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "app.crt")
+	#ssl_ctx.ca_certs = os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "app.crt")
+	"""
+	#TODO Replace with SSLContext (this option is maintained for compatibility reasons)
+	httpServer = HTTPServer(app, ssl_options={ 
+        "certfile": conf.APPCERT,
+        "keyfile": conf.APPKEY,
+        "cert_reqs": ssl.CERT_OPTIONAL,
+        "ssl_version": ssl.PROTOCOL_TLSv1,
+        #"ca_certs": conf.RECEIVERCERT,
+    })
+
+	httpServer.listen(8080)
 	ioloop.IOLoop.instance().start()
 
 	"""Multicore:def main():
