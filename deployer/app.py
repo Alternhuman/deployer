@@ -25,14 +25,43 @@ import tempfile
 __UPLOADS__ = tempfile.gettempdir()
 
 open_ws = set()
+class BaseHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+        return self.get_secure_cookie("user")
 
-class IndexHandler(RequestHandler):
+class IndexHandler(BaseHandler):
 	"""
-	In charge of handling GET requests. Provides the client with the .html/css/js necessary
+	In charge of handling GET requests. Provides the client with the necessary .html/css/js
 	"""
 	@web.addslash
 	def get(self):
-		self.render("templates/index.jade")
+		print(self.get_secure_cookie("user"))
+		if not self.current_user:
+			self.redirect("/login")
+		else:
+			user = tornado.escape.xhtml_escape(self.current_user)
+			self.render("templates/index.jade", user=user)
+			#self.render("templates/index.jade", logged=True, user="patata")
+
+
+
+class LoginHandler(BaseHandler):
+	def get(self):
+		if self.current_user:
+			self.redirect("/")
+		else:
+			self.render("templates/login.jade")
+
+	def post(self):
+		if authenticate(self.get_argument("name"), self.get_argument("pass")):
+			self.set_secure_cookie("user", self.get_argument("name"))
+
+		self.redirect("/")
+
+class Logout(BaseHandler):
+	def get(self):
+		self.clear_cookie("user")
+		self.redirect("/")
 
 class UploadAndDeployHandler(RequestHandler):
 	"""
@@ -102,16 +131,46 @@ class NodesHandler(websocket.WebSocketHandler):
 	def send_update(self):
 		pass
 
+
+from os import path
+from crypt import crypt
+from re import compile as compile_regex
+
+#http://code.activestate.com/recipes/578489-system-authentication-against-etcshadow-or-etcpass/
+def authenticate(name, password):
+	"""
+	Returns true or false depending on the success of the name-password combination using
+	the shadows or passwd file (The shadow file is preferred if it exists) 
+	"""
+	
+	if path.exists("/etc/shadow"):
+		import spwd
+		shadow = spwd.getspnam(name).sp_pwdp # https://docs.python.org/3.4/library/spwd.html#module-spwd
+	else:
+		import pwd
+		shadow = pwd.getpwnam(name).pw_passwd
+	
+	salt_pattern = compile_regex(r"\$.*\$.*\$")
+	
+	salt = salt_pattern.match(shadow).group()
+	
+	return crypt(password, salt) == shadow
+
+
 routes = [
 	(r'/', IndexHandler),
 	(r'/static/(.*)', StaticFileHandler, {"path":"./static"}),
 	(r'/ws/nodes', NodesHandler),
+	(r"/login", LoginHandler),
+    (r"/logout", Logout),
 	(r'/upload', UploadAndDeployHandler),
 ]
 
 settings = {
 	"debug": True,
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
+    "login_url":"/" , 
+    "cookie_secret":"2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
 }
 
 app = Application(routes, **settings)

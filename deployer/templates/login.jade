@@ -4,8 +4,6 @@ html
   head
     meta(charset="UTF-8")
     script(src="{{ static_url('js/jquery.min.js') }}")
-    script(src="{{ static_url('js/marco.js') }}")
-
     link(rel="stylesheet" href="{{ static_url('css/bootstrap.min.css') }}")
     link(rel="stylesheet" href="{{ static_url('css/style.css') }}")
     script(src="{{ static_url('js/bootstrap.min.js') }}")
@@ -26,31 +24,7 @@ html
             li: a(href='/')
               i.fa.fa-home
               |  Inicio
-            
-            li: a(href='/logout') 
-              i.fa.fa-home
-              |  #{user}: Logout
-          ul.nav.navbar-nav.navbar-right
-            li: p.navbar-text 
-              span#count 0
-              |  nodes available
-            
-    
-    div.page
-      div.container
-        div.row
-          div.col-sm-6
-            div.row.col-sm-12
-              div#dragandrophandler Drag and drop files here
-            div.row.col-sm-12
-              ul.list-group#list
-            div.row.col-sm-12#controls
-               button#uploadbutton.btn.btn-info Upload
-  
-          div.col-sm-6
-            div.row#listanodos
-    //else
-      div.container
+    div.container
         div.panel.panel-primary
           div.panel-heading
             h3.panel-title Login
@@ -62,12 +36,5 @@ html
                   input.form-control(type="text" name="name")
                 div.input-group
                   span.input-group-addon Pass
-                  input.form-control(type="text" name="pass")
-                input.btn.btn-primary(type="submit" value="Sign in")
-
-    
-
-
-
-
-
+                  input.form-control(type="password" name="pass")
+                input.btn.btn-primary(type="submit" value="Sign in")        
