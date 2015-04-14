@@ -24,17 +24,25 @@ from tempfile import tempdir
 import tempfile
 import ssl, conf
 from requests.adapters import HTTPAdapter 
+import utils
+
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 	def cert_verify(self, conn, *args, **kwargs):
+		"""
+		Avoids the verification of the SSL Hostname field 
+		"""
 		super().cert_verify(conn, *args, **kwargs)
 		conn.assert_hostname = False
 
 websession = requests.session()
-websession.mount('https://', NotCheckingHostnameHTTPAdapter())
+websession.mount('https://', NotCheckingHostnameHTTPAdapter()) # By changing the adapter no hostname is checked
 
-__UPLOADS__ = tempfile.gettempdir()
-__UPLOADS__ = "/home/martin/Desktop/"
+if not os.path.exists(conf.TMPDIR):
+	os.makedirs(conf.TMPDIR)
+
+__UPLOADS__ = conf.TMPDIR # tmp directory were files will be stored
+
 open_ws = set()
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -57,6 +65,9 @@ class IndexHandler(BaseHandler):
 
 
 class LoginHandler(BaseHandler):
+	"""
+	Handles login authentication through cookies
+	"""
 	def get(self):
 		if self.current_user:
 			self.redirect("/")
@@ -64,7 +75,7 @@ class LoginHandler(BaseHandler):
 			self.render("templates/login.jade")
 
 	def post(self):
-		if authenticate(self.get_argument("name"), self.get_argument("pass")):
+		if utils.authenticate(self.get_argument("name"), self.get_argument("pass")):
 			self.set_secure_cookie("user", self.get_argument("name"))
 
 		self.redirect("/")
@@ -74,7 +85,7 @@ class Logout(BaseHandler):
 		self.clear_cookie("user")
 		self.redirect("/")
 
-class UploadAndDeployHandler(RequestHandler):
+class UploadAndDeployHandler(BaseHandler):
 	"""
 	Listens for POSTs requests and performs the deployment asynchronously
 	"""
@@ -96,7 +107,7 @@ class UploadAndDeployHandler(RequestHandler):
 		
 		@tornado.gen.coroutine
 		def call_deploy(node):
-			yield thread_pool.submit(self.deploy, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''))
+			yield thread_pool.submit(self.deploy, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''), user=self.current_user)
 		
 		for node in nodes:
 			deployment = tornado.gen.Task(call_deploy, node)
@@ -104,7 +115,7 @@ class UploadAndDeployHandler(RequestHandler):
 		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
 	@tornado.web.asynchronous
-	def deploy(self, node, request, filename, command):
+	def deploy(self, node, request, filename, command, user):
 		
 		
 		def get_content_type(filename):
@@ -112,10 +123,10 @@ class UploadAndDeployHandler(RequestHandler):
 
 		url = "https://"+node+":1339/deploy"
 		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
-		commands = {'command': command}
-		#r = requests.post(url, files=files, data=commands, verify=False, cert=(conf.APPCERT, conf.APPKEY))
+		commands = {'command':command, 'user':user}
+		
 		r = websession.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
-		print("Here")
+		
 class NodesHandler(websocket.WebSocketHandler):
 	"""
 	Handler for the Polo websocket connection
@@ -143,31 +154,6 @@ class NodesHandler(websocket.WebSocketHandler):
 		pass
 
 
-from os import path
-from crypt import crypt
-from re import compile as compile_regex
-
-#http://code.activestate.com/recipes/578489-system-authentication-against-etcshadow-or-etcpass/
-def authenticate(name, password):
-	"""
-	Returns true or false depending on the success of the name-password combination using
-	the shadows or passwd file (The shadow file is preferred if it exists) 
-	"""
-	
-	if path.exists("/etc/shadow"):
-		import spwd
-		shadow = spwd.getspnam(name).sp_pwdp # https://docs.python.org/3.4/library/spwd.html#module-spwd
-	else:
-		import pwd
-		shadow = pwd.getpwnam(name).pw_passwd
-	
-	salt_pattern = compile_regex(r"\$.*\$.*\$")
-	
-	salt = salt_pattern.match(shadow).group()
-	
-	return crypt(password, salt) == shadow
-
-
 routes = [
 	(r'/', IndexHandler),
 	(r'/static/(.*)', StaticFileHandler, {"path":"./static"}),
@@ -179,8 +165,8 @@ routes = [
 
 settings = {
 	"debug": True,
-    "static_path": os.path.join(os.path.dirname(__file__), "static"),
-    "login_url":"/" , 
+    "static_path": conf.STATIC_PATH,
+    "login_url":"/login" , 
     "cookie_secret":"2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
 }
 

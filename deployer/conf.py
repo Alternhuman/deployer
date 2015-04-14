@@ -1,4 +1,5 @@
 from os.path import dirname, join
+import tempfile
 
 directory = dirname(__file__)
 cert_dir = "certs"
@@ -10,3 +11,7 @@ APPKEY  = join(certs, "app.key")
 
 RECEIVERCERT = join(certs, "receiver.crt")
 RECEIVERKEY = join(certs, "receiver.key")
+
+TMPDIR = join(tempfile.gettempdir(), "tmp_deployer")
+
+STATIC_PATH = os.path.join(os.path.dirname(__file__), "static")
