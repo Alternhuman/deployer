@@ -20,24 +20,22 @@ class DeployHandler(RequestHandler):
 		folder = self.get_argument('folder', '')
 		fname = file1['filename']
 		user = self.get_argument('user', '')
-
+		
+		user_pwd = pwd.getpwnam(user)
+		
 		if folder == "":
-			folder = pwd.getpwnam(user).pw_dir
+			folder = user_pwd.pw_dir
 				
-		deployment_folder = os.path.join(user_home, folder)
+		#deployment_folder = os.path.join(user_home, folder)
 
 		final_directory = os.path.join(folder, fname)
+
 		
-
-		output_file = open(final_directory, 'wb')
-		output_file.write(file1['body'])
-		output_file.close()
-
 		from concurrent import futures
 
 		@tornado.gen.coroutine
 		def call_execute():
-			yield thread_pool.submit(self.execute, command=command, filename=final_directory, directory=folder, user=user)
+			yield thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd)
 			
 		thread_pool = futures.ThreadPoolExecutor(max_workers=1)
 		tornado.gen.Task(call_execute)
@@ -45,11 +43,22 @@ class DeployHandler(RequestHandler):
 		self.finish('OK')
 
 	@tornado.web.asynchronous
-	def execute(self, command, filename, directory, user):
-		process = Popen(split(command), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out, err = process.communicate()
-		print(out)
-		print(err)
+	def execute(self, command, file_desc, filename, directory, user):
+		
+		def demote(user_uid, user_gid):
+			os.setgid(user_gid)
+			os.setuid(user_uid)
+
+		output_file = open(filename, 'wb')
+		output_file.write(file_desc['body'])
+		os.chown(filename, user.pw_uid, user.pw_gid)
+		
+		output_file.close()
+		if command is not "":
+			process = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			out, err = process.communicate()
+			print(out)
+			print(err)
 
 		"""import requests, mimetypes
 		def get_content_type(filename):

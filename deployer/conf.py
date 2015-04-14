@@ -14,4 +14,4 @@ RECEIVERKEY = join(certs, "receiver.key")
 
 TMPDIR = join(tempfile.gettempdir(), "tmp_deployer")
 
-STATIC_PATH = os.path.join(os.path.dirname(__file__), "static")
+STATIC_PATH = join(dirname(__file__), "static")

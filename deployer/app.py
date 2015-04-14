@@ -95,9 +95,10 @@ class UploadAndDeployHandler(BaseHandler):
 		file1 = self.request.files['file'][0] #Only one file at a time
 
 		original_fname = file1['filename']
+		print(os.path.join(__UPLOADS__, original_fname))
 		output_file = open(os.path.join(__UPLOADS__, original_fname), 'wb')
 		output_file.write(file1['body'])
-		
+		output_file.close()
 		# The nodes are returned as a comma-separated string
 		nodes = self.get_argument('nodes', '').split(',')[:-1] 
 		from concurrent import futures
