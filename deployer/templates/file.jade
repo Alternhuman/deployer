@@ -1,0 +1,18 @@
+li.list-group-item.upload-item
+  button.btn.btn-danger.delete-buton.pull-right(style="width:10%;")
+    div.glyphicon.glyphicon-remove
+    p.list-group-item-header filename
+    div.progress(style="width:85%;")
+      div.progress-bar(role="progressbar", aria-valuenow="0", aria-valuemin="0", aria-valuemax="100", style="min-width: 2em;")
+  input(type="text",name="command",placeholder="Command",maxlength="300")
+  br
+  input(type="text",placeholder="Deployment folder",name="folder", maxlength="300")
+  br
+  label(list-group-item-text,for="polo") Deploy in Polo?
+  input(type="checkbox",value="polo",name="polo")
+  input(type="text", name="idpolo", placeholder="Identifier", maxlength="40", disabled="true")
+  p.alert.alert-warning.polo The service will be registered permanently. Use the language-specific binding to perform a temporary registry on execution time.
+  label(list-group-item-text, for="tomcat") Deploy in Tomcat?
+  input(type="checkbox",value="tomcat",name="tomcat")
+  p.alert.alert-warning.warning The service will be installed on the Tomcat deployment directory after validating the format of the archive. If no instance of Tomcat is installed on the server, it won't be installed.
+  

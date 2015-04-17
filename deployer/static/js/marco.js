@@ -39,6 +39,28 @@ $(document).ready(function() {
             files_to_upload.splice(index, 1);
         });
     });
+
+    $('#list').delegate('input[name=polo]', 'click', function(){
+        if($(this).is(':checked')){
+            $(this).siblings('input[name=idpolo]').prop('disabled', false);
+            $(this).siblings('.polo.alert-warning').show(400);
+        }else{
+            $(this).siblings('input[name=idpolo]').prop('disabled', true);
+            $(this).siblings('.polo.alert-warning').hide(400);
+        }
+    });
+
+    $('#list').delegate('input[name=tomcat]', 'click', function(){
+        if($(this).is(':checked')){
+            $(this).siblings('.warning.alert-warning').show(400);
+            $(this).siblings('input[name=folder]').prop('disabled', true);
+            $(this).siblings('input[name=folder]').prop('placeholder', 'Default Tomcat directory');
+        }else{
+            $(this).siblings('.warning.alert-warning').hide(400);
+            $(this).siblings('input[name=folder]').prop('disabled', false);
+            $(this).siblings('input[name=folder]').prop('placeholder', 'Deployment folder');
+        }
+    });
 });
 
 //http://hayageek.com/drag-and-drop-file-upload-jquery/
@@ -90,7 +112,14 @@ function handleFileUpload(files, obj) {
 
         files[i].command = $(".upload-item").eq(i).find("input[name=command]").val();
         files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
-        
+        files[i].polo = $(".upload-item").eq(i).find("input[name=polo]").is(':checked');
+        if(files[i].polo){
+            files[i].identifier = $(".upload-item").eq(i).find("input[name=idpolo").val();
+        }
+        files[i].tomcat = $(".upload-item").eq(i).find("input[name=tomcat]").is(':checked');
+        if(!files[i].tomcat){
+            files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
+        }
         var fd = new FormData();
         fd.append('file', files[i].file);
         fd.append('command', files[i].command);
@@ -114,13 +143,20 @@ var fileCount = 0;
 
 function addToList(file){
     var filename = file.name;
+
+    var other= '<li class="list-group-item upload-item"><button style="width:10%;" class="btn btn-danger delete-buton pull-right"><div class="glyphicon glyphicon-remove"></div></button>'
+    var header_filename = '<p class="list-group-item-header">'+filename+'</p><div style="width:85%;" class="progress"><div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;" class="progress-bar"></div></div>'
+    var buttons = '<input type="text" name="command" placeholder="Command" maxlength="300"/><br/><input type="text" placeholder="Deployment folder" name="folder" maxlength="300"/><br/><label list-group-item-text="list-group-item-text" for="polo">Deploy in Polo?</label><input type="checkbox" value="polo" name="polo"/><input type="text" name="idpolo" placeholder="Identifier" maxlength="40" disabled="true"/><p class="alert alert-warning polo" style="display:none;">The service will be registered permanently. Use the language-specific binding to perform a temporary registry on execution time.</p>'
+    var labels = '<br></br><label list-group-item-text="list-group-item-text" for="tomcat">Deploy in Tomcat?</label><input type="checkbox" value="tomcat" name="tomcat"/><p class="alert alert-warning warning" style="display:none;">The service will be installed on the Tomcat deployment directory after validating the format of the archive. If no instance of Tomcat is installed on the server, it won\'t be installed.</p></li>'
+
     var str = "<li class='list-group-item upload-item'>"
     str += '<p class="list-group-item-header">'+filename+'</p>';
     str += '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">0%</div></div>'
-    //$("#list").append("<li class='list-group-item'>"+filename+"<input class='pull-right' type='checkbox' value='stahp"+fileCount+"' name='stahp"+fileCount+"' id='stahp"+fileCount+"'></input><label class='pull-right list-group-item-text' for='stahp"+fileCount+"'>Stahp</label></li>");
     str += '<input class="pull-right" type="checkbox" value="polo" name="polo"></input><label class="pull-right list-group-item-text" for="polo">Deploy in polo?</label><input type="text" name="command" placeholder="Command" maxlength="300"></input>';
     str +='<br></br><input type="text" placeholder="Deployment folder" name="folder" maxlength="300"></input><button class="btn btn-danger delete-buton pull-right">Delete</button>'
     str += "</li>"
+
+    str = other + header_filename + buttons + labels;
     $("#list").append(str);
 }
 
