@@ -116,15 +116,15 @@ class UploadAndDeployHandler(BaseHandler):
 		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
 	@tornado.web.asynchronous
-	def deploy(self, node, request, filename, command, user):
+	def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat=False):
 		
 		
 		def get_content_type(filename):
 			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
-		url = "https://"+node+":1339/deploy"
+		url = "https://"+node+":"+str(conf.RECEIVER_PORT)+"/deploy"
 		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
-		commands = {'command':command, 'user':user}
+		commands = {'command':command, 'user':user, 'folder': folder, 'idpolo': idpolo, 'tomcat': tomcat}
 		
 		r = websession.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
 		
@@ -140,7 +140,7 @@ class NodesHandler(websocket.WebSocketHandler):
 		open_ws.add(self)
 		m = marco.Marco()
 		try:
-			nodes = m.request_for("statusmonitor")
+			nodes = m.request_for("deployer")
 			self.write_message(json.dumps({"Nodes":[n.address[0] for n in nodes]}))
 		except marco.MarcoTimeOutException:
 			self.write_message(json.dumps({"Error": "Error in marco detection"}))
@@ -192,7 +192,7 @@ if __name__ == "__main__":
         #"ca_certs": conf.RECEIVERCERT,
     })
 
-	httpServer.listen(8080)
+	httpServer.listen(conf.DEPLOYER_PORT)
 	ioloop.IOLoop.instance().start()
 
 	"""Multicore:def main():

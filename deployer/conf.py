@@ -15,3 +15,8 @@ RECEIVERKEY = join(certs, "receiver.key")
 TMPDIR = join(tempfile.gettempdir(), "tmp_deployer")
 
 STATIC_PATH = join(dirname(__file__), "static")
+
+TOMCAT_PATH = '/var/lib/tomcat7/webapps/'
+
+DEPLOYER_PORT = 1341
+RECEIVER_PORT= 1339
