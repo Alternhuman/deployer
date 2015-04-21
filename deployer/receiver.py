@@ -18,6 +18,11 @@ import conf
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
+		"""
+		POST handler received from deployer.py. 
+		It handles the deployment of the file and the execution of the desired command.
+		"""
+
 		file1 = self.request.files['file'][0]
 		
 		command = self.get_argument('command', '')
@@ -28,6 +33,7 @@ class DeployHandler(RequestHandler):
 			folder = self.get_argument('folder', '')
 		else:
 			folder = conf.TOMCAT_PATH
+		
 		fname = file1['filename']
 		
 		user = self.get_argument('user', '')
@@ -37,8 +43,6 @@ class DeployHandler(RequestHandler):
 		if folder == '':
 			folder = user_pwd.pw_dir
 				
-		#deployment_folder = os.path.join(user_home, folder)
-
 		final_directory = os.path.join(folder, fname)
 
 		
@@ -49,16 +53,17 @@ class DeployHandler(RequestHandler):
 			yield thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat)
 			
 		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
-		#yield tornado.gen.Task(call_execute)
 		thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat)
+		
 		self.finish('OK')
 
 	@tornado.web.asynchronous
 	def execute(self, command, file_desc, filename, directory, user, tomcat=False):
+		
 		def demote(user_uid, user_gid):
 			os.setgid(user_gid)
 			os.setuid(user_uid)
-		print(filename)
+		
 		if os.path.exists(os.path.dirname(filename)):
 			output_file = open(filename, 'wb')
 		else:
@@ -74,15 +79,6 @@ class DeployHandler(RequestHandler):
 			out, err = process.communicate()
 			print(out)
 			print(err)
-
-		"""import requests, mimetypes
-		def get_content_type(filename):
-			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
-
-		url = "http://"+node+":1339/deploy"
-		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
-		commands = {'command': command}
-		r = requests.post(url, files=files, data=commands)"""
 
 routes =  [(
 	r'/deploy', DeployHandler

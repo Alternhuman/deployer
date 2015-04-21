@@ -7,10 +7,11 @@ from tornado import web, websocket, ioloop, template
 from tornado.httpserver import HTTPServer
 from pyjade.ext.tornado import patch_tornado
 
-import os
-import random, string
+import os, random, string, json, mimetypes, ssl, conf
+from tempfile import tempdir
+import tempfile
 
-patch_tornado()
+
 
 import sys
 sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
@@ -19,12 +20,10 @@ from bindings.marco import marco
 from marco_conf.utils import Node
 import utils
 
-import json
-import requests, mimetypes
-from tempfile import tempdir
-import tempfile
-import ssl, conf
+import requests
 from requests.adapters import HTTPAdapter 
+
+patch_tornado() #Fix to allow pyjade to work with Tornado
 
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
@@ -189,14 +188,6 @@ app = Application(routes, **settings)
 
 if __name__ == "__main__":
 	
-	"""ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-	ssl_ctx.load_cert_chain(os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "receiver.crt"),
-                        os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "receiver.key"))
-	ssl_ctx.verify_mode = ssl.CERT_OPTIONAL
-	#ssl_ctx.ssl_version = ssl.PROTOCOL_TLSv1
-	#ca_certs = os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "app.crt")
-	#ssl_ctx.ca_certs = os.path.join("/home/martin/TFG/workspaces/deployer/cert/certs", "app.crt")
-	"""
 	#TODO Replace with SSLContext (this option is maintained for compatibility reasons)
 	httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
@@ -208,10 +199,4 @@ if __name__ == "__main__":
 
 	httpServer.listen(conf.DEPLOYER_PORT)
 	ioloop.IOLoop.instance().start()
-
-	"""Multicore:def main():
-	app = make_app()
-	server = tornado.httpserver.HTTPServer(app)
-	server.bind(8888)
-	server.start(0)  # forks one process per cpu
-	IOLoop.current().start()"""
+	#TODO consider multicore server

@@ -69,6 +69,8 @@ class TestLogout(AsyncTestCase):
 		
 		self.assertEqual(200, response.code)
 
+
+
 """from unittest.mock import MagicMock
 thing = ProductionClass()
 thing.method = MagicMock(return_value=3)
