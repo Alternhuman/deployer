@@ -29,7 +29,7 @@ from requests.adapters import HTTPAdapter
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 	"""
-	A middleware with avoids the verification of the SSL Hostname field.
+	A middleware that avoids the verification of the SSL Hostname field.
 	Due to the fact that the name of the client cannot be verified,
 	it is simply not checked
 	"""
@@ -66,14 +66,13 @@ class IndexHandler(BaseHandler):
 	"""
 	@web.addslash
 	def get(self):
-		print(self.get_secure_cookie("user"))
+		
 		if not self.current_user:
 			self.redirect("/login")
 		else:
 			user = tornado.escape.xhtml_escape(self.current_user)
 			self.render("templates/index.jade", user=user)
-			#self.render("templates/index.jade", logged=True, user="patata")
-
+			
 
 
 class LoginHandler(BaseHandler):
@@ -131,7 +130,7 @@ class UploadAndDeployHandler(BaseHandler):
 		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
 	@tornado.web.asynchronous
-	def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat=False):
+	def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat=""):
 		
 		
 		def get_content_type(filename):

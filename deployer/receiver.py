@@ -10,6 +10,7 @@ from shlex import split
 from subprocess import Popen
 import subprocess
 import pwd
+from tornado.gen import coroutine
 
 import sys
 sys.path.append(os.path.realpath(__file__))
@@ -23,7 +24,7 @@ class DeployHandler(RequestHandler):
 		command = self.get_argument('command', '')
 		idpolo = self.get_argument('idpolo', '')
 		tomcat = self.get_argument('tomcat', '')
-		#print(tomcat)
+		
 		if tomcat == '':
 			folder = self.get_argument('folder', '')
 		else:
@@ -44,7 +45,7 @@ class DeployHandler(RequestHandler):
 		
 		from concurrent import futures
 
-		@tornado.gen.coroutine
+		@coroutine
 		def call_execute():
 			yield thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat)
 			
