@@ -11,7 +11,6 @@ from subprocess import Popen
 import subprocess
 import pwd
 from tornado.gen import coroutine
-
 import sys
 sys.path.append(os.path.realpath(__file__))
 import conf
@@ -49,14 +48,13 @@ class DeployHandler(RequestHandler):
 		def call_execute():
 			yield thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat)
 			
-		thread_pool = futures.ThreadPoolExecutor(max_workers=1)
-		tornado.gen.Task(call_execute)
-
+		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
+		#yield tornado.gen.Task(call_execute)
+		thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat)
 		self.finish('OK')
 
 	@tornado.web.asynchronous
 	def execute(self, command, file_desc, filename, directory, user, tomcat=False):
-		
 		def demote(user_uid, user_gid):
 			os.setgid(user_gid)
 			os.setuid(user_uid)

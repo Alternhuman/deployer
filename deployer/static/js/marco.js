@@ -120,10 +120,12 @@ function handleFileUpload(files, obj) {
         if(!files[i].tomcat){
             files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
         }
+        
         var fd = new FormData();
         fd.append('file', files[i].file);
         fd.append('command', files[i].command);
         fd.append('folder', files[i].folder);
+        fd.append('tomcat', files[i].tomcat);
         
         var cadena = "";
         var ips = $(".chosen").children(".ip")
