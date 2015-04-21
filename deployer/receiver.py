@@ -22,9 +22,9 @@ class DeployHandler(RequestHandler):
 		
 		command = self.get_argument('command', '')
 		idpolo = self.get_argument('idpolo', '')
-		tomcat = self.get_argument('tomcat', False)
-		
-		if not tomcat:
+		tomcat = self.get_argument('tomcat', '')
+		#print(tomcat)
+		if tomcat == '':
 			folder = self.get_argument('folder', '')
 		else:
 			folder = conf.TOMCAT_PATH
@@ -59,8 +59,8 @@ class DeployHandler(RequestHandler):
 		def demote(user_uid, user_gid):
 			os.setgid(user_gid)
 			os.setuid(user_uid)
-
-		if os.path.exists(os.dirname(filename)):
+		print(filename)
+		if os.path.exists(os.path.dirname(filename)):
 			output_file = open(filename, 'wb')
 		else:
 			return

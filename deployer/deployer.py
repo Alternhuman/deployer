@@ -13,7 +13,7 @@ import random, string
 patch_tornado()
 
 import sys
-sys.path.append('/opt/marcopolo/')
+sys.path.append('/opt/marcopolo/') #Temporary
 
 from bindings.marco import marco
 from marco_conf.utils import Node
@@ -108,7 +108,7 @@ class UploadAndDeployHandler(BaseHandler):
 		
 		@tornado.gen.coroutine
 		def call_deploy(node):
-			yield thread_pool.submit(self.deploy, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''), user=self.current_user)
+			yield thread_pool.submit(self.deploy, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''), user=self.current_user, tomcat=self.get_argument('tomcat', ''))
 		
 		for node in nodes:
 			deployment = tornado.gen.Task(call_deploy, node)
