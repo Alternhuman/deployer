@@ -13,10 +13,11 @@ import random, string
 patch_tornado()
 
 import sys
-sys.path.append('/opt/marcopolo/') #Temporary
+sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
 
 from bindings.marco import marco
 from marco_conf.utils import Node
+import utils
 
 import json
 import requests, mimetypes
@@ -24,10 +25,14 @@ from tempfile import tempdir
 import tempfile
 import ssl, conf
 from requests.adapters import HTTPAdapter 
-import utils
 
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
+	"""
+	A middleware with avoids the verification of the SSL Hostname field.
+	Due to the fact that the name of the client cannot be verified,
+	it is simply not checked
+	"""
 	def cert_verify(self, conn, *args, **kwargs):
 		"""
 		Avoids the verification of the SSL Hostname field 
@@ -35,18 +40,25 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 		super().cert_verify(conn, *args, **kwargs)
 		conn.assert_hostname = False
 
+
 websession = requests.session()
 websession.mount('https://', NotCheckingHostnameHTTPAdapter()) # By changing the adapter no hostname is checked
 
+#Creation of the directory if it does not exists
 if not os.path.exists(conf.TMPDIR):
 	os.makedirs(conf.TMPDIR)
 
 __UPLOADS__ = conf.TMPDIR # tmp directory were files will be stored
 
 open_ws = set()
+
 class BaseHandler(tornado.web.RequestHandler):
-    def get_current_user(self):
-        return self.get_secure_cookie("user")
+
+	def get_current_user(self):
+		"""
+		Decrypts the secure cookie
+		"""
+		return self.get_secure_cookie("user")
 
 class IndexHandler(BaseHandler):
 	"""
@@ -75,9 +87,12 @@ class LoginHandler(BaseHandler):
 			self.render("templates/login.jade")
 
 	def post(self):
+
 		if utils.authenticate(self.get_argument("name"), self.get_argument("pass")):
 			self.set_secure_cookie("user", self.get_argument("name"))
-
+		else:
+			self.set_status(403)
+			self.finish("")
 		self.redirect("/")
 
 class Logout(BaseHandler):
