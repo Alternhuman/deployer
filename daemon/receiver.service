@@ -1,0 +1,18 @@
+[Unit]
+Description=A deployment utility
+Wants=polo.service
+Requires=polo.service
+After=polo.service
+
+[Service]
+
+ExecStart=/usr/bin/python3 /opt/deployer/receiver.py &> /dev/null
+ExecStop=/usr/bin/python3 /opt/deployer/daemon/receiverstop.py &> /dev/null
+
+Type=simple
+User=root
+Group=root
+PIDFile=/var/run/deployer/receiver.pid
+
+[Install]
+WantedBy=multi-user.target
