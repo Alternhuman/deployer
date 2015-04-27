@@ -11,8 +11,6 @@ import os, random, string, json, mimetypes, ssl, conf
 from tempfile import tempdir
 import tempfile
 
-
-
 import sys
 sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
 
@@ -25,6 +23,8 @@ from requests.adapters import HTTPAdapter
 
 patch_tornado() #Fix to allow pyjade to work with Tornado
 
+import signal
+from os import path, makedirs
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 	"""
@@ -42,6 +42,10 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 
 websession = requests.session()
 websession.mount('https://', NotCheckingHostnameHTTPAdapter()) # By changing the adapter no hostname is checked
+
+from requests_futures.sessions import FuturesSession
+futures_session = FuturesSession()
+futures_session.mount('https://', NotCheckingHostnameHTTPAdapter())
 
 #Creation of the directory if it does not exists
 if not os.path.exists(conf.TMPDIR):
@@ -99,11 +103,12 @@ class Logout(BaseHandler):
 		self.redirect("/")
 
 class UploadAndDeployHandler(BaseHandler):
+	from tornado.gen import engine
 	"""
 	Listens for POSTs requests and performs the deployment asynchronously
 	"""
 	@tornado.web.asynchronous #The post is asynchronous due to the potencially long deploying response time
-	@tornado.gen.engine
+	@engine
 	def post(self):
 		file1 = self.request.files['file'][0] #Only one file at a time
 
@@ -121,10 +126,24 @@ class UploadAndDeployHandler(BaseHandler):
 		
 		@tornado.gen.coroutine
 		def call_deploy(node):
-			yield thread_pool.submit(self.deploy, node=node, request=self, filename=original_fname, command=self.get_argument('command', ''), user=self.current_user, tomcat=self.get_argument('tomcat', ''))
+			yield thread_pool.submit(self.deploy, node=node,
+			 request=self, filename=original_fname, 
+			 command=self.get_argument('command', ''), 
+			 user=self.current_user, 
+			 folder=self.get_argument('folder',''),
+			 tomcat=self.get_argument('tomcat', ''))
 		
 		for node in nodes:
-			deployment = tornado.gen.Task(call_deploy, node)
+			future = self.deploy(node=node,
+			 request=self, 
+			 filename=original_fname, 
+			 command=self.get_argument('command', ''), 
+			 user=self.current_user, 
+			 folder=self.get_argument('folder',''),
+			 tomcat=self.get_argument('tomcat', ''))
+
+
+			#deployment = tornado.gen.Task(call_deploy, node)
 		
 		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
@@ -139,7 +158,7 @@ class UploadAndDeployHandler(BaseHandler):
 		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
 		commands = {'command':command, 'user':user, 'folder': folder, 'idpolo': idpolo, 'tomcat': tomcat}
 		
-		r = websession.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
+		return futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
 		
 class NodesHandler(websocket.WebSocketHandler):
 	"""
@@ -188,13 +207,22 @@ app = Application(routes, **settings)
 
 if __name__ == "__main__":
 	
+	pid = os.getpid()
+
+	if not os.path.exists('/var/run/deployer'):
+		makedirs('/var/run/deployer')
+
+	f = open(conf.PIDFILE_DEPLOYER, 'w')
+	f.write(str(pid))
+	f.close()
+
 	#TODO Replace with SSLContext (this option is maintained for compatibility reasons)
 	httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
         "keyfile": conf.APPKEY,
         "cert_reqs": ssl.CERT_OPTIONAL,
-        "ssl_version": ssl.PROTOCOL_TLSv1,
-        #"ca_certs": conf.RECEIVERCERT,
+        #"ssl_version": ssl.PROTOCOL_TLSv1,
+        "ca_certs": conf.RECEIVERCERT,
     })
 
 	httpServer.listen(conf.DEPLOYER_PORT)

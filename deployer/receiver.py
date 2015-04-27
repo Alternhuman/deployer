@@ -15,6 +15,9 @@ import sys
 sys.path.append(os.path.realpath(__file__))
 import conf
 
+import signal
+from os import path, makedirs
+
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
@@ -29,11 +32,11 @@ class DeployHandler(RequestHandler):
 		idpolo = self.get_argument('idpolo', '')
 		tomcat = self.get_argument('tomcat', '')
 		
-		if tomcat == '':
+		if not tomcat:
 			folder = self.get_argument('folder', '')
 		else:
 			folder = conf.TOMCAT_PATH
-		
+
 		fname = file1['filename']
 		
 		user = self.get_argument('user', '')
@@ -41,10 +44,9 @@ class DeployHandler(RequestHandler):
 		user_pwd = pwd.getpwnam(user)
 		
 		if folder == '':
-			folder = user_pwd.pw_dir
-				
+			folder = user_pwd.pw_dir	
 		final_directory = os.path.join(folder, fname)
-
+		print(folder)
 		
 		from concurrent import futures
 
@@ -63,7 +65,7 @@ class DeployHandler(RequestHandler):
 		def demote(user_uid, user_gid):
 			os.setgid(user_gid)
 			os.setuid(user_uid)
-		
+			
 		if os.path.exists(os.path.dirname(filename)):
 			output_file = open(filename, 'wb')
 		else:
@@ -77,8 +79,6 @@ class DeployHandler(RequestHandler):
 		if command is not "":
 			process = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			out, err = process.communicate()
-			print(out)
-			print(err)
 
 routes =  [(
 	r'/deploy', DeployHandler
@@ -93,10 +93,18 @@ app = Application(routes, **settings)
 if __name__ == "__main__":
 	import conf, ssl
 
+	pid = os.getpid()
+
+	if not os.path.exists('/var/run/deployer'):
+		makedirs('/var/run/deployer')
+
+	f = open(conf.PIDFILE_RECEIVER, 'w')
+	f.write(str(pid))
+	f.close()
+
 	httpServer = HTTPServer(app, ssl_options={
 		"certfile": conf.RECEIVERCERT,
 		"keyfile": conf.RECEIVERKEY,
-		"ssl_version": ssl.CERT_OPTIONAL,
 		"cert_reqs": ssl.CERT_OPTIONAL,
 		"ca_certs": conf.APPCERT,
 		})

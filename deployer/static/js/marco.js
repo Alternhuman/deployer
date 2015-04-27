@@ -111,13 +111,17 @@ function handleFileUpload(files, obj) {
     for (var i = 0; i < files.length; i++) {
 
         files[i].command = $(".upload-item").eq(i).find("input[name=command]").val();
-        files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
+        //files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
         files[i].polo = $(".upload-item").eq(i).find("input[name=polo]").is(':checked');
         if(files[i].polo){
             files[i].identifier = $(".upload-item").eq(i).find("input[name=idpolo").val();
         }
-        files[i].tomcat = $(".upload-item").eq(i).find("input[name=tomcat]").is(':checked');
-        if(!files[i].tomcat){
+        
+        if($(".upload-item").eq(i).find("input[name=tomcat]").is(':checked')){
+            files[i].tomcat = true
+            
+        }else{
+            files[i].tomcat = false      
             files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
         }
         
@@ -125,7 +129,8 @@ function handleFileUpload(files, obj) {
         fd.append('file', files[i].file);
         fd.append('command', files[i].command);
         fd.append('folder', files[i].folder);
-        fd.append('tomcat', files[i].tomcat);
+        if(files[i].tomcat === true)
+            fd.append('tomcat', files[i].tomcat);
         
         var cadena = "";
         var ips = $(".chosen").children(".ip")
