@@ -1,12 +1,11 @@
 [Unit]
 Description=A deployment utility
-Wants=polo.service
 Requires=polo.service
 After=polo.service
 
 [Service]
 
-ExecStart=/usr/bin/python3 /opt/deployer/deployer.py &> /dev/null
+ExecStart=/usr/bin/python3 /opt/deployer/deployer/deployer.py &> /dev/null
 ExecStop=/usr/bin/python3 /opt/deployer/daemon/deployerstop.py &> /dev/null
 
 Type=simple
