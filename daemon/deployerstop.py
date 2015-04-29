@@ -5,8 +5,11 @@ import os, signal
 
 PIDFILE = '/var/run/deployer/deployer.pid'
 
-f = open(PIDFILE, 'r')
-pid = f.read()
-f.close()
-kill(int(pid), signal.SIGTERM)
-os.remove(PIDFILE)
+try:
+	f = open(PIDFILE, 'r')
+	pid = f.read()
+	f.close()
+	kill(int(pid), signal.SIGTERM)
+	os.remove(PIDFILE)
+except FileNotFoundError:
+	pass #log incident

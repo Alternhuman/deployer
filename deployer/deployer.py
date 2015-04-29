@@ -92,10 +92,11 @@ class LoginHandler(BaseHandler):
 
 		if utils.authenticate(self.get_argument("name"), self.get_argument("pass")):
 			self.set_secure_cookie("user", self.get_argument("name"))
+			self.redirect("/")
 		else:
 			self.set_status(403)
+			print("Error")
 			self.finish("")
-		self.redirect("/")
 
 class Logout(BaseHandler):
 	def get(self):
