@@ -110,14 +110,14 @@
     background-color: rgba(0, 255, 0, 0.4);
 }
 
-.not-chosen{
+.chosen, .not-chosen{
     transition: background-color 1s;
 }
 
-.not-chosen:hover{
-    background-color: rgba(0, 255, 0, 0.4);
+.hostname, .ip{
+    font-weight: bold;
 }
 
-.hostname{
-    font-weight: bold;
+.alert.alert-success{
+    display:none;
 }

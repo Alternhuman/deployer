@@ -29,7 +29,7 @@ html
             
             li: a(href='/logout') 
               i.fa.fa-home
-              |  #{user}: Logout
+              |  #{user}: logout
           ul.nav.navbar-nav.navbar-right
             li: p.navbar-text 
               span#count 0
@@ -42,6 +42,9 @@ html
           div.col-sm-6
             div.row.col-sm-12
               div#dragandrophandler Drag and drop files here
+              div.alert.alert-success
+                p#status
+
             div.row.col-sm-12
               ul.list-group#list
                 //li.list-group-item.upload-item
@@ -68,22 +71,9 @@ html
   
           div.col-sm-6
             div.row#listanodos
-    //else
-      div.container
-        div.panel.panel-primary
-          div.panel-heading
-            h3.panel-title Login
-          div.row
-            div.col-sm-12
-              form(action="/login" method="post")
-                div.input-group
-                  span.input-group-addon Name
-                  input.form-control(type="text" name="name")
-                div.input-group
-                  span.input-group-addon Pass
-                  input.form-control(type="text" name="pass")
-                input.btn.btn-primary(type="submit" value="Sign in")
-
+              div#wait(width="20%", style="display:block;margin-left:auto;margin-right:auto;")
+                img(width="20%", style="display:block;margin-left:auto;margin-right:auto;", src="{{ static_url('img/wait.gif') }}")
+                p(width="20%", style="text-align:center;display:block;margin-left:auto;margin-right:auto;") Buscando nodos
     
 
 

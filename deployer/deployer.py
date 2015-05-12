@@ -21,7 +21,7 @@ import utils
 import requests
 from requests.adapters import HTTPAdapter 
 
-patch_tornado() #Fix to allow pyjade to work with Tornado
+patch_tornado() #Allows pyjade to work with Tornado
 
 import signal
 from os import path, makedirs
@@ -29,7 +29,7 @@ from os import path, makedirs
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 	"""
 	A middleware that avoids the verification of the SSL Hostname field.
-	Due to the fact that the name of the client cannot be verified,
+	Since the name of the client cannot be verified,
 	it is simply not checked
 	"""
 	def cert_verify(self, conn, *args, **kwargs):
@@ -47,7 +47,7 @@ from requests_futures.sessions import FuturesSession
 futures_session = FuturesSession()
 futures_session.mount('https://', NotCheckingHostnameHTTPAdapter())
 
-#Creation of the directory if it does not exists
+#Creation of the temporal directory if it does not exists
 if not os.path.exists(conf.TMPDIR):
 	os.makedirs(conf.TMPDIR)
 
@@ -55,6 +55,7 @@ __UPLOADS__ = conf.TMPDIR # tmp directory were files will be stored
 
 open_ws = set()
 
+#TODO
 class BaseHandler(tornado.web.RequestHandler):
 
 	def get_current_user(self):
@@ -67,7 +68,7 @@ class IndexHandler(BaseHandler):
 	"""
 	In charge of handling GET requests. Provides the client with the necessary .html/css/js
 	"""
-	@web.addslash
+	@web.addslash #Appends a '/'
 	def get(self):
 		
 		if not self.current_user:
@@ -80,7 +81,7 @@ class IndexHandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
 	"""
-	Handles login authentication through cookies
+	Handles login authentication through secure cookies and PAM
 	"""
 	def get(self):
 		if self.current_user:
@@ -94,11 +95,13 @@ class LoginHandler(BaseHandler):
 			self.set_secure_cookie("user", self.get_argument("name"))
 			self.redirect("/")
 		else:
-			self.set_status(403)
-			print("Error")
+			self.set_status(403) #TODO
 			self.finish("")
 
 class Logout(BaseHandler):
+	"""
+	Removes the secure cookie
+	"""
 	def get(self):
 		self.clear_cookie("user")
 		self.redirect("/")
@@ -106,9 +109,9 @@ class Logout(BaseHandler):
 class UploadAndDeployHandler(BaseHandler):
 	from tornado.gen import engine
 	"""
-	Listens for POSTs requests and performs the deployment asynchronously
+	Listens for POST requests and performs the deployment asynchronously
 	"""
-	@tornado.web.asynchronous #The post is asynchronous due to the potencially long deploying response time
+	@tornado.web.asynchronous #The post is asynchronous due to the potencially long deploying time
 	@engine
 	def post(self):
 		file1 = self.request.files['file'][0] #Only one file at a time
@@ -118,12 +121,15 @@ class UploadAndDeployHandler(BaseHandler):
 		output_file = open(os.path.join(__UPLOADS__, original_fname), 'wb')
 		output_file.write(file1['body'])
 		output_file.close()
-		# The nodes are returned as a comma-separated string
-		nodes = self.get_argument('nodes', '').split(',')[:-1] 
+		
+		# The nodes where to deploy are returned as a comma-separated string
+		nodes = self.get_argument('nodes', '').split(',')[:-1] #TODO: no final comma
 		from concurrent import futures
 		
 		#The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
 		thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
+		
+		#print("Print" + self.get_argument('overwrite', False));
 		
 		@tornado.gen.coroutine
 		def call_deploy(node):
@@ -132,7 +138,8 @@ class UploadAndDeployHandler(BaseHandler):
 			 command=self.get_argument('command', ''), 
 			 user=self.current_user, 
 			 folder=self.get_argument('folder',''),
-			 tomcat=self.get_argument('tomcat', ''))
+			 tomcat=self.get_argument('tomcat', ''),
+			 overwrite=self.get_argument('overwrite', 'false'))
 		
 		for node in nodes:
 			future = self.deploy(node=node,
@@ -141,7 +148,8 @@ class UploadAndDeployHandler(BaseHandler):
 			 command=self.get_argument('command', ''), 
 			 user=self.current_user, 
 			 folder=self.get_argument('folder',''),
-			 tomcat=self.get_argument('tomcat', ''))
+			 tomcat=self.get_argument('tomcat', ''),
+			 overwrite=self.get_argument('overwrite', 'false'))
 
 
 			#deployment = tornado.gen.Task(call_deploy, node)
@@ -149,15 +157,20 @@ class UploadAndDeployHandler(BaseHandler):
 		self.finish("file" + original_fname + " is uploaded and on deploy")
 	
 	@tornado.web.asynchronous
-	def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat=""):
-		
+	def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat="", overwrite='false'):
 		
 		def get_content_type(filename):
 			return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
 		url = "https://"+node+":"+str(conf.RECEIVER_PORT)+"/deploy"
 		files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
-		commands = {'command':command, 'user':user, 'folder': folder, 'idpolo': idpolo, 'tomcat': tomcat}
+		commands = {'command':command, 
+					'user':user, 
+					'folder': folder, 
+					'idpolo': idpolo, 
+					'tomcat': tomcat,
+					'overwrite':overwrite
+					}
 		
 		return futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
 		
@@ -165,7 +178,7 @@ class NodesHandler(websocket.WebSocketHandler):
 	"""
 	Handler for the Polo websocket connection
 	"""
-	#polo will have events to notify of new nodes. New crazy idea...
+	#TODO: polo will have events to notify of new nodes. New crazy idea...
 	def check_origin(self, origin):
 		return True
 
@@ -221,11 +234,9 @@ if __name__ == "__main__":
 	httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
         "keyfile": conf.APPKEY,
-        "cert_reqs": ssl.CERT_OPTIONAL,
-        #"ssl_version": ssl.PROTOCOL_TLSv1,
-        "ca_certs": conf.RECEIVERCERT,
     })
 
 	httpServer.listen(conf.DEPLOYER_PORT)
+	print("Serving on port %d" % conf.DEPLOYER_PORT)
 	ioloop.IOLoop.instance().start()
 	#TODO consider multicore server

@@ -2,8 +2,8 @@
 
 function nodo(info){
     var cadena = "<div class='node not-chosen'>";
-    cadena += "<p class='hostname'>Hostname</p>"
     cadena += "<p class='ip'>"+info+"</p>";
+    cadena += "<input class='deploy' type='checkbox'></input>"
     cadena += "</div>";
     return cadena;
 }
@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     ws.onmessage = function(evt) {
         var parsed_data = JSON.parse(evt.data)
-
+        $("#listanodos").html("");
         if (parsed_data["Nodes"]) {
             $("#count").html(parsed_data["Nodes"].length);
 
@@ -27,8 +27,12 @@ $(document).ready(function() {
         } 
     };
 
-    $("#listanodos").delegate('.node','click', function(){
+    /*$("#listanodos").delegate('.node','click', function(){
         $(this).toggleClass("chosen").toggleClass("not-chosen");
+    });*/
+
+    $("#listanodos").on('click', "input[type=checkbox]", function(){
+        console.log($(this).closest(".node").toggleClass("chosen").toggleClass("not-chosen"));
     });
     
     $("#list").delegate('.delete-buton', 'click', function(){
@@ -91,9 +95,13 @@ function sendFileToServer(formData, status) {
         processData: false,
         cache: false,
         data: formData,
+        beforeSend:function(data){
+            $(".alert.alert-success").hide();
+        },
         success: function(data) {
             status.setProgress(100);
-            $("#list").append("File upload Done<br>");
+            $(".alert.alert-success").show();
+            $(".alert.alert-success").text("File upload done");
         }
     });
 }
@@ -124,6 +132,10 @@ function handleFileUpload(files, obj) {
             files[i].tomcat = false      
             files[i].folder = $(".upload-item").eq(i).find("input[name=folder]").val();
         }
+
+        
+        files[i].overwrite = $(".upload-item").eq(i).find("input[name=overwrite]").is(':checked');
+        
         
         var fd = new FormData();
         fd.append('file', files[i].file);
@@ -131,7 +143,7 @@ function handleFileUpload(files, obj) {
         fd.append('folder', files[i].folder);
         if(files[i].tomcat === true)
             fd.append('tomcat', files[i].tomcat);
-        
+        fd.append('overwrite', files[i].overwrite);
         var cadena = "";
         var ips = $(".chosen").children(".ip")
         
@@ -154,8 +166,8 @@ function addToList(file){
     var other= '<li class="list-group-item upload-item"><button style="width:10%;" class="btn btn-danger delete-buton pull-right"><div class="glyphicon glyphicon-remove"></div></button>'
     var header_filename = '<p class="list-group-item-header">'+filename+'</p><div style="width:85%;" class="progress"><div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;" class="progress-bar"></div></div>'
     var buttons = '<input type="text" name="command" placeholder="Command" maxlength="300"/><br/><input type="text" placeholder="Deployment folder" name="folder" maxlength="300"/><br/><label list-group-item-text="list-group-item-text" for="polo">Deploy in Polo?</label><input type="checkbox" value="polo" name="polo"/><input type="text" name="idpolo" placeholder="Identifier" maxlength="40" disabled="true"/><p class="alert alert-warning polo" style="display:none;">The service will be registered permanently. Use the language-specific binding to perform a temporary registry on execution time.</p>'
-    var labels = '<br></br><label list-group-item-text="list-group-item-text" for="tomcat">Deploy in Tomcat?</label><input type="checkbox" value="tomcat" name="tomcat"/><p class="alert alert-warning warning" style="display:none;">The service will be installed on the Tomcat deployment directory after validating the format of the archive. If no instance of Tomcat is installed on the server, it won\'t be installed.</p></li>'
-
+    var labels = '<br></br><label list-group-item-text="list-group-item-text" for="tomcat">Deploy in Tomcat?</label><input type="checkbox" value="tomcat" name="tomcat"/><p class="alert alert-warning warning" style="display:none;">The service will be installed on the Tomcat deployment directory after validating the format of the archive. If no instance of Tomcat is installed on the server, it won\'t be installed.</p>'
+    labels += '<br></br><label list-group-item-text="list-group-item-text" for="overwrite">Overwrite file if it exists?</label><input type="checkbox" value="overwrite" name="overwrite" checked/></li>'
     var str = "<li class='list-group-item upload-item'>"
     str += '<p class="list-group-item-header">'+filename+'</p>';
     str += '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">0%</div></div>'
