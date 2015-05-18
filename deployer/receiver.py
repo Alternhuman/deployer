@@ -100,15 +100,39 @@ class DeployHandler(RequestHandler):
 			process = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			out, err = process.communicate()
 
-routes =  [(
-	r'/deploy', DeployHandler
-	)]
+from asynclogger import ExecuteCommand
+from tornado.websocket import WebSocketHandler
 
+opensockets={}
 settings = {
 	"debug": True,
 	"static_path": os.path.join(os.path.dirname(__file__), "static"),
+	"cookie_secret": "2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
 }
+class LoggerHandler(WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+	def open(self):
+		print("Open")
+		self.write_message("Hola")
+
+	def on_message(self, message):
+		print("The cookie is" + message)
+		from tornado.web import decode_signed_value
+		user_id = decode_signed_value(settings["cookie_secret"], 'user', message)
+		print("The user_id is "+user_id.decode('utf-8'))
+
+routes =  [
+	(r'/deploy', DeployHandler),
+	
+]
+
+
 app = Application(routes, **settings)
+class IndexHandler2(RequestHandler):
+	def get(self):
+		self.write("HOla")
+wsapp = Application([(r'/', IndexHandler2),(r'/ws/', LoggerHandler)], **settings);
 
 if __name__ == "__main__":
 	import conf, ssl
@@ -130,6 +154,9 @@ if __name__ == "__main__":
 		})
 
 	httpServer.listen(conf.RECEIVER_PORT)
-	
+
+	wsapp.listen(1370, ssl_options={"certfile": conf.APPCERT,
+        "keyfile": conf.APPKEY})
+
 	print("Starting receiver on port %d" % conf.RECEIVER_PORT)
 	ioloop.IOLoop.instance().start()
