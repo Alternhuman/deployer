@@ -31,6 +31,7 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 	A middleware that avoids the verification of the SSL Hostname field.
 	Since the name of the client cannot be verified,
 	it is simply not checked
+	From Juan Luis Boya
 	"""
 	def cert_verify(self, conn, *args, **kwargs):
 		"""
@@ -186,7 +187,7 @@ class NodesHandler(websocket.WebSocketHandler):
 		open_ws.add(self)
 		m = marco.Marco()
 		try:
-			nodes = m.request_for("deployer")
+			nodes = m.request_for("marco-bootstrap-slave")
 			self.write_message(json.dumps({"Nodes":[n.address[0] for n in nodes]}))
 		except marco.MarcoTimeOutException:
 			self.write_message(json.dumps({"Error": "Error in marco detection"}))
