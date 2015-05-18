@@ -1,9 +1,21 @@
-/*var ws;
-function createSocket(){
+var connectedSockets = []
+
+var ws;
+function createSocket(url){
+    console.log(url);
+    if(connectedSockets.indexOf(url) > -1){
+        return;
+    }
+
+    connectedSockets.push(url);
+
     var loc = window.location;
     var uri = loc.protocol == "https:" ? "wss:" : "ws:";
     uri += "//" + "localhost:1370" + "/ws/";
+
+    uri = "wss://"+url+":1370/ws/"
     ws = new WebSocket("wss://localhost:1370/ws/");
+
 
     ws.onmessage = function(evt) {
         console.log(evt.data) 
@@ -12,7 +24,7 @@ function createSocket(){
     ws.onopen=function(evt){
         ws.send($.cookie("user"));
     }
-}*/
+}
 
 var tabs = [];
 
@@ -60,7 +72,8 @@ function parseTabs() {
     $("ul.nav-tabs").each(function() {
 
         var $active, $content, $links = $(this).find('a');
-
+        if($active == undefined)
+            return;
         // If the location.hash matches one of the links, use that as the active tab.
         // If no match is found, use the first link as the initial active tab.
         $active = $($links.filter('[href="' + location.hash + '"]')[0] || $links[0]);
@@ -99,7 +112,7 @@ function parseTabs() {
 
 $(document).ready(function(){
     parseTabs();
-    createTabs('172.20.1.1');
+    /*createTabs('172.20.1.1');
     createTabs('172.20.1.2');
 
     for (var i = 5 - 1; i >= 0; i--) {
@@ -114,5 +127,5 @@ $(document).ready(function(){
         window.setTimeout(append, 2000);
     };
 
-    window.setTimeout(append, 500);
+    window.setTimeout(append, 500);*/
 });

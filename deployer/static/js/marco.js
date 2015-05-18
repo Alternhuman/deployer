@@ -150,6 +150,7 @@ function handleFileUpload(files, obj) {
         if(ips.length > 0){
             ips.each(function(index){
                 cadena += $(this).html() + ",";
+                createSocket($(this).html());
             });
             fd.append('nodes', cadena);
             var status = new createStatusbar($(".progress-bar").eq(i));

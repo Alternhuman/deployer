@@ -28,6 +28,21 @@ import sys
 from asynclogger import ExecuteCommand
 from tornado.websocket import WebSocketHandler
 import json
+
+import socket
+import string
+import hashlib
+
+if int(sys.version[0]) < 3:
+	import urlparse
+else:
+	import urllib.parse as urlparse
+ip = ""
+def getip(protocol, host):
+	hostname = urlparse.urlparse("%s://%s" % (protocol, host)).hostname
+	ip_address = socket.gethostbyname(hostname)
+	return ip_address
+
 opensockets={}
 
 io_loop = ioloop.IOLoop.instance()
@@ -48,6 +63,12 @@ class ProcessReactor(object):
 	def __init__(self, user, directory, *args, **kwargs):
 		self.user = user
 		self.command = ' '.join(*args)
+		self.ip = ip
+		def randomString():
+			import random
+			return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(3))
+
+		self.identifier = "AAA"#int(hashlib.sha1(self.command+randomString()).hexdigest(), 16) % (10 ** 8)
 		self.opensockets  =opensockets
 		kwargs['stdout'] = subprocess.PIPE
 		print(args)
@@ -85,7 +106,7 @@ class ProcessReactor(object):
 	def on_line(self, line):
 		print(self.user.pw_name)
 		for ws in self.opensockets[self.user.pw_name]:
-			ws.on_line(self.user.pw_name, self.command, line)
+			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier)
 
 
 class ExecuteCommand():
@@ -184,7 +205,8 @@ class LoggerHandler(WebSocketHandler):
 		return True
 	
 	def open(self):
-		self.write_message("Hola")
+		global ip
+		ip = getip(self.request.protocol, self.request.host)
 
 	def on_message(self, message):
 		from tornado.web import decode_signed_value
@@ -195,12 +217,14 @@ class LoggerHandler(WebSocketHandler):
 				opensockets[user_id] = []
 			opensockets[user_id].append(self)
 
-	def on_line(self, user, command, message):
+	def on_line(self, user, command, message, ip, identifier):
 		print("on_line")
 		msg = {}
 		msg["user"] = user
 		msg["command"] = command
 		msg["message"] = message
+		msg["ip"] = ip
+		msg["identifier"] = identifier
 		self.write_message(json.dumps(msg))
 
 	def on_close(self):
