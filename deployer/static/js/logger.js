@@ -1,12 +1,13 @@
 var connectedSockets = []
 
 var ws;
-function createSocket(url){
+function createSocket(url, callback){
     console.log(url);
     if(connectedSockets.indexOf(url) > -1){
+        console.log("Returning")
         return;
     }
-
+    console.log("Creating socket");
     connectedSockets.push(url);
 
     var loc = window.location;
@@ -16,20 +17,25 @@ function createSocket(url){
     uri = "wss://"+url+":1370/ws/"
     ws = new WebSocket("wss://localhost:1370/ws/");
 
-
     ws.onmessage = function(evt) {
-        console.log(evt.data) 
+        var msg = JSON.parse(evt.data);
+        if($("#"+msg.identifier).length < 1){
+            createOutput(msg.ip, msg.identifier, msg.command);
+        }
+        addOutput(msg.ip, msg.identifier, msg.message);
     };
     console.log($.cookie("user"));
     ws.onopen=function(evt){
         ws.send($.cookie("user"));
-    }
+        console.log("Calling callback");
+        callback();
+    };
 }
 
 var tabs = [];
 
 function createTabs(host){
-    var identifier = "tab"+(Object.keys(tabs).length+4);
+    var identifier = "tab"+(Object.keys(tabs).length);
     $("ul.nav-tabs").append("<li><a href='#"+identifier+"'>"+host+"</a></li>");
 
     $("#window").append("<div id='"+identifier+"' style='display:none'></div>");
@@ -72,12 +78,15 @@ function parseTabs() {
     $("ul.nav-tabs").each(function() {
 
         var $active, $content, $links = $(this).find('a');
-        if($active == undefined)
-            return;
+
         // If the location.hash matches one of the links, use that as the active tab.
         // If no match is found, use the first link as the initial active tab.
         $active = $($links.filter('[href="' + location.hash + '"]')[0] || $links[0]);
-        $active.addClass('active');
+        /*if($active == undefined){
+            console.log("Returning");
+            return;
+        }*/
+        //$active.addClass('active');
 
         $content = $($active[0].hash);
 
@@ -86,10 +95,14 @@ function parseTabs() {
             $(this.hash).hide();
         });
 
+        $links.each(function(){
+            $(this.hash).hide();
+        });
+
         $(this).unbind('click');
         // Bind the click event handler
         $(this).on('click', 'a', function(e) {
-            //console.log("Clicked");
+            console.log("Clicked");
             $("ul.nav-tabs li.active").removeClass('active');
             $(this).closest('li').addClass('active');
             // Make the old tab inactive.

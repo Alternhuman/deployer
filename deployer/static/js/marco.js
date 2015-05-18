@@ -149,12 +149,21 @@ function handleFileUpload(files, obj) {
         
         if(ips.length > 0){
             ips.each(function(index){
+                console.log(index, ips.length)
                 cadena += $(this).html() + ",";
-                createSocket($(this).html());
+                var ip = $(this).html();
+                createSocket(ip, function(){
+                    console.log("Callback called");
+                    if(index >= ips.length - 1){
+                        console.log("Inside")
+                        fd.append('nodes', cadena);
+                        var status = new createStatusbar($(".progress-bar").eq(i));
+                        createTabs(ip);
+                        sendFileToServer(fd, status);
+                    }
+                });
             });
-            fd.append('nodes', cadena);
-            var status = new createStatusbar($(".progress-bar").eq(i));
-            sendFileToServer(fd, status);
+            
         }
     }
 }

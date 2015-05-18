@@ -39,8 +39,10 @@ else:
 	import urllib.parse as urlparse
 ip = ""
 def getip(protocol, host):
+	print(host)
 	hostname = urlparse.urlparse("%s://%s" % (protocol, host)).hostname
 	ip_address = socket.gethostbyname(hostname)
+	return "192.168.1.133"
 	return ip_address
 
 opensockets={}
@@ -69,9 +71,9 @@ class ProcessReactor(object):
 			return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(3))
 
 		self.identifier = "AAA"#int(hashlib.sha1(self.command+randomString()).hexdigest(), 16) % (10 ** 8)
-		self.opensockets  =opensockets
+		self.opensockets  = opensockets
 		kwargs['stdout'] = subprocess.PIPE
-		print(args)
+		#print(args)
 		def demote(uid, gid):
 			os.setgid(gid)
 			os.setuid(uid)
@@ -88,15 +90,15 @@ class ProcessReactor(object):
 
 	def can_read(self, fd, events):
 		data = self.process.stdout.read(1024)
-		print(data)
+		#print(data)
 		self.on_data(data)
 		if len(data) > 0:
 			self.on_data(data)
 
 		else:
-			print("Lost connection to subprocess")
+			#print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
-			print("Stopping")
+			#print("Stopping")
 			#sys.exit(1)
 
 	def on_data(self, data):
@@ -104,7 +106,7 @@ class ProcessReactor(object):
 			self.on_line(line.decode('utf-8'))
 
 	def on_line(self, line):
-		print(self.user.pw_name)
+		#print(self.user.pw_name)
 		for ws in self.opensockets[self.user.pw_name]:
 			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier)
 
@@ -150,13 +152,13 @@ class DeployHandler(RequestHandler):
 
 
 		final_directory = os.path.join(folder, fname)
-		print(final_directory)
+		#print(final_directory)
 		
 		overwrite = self.get_argument('overwrite', 'false')
-		print(overwrite)
+		#print(overwrite)
 		overwrite = False if overwrite.lower() == 'false' else True;
 
-		print("Overwrite: " + str(overwrite))
+		#print("Overwrite: " + str(overwrite))
 		from concurrent import futures
 
 		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
@@ -168,10 +170,11 @@ class DeployHandler(RequestHandler):
 	def execute(self, command, file_desc, filename, directory, user, tomcat=False, overwrite="false"):
 		
 		if os.path.isfile(filename) and not overwrite:
-			print("File already exists and cannot overwrite")
+			#print("File already exists and cannot overwrite")
 			return
 		else:
-			print("Overwriting all the things!")
+			#print("Overwriting all the things!")
+			pass
 		def demote(user_uid, user_gid):
 			os.setgid(user_gid)
 			os.setuid(user_uid)
@@ -179,7 +182,7 @@ class DeployHandler(RequestHandler):
 		if os.path.exists(os.path.dirname(filename)):
 			output_file = open(filename, 'wb')
 		else:
-			print("Path does not exist")
+			#print("Path does not exist")
 			return
 
 		output_file.write(file_desc['body'])
@@ -211,14 +214,15 @@ class LoggerHandler(WebSocketHandler):
 	def on_message(self, message):
 		from tornado.web import decode_signed_value
 		user_id = decode_signed_value(settings["cookie_secret"], 'user', message).decode('utf-8')
-		print(user_id)
+		#print(user_id)
 		if not user_id is None:
 			if opensockets.get(user_id) is None:
 				opensockets[user_id] = []
 			opensockets[user_id].append(self)
+			print("Opening socket")
 
 	def on_line(self, user, command, message, ip, identifier):
-		print("on_line")
+		#print("on_line")
 		msg = {}
 		msg["user"] = user
 		msg["command"] = command
@@ -269,6 +273,6 @@ if __name__ == "__main__":
 	wsapp.listen(1370, ssl_options={"certfile": conf.APPCERT,
         "keyfile": conf.APPKEY})
 
-	print("Starting receiver on port %d" % conf.RECEIVER_PORT)
+	#print("Starting receiver on port %d" % conf.RECEIVER_PORT)
 	
 	io_loop.start()
