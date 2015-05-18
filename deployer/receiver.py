@@ -18,6 +18,81 @@ import conf
 import signal
 from os import path, makedirs
 
+from tornado.web import RequestHandler, Application, StaticFileHandler
+from tornado import ioloop
+from tornado.websocket import WebSocketHandler
+import subprocess
+import fcntl
+import os
+import sys
+from asynclogger import ExecuteCommand
+from tornado.websocket import WebSocketHandler
+import json
+opensockets={}
+
+io_loop = ioloop.IOLoop.instance()
+
+class LineBuffer(object):
+	def __init__(self):
+		self.buffer = b''
+
+	def read_lines(self, input):
+		while b'\n' in input:
+			before, after = input.split(b'\n', 1)
+			yield self.buffer + before
+			self.buffer = b''
+			input = after
+		self.buffer += input
+
+class ProcessReactor(object):
+	def __init__(self, user, directory, *args, **kwargs):
+		self.user = user
+		self.command = ' '.join(*args)
+		self.opensockets  =opensockets
+		kwargs['stdout'] = subprocess.PIPE
+		print(args)
+		def demote(uid, gid):
+			os.setgid(gid)
+			os.setuid(uid)
+
+		self.process = subprocess.Popen(preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, *args, **kwargs)
+		
+		self.fd = self.process.stdout.fileno()
+		fl = fcntl.fcntl(self.fd, fcntl.F_GETFL)
+		fcntl.fcntl(self.fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
+		io_loop.add_handler(self.process.stdout, self.can_read, io_loop.READ)
+
+		self.line_buffer = LineBuffer()
+
+	def can_read(self, fd, events):
+		data = self.process.stdout.read(1024)
+		print(data)
+		self.on_data(data)
+		if len(data) > 0:
+			self.on_data(data)
+
+		else:
+			print("Lost connection to subprocess")
+			io_loop.remove_handler(self.process.stdout)
+			print("Stopping")
+			#sys.exit(1)
+
+	def on_data(self, data):
+		for line in self.line_buffer.read_lines(data):
+			self.on_line(line.decode('utf-8'))
+
+	def on_line(self, line):
+		print(self.user.pw_name)
+		for ws in self.opensockets[self.user.pw_name]:
+			ws.on_line(self.user.pw_name, self.command, line)
+
+
+class ExecuteCommand():
+	def __init__(self, user, ioloop, opensockets):
+		self.user = user.pw_name
+		self.processreactor = ProcessReactor(user, ioloop, opensockets, ['cat', 'lines.txt'])
+
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
 	def post(self):
@@ -63,10 +138,6 @@ class DeployHandler(RequestHandler):
 		print("Overwrite: " + str(overwrite))
 		from concurrent import futures
 
-		@coroutine
-		def call_execute():
-			yield thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
-			
 		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
 		thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
 		
@@ -97,13 +168,11 @@ class DeployHandler(RequestHandler):
 			os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
 		output_file.close()
 		if command is not "":
-			process = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			out, err = process.communicate()
+			p = ProcessReactor(user, directory, split(command))
+			#process = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			#out, err = process.communicate()
 
-from asynclogger import ExecuteCommand
-from tornado.websocket import WebSocketHandler
 
-opensockets={}
 settings = {
 	"debug": True,
 	"static_path": os.path.join(os.path.dirname(__file__), "static"),
@@ -119,11 +188,20 @@ class LoggerHandler(WebSocketHandler):
 
 	def on_message(self, message):
 		from tornado.web import decode_signed_value
-		user_id = decode_signed_value(settings["cookie_secret"], 'user', message)
+		user_id = decode_signed_value(settings["cookie_secret"], 'user', message).decode('utf-8')
+		print(user_id)
 		if not user_id is None:
 			if opensockets.get(user_id) is None:
 				opensockets[user_id] = []
 			opensockets[user_id].append(self)
+
+	def on_line(self, user, command, message):
+		print("on_line")
+		msg = {}
+		msg["user"] = user
+		msg["command"] = command
+		msg["message"] = message
+		self.write_message(json.dumps(msg))
 
 	def on_close(self):
 		success = False
@@ -168,4 +246,5 @@ if __name__ == "__main__":
         "keyfile": conf.APPKEY})
 
 	print("Starting receiver on port %d" % conf.RECEIVER_PORT)
-	ioloop.IOLoop.instance().start()
+	
+	io_loop.start()
