@@ -121,3 +121,9 @@
 .alert.alert-success{
     display:none;
 }
+
+.output{
+    overflow-y: scroll;
+    height: 200px;
+    max-height: 200px;
+}

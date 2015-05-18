@@ -29,7 +29,7 @@ function createTabs(host){
 function createOutput(host, identifier, command){
     $tab = tabs[host];
     //console.log($tab);
-    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-default'><div class='panel-heading'>"+command+"</div><div class='panel-body'></div></div></div>");
+    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-default'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
 
 }
 //TODO: http://stackoverflow.com/a/12034334/2628463
@@ -108,5 +108,11 @@ $(document).ready(function(){
 
     addOutput('172.20.1.2', 'abc2', 'hola');
     addOutput('172.20.1.2', 'abc2', 'hola2');
-        
+    
+    function append(){
+        addOutput('172.20.1.2', 'abc2', 'hola2');
+        window.setTimeout(append, 2000);
+    };
+
+    window.setTimeout(append, 500);
 });
