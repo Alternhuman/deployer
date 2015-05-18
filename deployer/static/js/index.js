@@ -1,19 +1,3 @@
-var ws;
-function createSocket(){
-    var loc = window.location;
-    var uri = loc.protocol == "https:" ? "wss:" : "ws:";
-    uri += "//" + "localhost:1370" + "/ws/";
-    ws = new WebSocket("wss://localhost:1370/ws/");
-
-    ws.onmessage = function(evt) {
-        console.log(evt.data) 
-    };
-    console.log($.cookie("user"));
-    ws.onopen=function(evt){
-        ws.send($.cookie("user"));
-    }
-}
-
 $(document).ready(function() {
     $("ul.tabs").each(function() {
         var $active, $content, $links = $(this).find('a');
@@ -49,5 +33,5 @@ $(document).ready(function() {
         });
     });
 
-	createSocket();
+	//createSocket();
 });

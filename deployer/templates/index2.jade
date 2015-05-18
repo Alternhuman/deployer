@@ -40,4 +40,50 @@ block content
               img(width="20%", style="display:block;margin-left:auto;margin-right:auto;", src="{{ static_url('img/wait.gif') }}")
               p(width="20%", style="text-align:center;display:block;margin-left:auto;margin-right:auto;") Buscando nodos
   div.page#logger
-    p Hola
+    div.container
+      div.row#window
+        ul.nav.nav-tabs
+          li.active
+            a(href="#tab1").active 172.20.1.1
+          li
+            a(href="#tab2") 172.20.1.2
+          li
+            a(href="#tab3") 172.20.1.3
+
+        div#tab1
+          div.col-xs-6
+            div.panel.panel-default
+              div.panel-heading
+                p Proceso cat -c
+              div.panel-body
+                p Panel body
+
+          div.col-xs-6
+            div.panel.panel-primary
+              div.panel-heading
+                p Proceso cat -c
+              div.panel-body
+                p Panel body
+          div.col-xs-6
+            div.panel.panel-primary
+              div.panel-heading
+                p Proceso cat -c
+              div.panel-body
+                p Panel body
+          div.col-xs-6
+            div.panel.panel-primary
+              div.panel-heading
+                p Proceso cat -c
+              div.panel-body
+                p Panel body
+          div.col-xs-6
+            div.panel.panel-primary
+              div.panel-heading
+                p Proceso cat -c
+              div.panel-body
+                p Panel body
+        div#tab2
+          p 2
+        div#tab3
+          p 3
+        
