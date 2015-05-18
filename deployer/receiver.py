@@ -109,22 +109,30 @@ settings = {
 	"static_path": os.path.join(os.path.dirname(__file__), "static"),
 	"cookie_secret": "2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
 }
+
 class LoggerHandler(WebSocketHandler):
 	def check_origin(self, origin):
 		return True
+	
 	def open(self):
-		print("Open")
 		self.write_message("Hola")
 
 	def on_message(self, message):
-		print("The cookie is" + message)
 		from tornado.web import decode_signed_value
 		user_id = decode_signed_value(settings["cookie_secret"], 'user', message)
-		print("The user_id is "+user_id.decode('utf-8'))
+		if not user_id is None:
+			if opensockets.get(user_id) is None:
+				opensockets[user_id] = []
+			opensockets[user_id].append(self)
+
+	def on_close(self):
+		success = False
+		for ws in opensockets:
+			if self in opensockets[ws]:
+				opensockets[ws].remove(self)
 
 routes =  [
 	(r'/deploy', DeployHandler),
-	
 ]
 
 
@@ -132,6 +140,7 @@ app = Application(routes, **settings)
 class IndexHandler2(RequestHandler):
 	def get(self):
 		self.write("HOla")
+
 wsapp = Application([(r'/', IndexHandler2),(r'/ws/', LoggerHandler)], **settings);
 
 if __name__ == "__main__":
