@@ -234,8 +234,8 @@ if __name__ == "__main__":
 	
 	pid = os.getpid()
 
-	if not os.path.exists('/var/run/deployer'):
-		makedirs('/var/run/deployer')
+	if not os.path.exists('/var/run/marcopolo'):
+		makedirs('/var/run/marcopolo')
 
 	f = open(conf.PIDFILE_DEPLOYER, 'w')
 	f.write(str(pid))
