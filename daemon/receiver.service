@@ -5,13 +5,13 @@ After=polo.service
 
 [Service]
 
-ExecStart=/usr/bin/python3 /opt/deployer/deployer/receiver.py &> /dev/null
-ExecStop=/usr/bin/python3 /opt/deployer/daemon/receiverstop.py &> /dev/null
+ExecStart=/opt/deployer/deployer/receiver.py &> /dev/null
+ExecStop=/opt/deployer/daemon/receiverstop.py &> /dev/null
 
 Type=simple
 User=root
 Group=root
-PIDFile=/var/run/deployer/receiver.pid
+PIDFile=/var/run/marcopolo/receiver.pid
 
 [Install]
 WantedBy=multi-user.target

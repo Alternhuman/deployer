@@ -1,0 +1,19 @@
+[Unit]
+Description=A simple status monitor web application built with MarcoPolo
+After=marco.service
+After=polo.service
+Requires=marco.service
+Requires=polo.service
+
+[Service]
+
+ExecStart=/opt/statusmonitor/statusmonitor.py &> /dev/null
+ExecStop=/opt/statusmonitor/daemon/statusmonitorstop.py &> /dev/null
+
+Type=simple
+User=root
+Group=root
+PIDFile=/var/run/marcopolo/statusmonitor.pid
+
+[Install]
+WantedBy=multi-user.target
