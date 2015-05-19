@@ -32,7 +32,7 @@ $(document).ready(function() {
     });*/
 
     $("#listanodos").on('click', "input[type=checkbox]", function(){
-        console.log($(this).closest(".node").toggleClass("chosen").toggleClass("not-chosen"));
+        $(this).closest(".node").toggleClass("chosen").toggleClass("not-chosen");
     });
     
     $("#list").delegate('.delete-buton', 'click', function(){
@@ -83,7 +83,7 @@ function sendFileToServer(formData, status) {
                     if (event.lengthComputable) {
                         percent = Math.ceil(position / total * 100);
                     }
-
+                    //console.log("Percent"+percent);
                     status.setProgress(percent);
                 }, false);
             }
@@ -146,18 +146,21 @@ function handleFileUpload(files, obj) {
         fd.append('overwrite', files[i].overwrite);
         var cadena = "";
         var ips = $(".chosen").children(".ip")
-        
+        var j = i;
         if(ips.length > 0){
             ips.each(function(index){
                 //console.log(index, ips.length)
                 cadena += $(this).html() + ",";
                 var ip = $(this).html();
+
                 createSocket(ip, function(){
-                    //console.log("Callback called");
+
                     if(index >= ips.length - 1){
-                        //console.log("Inside")
+
                         fd.append('nodes', cadena);
-                        var status = new createStatusbar($(".progress-bar").eq(i));
+                        console.log($(".progress-bar"));
+                        console.log($(".progress-bar").eq(j), j);
+                        var status = new createStatusbar($(".progress-bar").eq(j));
                         createTabs(ip);
                         sendFileToServer(fd, status);
                     }

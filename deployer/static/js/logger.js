@@ -24,7 +24,7 @@ function createSocket(url, callback){
         }
         addOutput(msg.ip, msg.identifier, msg.message);
     };
-    console.log($.cookie("user"));
+    //console.log($.cookie("user"));
     ws.onopen=function(evt){
         ws.send($.cookie("user"));
         //console.log("Calling callback");
@@ -46,7 +46,7 @@ function createTabs(host){
 
 function createOutput(host, identifier, command){
     $tab = tabs[host];
-    console.log(tabs);
+    //console.log(tabs);
     $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-default'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
 
 }
@@ -70,8 +70,8 @@ function addOutput(host, identifier, message, stream){
     $tab = tabs[host];
 
     $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p>"+escapeHtml(message)+"</p>")
-    console.log("Output");
-    console.log($("#"+$tab.selector).find("#"+identifier));
+    //console.log("Output");
+    $("#"+$tab.selector).find("#"+identifier);
 }
 
 function parseTabs() {
@@ -97,14 +97,14 @@ function parseTabs() {
             $(this.hash).hide();
         });
 
-        $links.each(function(){
+        /*$links.each(function(){
             $(this.hash).hide();
-        });
+        });*/
 
         $(this).unbind('click');
         // Bind the click event handler
         $(this).on('click', 'a', function(e) {
-            console.log("Clicked");
+            //console.log("Clicked");
             $("ul.nav-tabs li.active").removeClass('active');
             $(this).closest('li').addClass('active');
             // Make the old tab inactive.
@@ -120,7 +120,7 @@ function parseTabs() {
             $content.show();
 
             // Prevent the anchor's default click action
-            //e.preventDefault();
+            e.preventDefault();
         });
     });
 };
