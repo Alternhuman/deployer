@@ -9,7 +9,10 @@ $(document).ready(function(){
       $("#listanodos").html("");
       for(var ip in data.nodes){
         createPanel(nodes++, data.nodes[ip]);
-        $("#listanodos").append(nodo(data.nodes[ip]));
+
+        nodo(data.nodes[ip], function(data){
+          $("#listanodos").append(data);
+        });
       }
     },
     error: function(x, status, error){

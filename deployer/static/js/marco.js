@@ -1,11 +1,39 @@
 'use strict'
 
-function nodo(info){
-    var cadena = "<div class='node not-chosen'>";
-    cadena += "<p class='ip'>"+info+"</p>";
-    cadena += "<input class='deploy' type='checkbox'></input>"
-    cadena += "</div>";
-    return cadena;
+function probeSocket(uri, callback, errcallback){
+    var probews;
+    probews = new WebSocket(uri);
+    
+    probews.onmessage= function(evt){
+        callback(evt);
+    }
+    
+    probews.onerror = function(evt){
+        errcallback(evt);
+    }
+    
+}
+
+function nodo(info, callback){
+    var uri = "wss://"+info+":1370/ws/probe/";
+    probeSocket(uri, function(evt){
+        var i = info;
+        var cadena = "<div class='node not-chosen'>";
+        cadena += "<p class='ip'>"+i+"</p>";
+        cadena += "<input class='deploy' type='checkbox'></input>"
+        cadena += "</div>";
+        callback(cadena);
+    }, function(evt){
+        var i = info;
+        var probeuri = "https://"+i+":1370/";
+        var cadena = "<div class='node not-chosen'>";
+        cadena += "<p class='ip'>"+i+"</p>";
+        cadena += "<p>Error en la creación del socket. Click <a href='"+probeuri+"'>aquí para resolver</a></p>"
+        cadena += "<input class='deploy' type='checkbox'></input>"
+        cadena += "</div>";
+        callback(cadena);
+    });
+    
 }
 
 
@@ -47,6 +75,8 @@ $(document).ready(function() {
         }
     });
 });
+
+
 
 //http://hayageek.com/drag-and-drop-file-upload-jquery/
 

@@ -21,6 +21,8 @@ $(document).ready(function(){
     });
 });
 
+
+
 function createSocket(url, callback){
     //The socket is only created once
     if(connectedSockets.indexOf(url) > -1){

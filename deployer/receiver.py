@@ -267,6 +267,10 @@ class ProbeWSHandler(WebSocketHandler):
 	def open(self):
 		self.write_message("OK")
 		self.close()
+class ProbeHandler(RequestHandler):
+	def get(self):
+		self.write("Hola")
+
 
 routes =  [
 	(r'/deploy', DeployHandler),
@@ -274,15 +278,11 @@ routes =  [
 
 routes_ws = [
 	(r'/', ProbeHandler),
-	(r'/ws/probe', ProbeWSHandler),
+	(r'/ws/probe/', ProbeWSHandler),
 	(r'/ws/', LoggerHandler)
 ]
 
 app = Application(routes, **settings)
-
-class ProbeHandler(RequestHandler):
-	def get(self):
-		self.write("Hola")
 
 wsapp = Application(routes_ws, **settings);
 
