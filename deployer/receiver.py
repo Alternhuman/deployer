@@ -25,7 +25,7 @@ import subprocess
 import fcntl
 import os
 import sys
-from asynclogger import ExecuteCommand
+#from asynclogger import ExecuteCommand
 from tornado.websocket import WebSocketHandler
 import json
 
@@ -91,7 +91,7 @@ class ProcessReactor(object):
 
 	def can_read(self, fd, events):
 		data = self.process.stdout.read(1024)
-		#print(data)
+		print(data)
 		self.on_data(data)
 		if len(data) > 0:
 			self.on_data(data)
@@ -100,12 +100,11 @@ class ProcessReactor(object):
 			print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
 			self.stop_output()
-			#print("Stopping")
-			#sys.exit(1)
 
 	def on_data(self, data):
+		#print(data)
 		for line in self.line_buffer.read_lines(data):
-			print(line.decode('utf-8'))
+			#print(line.decode('utf-8'))
 			self.on_line(line.decode('utf-8'))
 
 	def on_line(self, line):
@@ -118,10 +117,10 @@ class ProcessReactor(object):
 			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True)
 
 
-class ExecuteCommand():
-	def __init__(self, user, ioloop, opensockets):
-		self.user = user.pw_name
-		self.processreactor = ProcessReactor(user, ioloop, opensockets, ['cat', 'lines.txt'])
+# class ExecuteCommand():
+# 	def __init__(self, user, ioloop, opensockets):
+# 		self.user = user.pw_name
+# 		self.processreactor = ProcessReactor(user, ioloop, opensockets, ['cat', 'lines.txt'])
 
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
@@ -230,7 +229,7 @@ class LoggerHandler(WebSocketHandler):
 
 	def on_line(self, user, command, message, ip, identifier, stop=False):
 		#print("on_line")
-		print (message)
+		#print (message)
 		if stop:
 			print("stopping")
 			msg={}
@@ -248,7 +247,7 @@ class LoggerHandler(WebSocketHandler):
 			msg["ip"] = ip
 			msg["identifier"] = identifier
 			msg["stop"] = False
-		print(msg)
+		#print(msg)
 		self.write_message(json.dumps(msg))
 
 	def on_close(self):
@@ -265,7 +264,7 @@ routes =  [
 app = Application(routes, **settings)
 class IndexHandler2(RequestHandler):
 	def get(self):
-		self.write("HOla")
+		self.write("Hola")
 
 wsapp = Application([(r'/', IndexHandler2),(r'/ws/', LoggerHandler)], **settings);
 

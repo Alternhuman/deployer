@@ -127,3 +127,15 @@
     height: 200px;
     max-height: 200px;
 }
+
+.stdout, .stderr{
+    font-family: "Courier New", Courier, monospace;
+}
+
+.stdout{
+    color: #000;
+}
+
+.stderr{
+    color: #f00;
+}

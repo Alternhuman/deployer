@@ -23,7 +23,7 @@ function createSocket(url, callback){
         if($("#"+msg.identifier).length < 1){
             createOutput(msg.ip, msg.identifier, msg.command);
         }
-        addOutput(msg.ip, msg.identifier, msg.message, "stdio", msg.stop);
+        addOutput(msg.ip, msg.identifier, msg.message, "stdout", msg.stop);
     };
     //console.log($.cookie("user"));
     ws.onopen=function(evt){
@@ -75,7 +75,8 @@ function addOutput(host, identifier, message, stream, stop){
     if (stop == true){
         $("#"+$tab.selector).find("#"+identifier).find(".panel").removeClass("panel-primary").addClass("panel-default");
     }else{
-        $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p>"+escapeHtml(message)+"</p>")
+        console.log("message"+message);
+        $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p class='"+stream+"'>"+escapeHtml(message)+"</p>")
         //console.log("Output");
         $("#"+$tab.selector).find("#"+identifier);
     }
@@ -134,20 +135,4 @@ function parseTabs() {
 
 $(document).ready(function(){
     parseTabs();
-    /*createTabs('172.20.1.1');
-    createTabs('172.20.1.2');
-
-    for (var i = 5 - 1; i >= 0; i--) {
-        createOutput('172.20.1.2', 'abc'+i, "cat -c");
-    };
-
-    addOutput('172.20.1.2', 'abc2', 'hola');
-    addOutput('172.20.1.2', 'abc2', 'hola2');
-    
-    function append(){
-        addOutput('172.20.1.2', 'abc2', 'hola2');
-        window.setTimeout(append, 2000);
-    };
-
-    window.setTimeout(append, 500);*/
 });
