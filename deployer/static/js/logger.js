@@ -3,7 +3,11 @@ var newConnections=0;
 
 function newConnection(){
     newConnections++;
-    $("span.badge.logger-badge").text(newConnections).show();
+    $badge = $("span.badge.logger-badge");
+    $badge.text(newConnections);
+    if(!$badge.hasClass("active")){
+        $badge.show();
+    }
 }
 
 function resetConnectionsCounter(){
