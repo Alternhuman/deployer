@@ -74,6 +74,7 @@ class ProcessReactor(object):
 		self.identifier = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
 		self.opensockets  = opensockets
 		kwargs['stdout'] = subprocess.PIPE
+		kwargs['stderr'] = subprocess.PIPE
 		#print(args)
 		def demote(uid, gid):
 			os.setgid(gid)
@@ -85,32 +86,46 @@ class ProcessReactor(object):
 		fl = fcntl.fcntl(self.fd, fcntl.F_GETFL)
 		fcntl.fcntl(self.fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
-		io_loop.add_handler(self.process.stdout, self.can_read, io_loop.READ)
+		self.fd_err = self.process.stderr.fileno()
+		fl_err = fcntl.fcntl(self.fd_err, fcntl.F_GETFL)
+		fcntl.fcntl(self.fd_err, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
 		self.line_buffer = LineBuffer()
+		io_loop.add_handler(self.process.stdout, self.can_read, io_loop.READ)
+		io_loop.add_handler(self.process.stderr, self.can_read_stderr, io_loop.READ)
+		
 
 	def can_read(self, fd, events):
 		data = self.process.stdout.read(1024)
-		print(data)
-		self.on_data(data)
+		
 		if len(data) > 0:
-			self.on_data(data)
+			self.on_data(data, "stdout")
 
 		else:
 			print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
 			self.stop_output()
+	def can_read_stderr(self, fd, events):
+		data = self.process.stderr.read(1024)
 
-	def on_data(self, data):
+		if len(data) > 0:
+			self.on_data(data, "stderr")
+
+		else:
+			print("Lost connection to subprocess")
+			io_loop.remove_handler(self.process.stderr)
+			self.stop_output()
+
+	def on_data(self, data, stream_name):
 		#print(data)
 		for line in self.line_buffer.read_lines(data):
 			#print(line.decode('utf-8'))
-			self.on_line(line.decode('utf-8'))
+			self.on_line(line.decode('utf-8'), stream_name)
 
-	def on_line(self, line):
+	def on_line(self, line, stream_name):
 		#print(self.user.pw_name)
 		for ws in self.opensockets[self.user.pw_name]:
-			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False)
+			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False, stream_name)
 
 	def stop_output(self):
 		for ws in self.opensockets[self.user.pw_name]:
@@ -227,7 +242,7 @@ class LoggerHandler(WebSocketHandler):
 			opensockets[user_id].append(self)
 			print("Opening socket")
 
-	def on_line(self, user, command, message, ip, identifier, stop=False):
+	def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout"):
 		#print("on_line")
 		#print (message)
 		if stop:
@@ -238,6 +253,7 @@ class LoggerHandler(WebSocketHandler):
 			msg["command"] = command
 			msg["identifier"] = identifier
 			msg["stop"] = True
+			msg["stream_name"] = stream_name
 			
 		else:
 			msg = {}
@@ -247,6 +263,7 @@ class LoggerHandler(WebSocketHandler):
 			msg["ip"] = ip
 			msg["identifier"] = identifier
 			msg["stop"] = False
+			msg["stream_name"] = stream_name
 		#print(msg)
 		self.write_message(json.dumps(msg))
 

@@ -23,7 +23,7 @@ function createSocket(url, callback){
         if($("#"+msg.identifier).length < 1){
             createOutput(msg.ip, msg.identifier, msg.command);
         }
-        addOutput(msg.ip, msg.identifier, msg.message, "stdout", msg.stop);
+        addOutput(msg.ip, msg.identifier, msg.message, msg.stream_name, msg.stop);
     };
     //console.log($.cookie("user"));
     ws.onopen=function(evt){
