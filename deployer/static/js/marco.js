@@ -8,6 +8,8 @@ function nodo(info){
     return cadena;
 }
 
+
+
 $(document).ready(function() {
 
     var loc = window.location;
@@ -27,12 +29,8 @@ $(document).ready(function() {
         } 
     };
 
-    /*$("#listanodos").delegate('.node','click', function(){
-        $(this).toggleClass("chosen").toggleClass("not-chosen");
-    });*/
-
     $("#listanodos").on('click', "input[type=checkbox]", function(){
-        console.log($(this).closest(".node").toggleClass("chosen").toggleClass("not-chosen"));
+        $(this).closest(".node").toggleClass("chosen").toggleClass("not-chosen");
     });
     
     $("#list").delegate('.delete-buton', 'click', function(){
@@ -70,6 +68,7 @@ $(document).ready(function() {
 //http://hayageek.com/drag-and-drop-file-upload-jquery/
 
 function sendFileToServer(formData, status) {
+
     var uploadURL = "/upload"; //Upload URL
     var extraData = {}; //Extra Data.
     var jqXHR = $.ajax({
@@ -146,14 +145,27 @@ function handleFileUpload(files, obj) {
         fd.append('overwrite', files[i].overwrite);
         var cadena = "";
         var ips = $(".chosen").children(".ip")
-        
+        var j = i;
+
         if(ips.length > 0){
             ips.each(function(index){
+
                 cadena += $(this).html() + ",";
+                var ip = $(this).html();
+
+                createSocket(ip, function(){
+
+                    if(index >= ips.length - 1){
+
+                        fd.append('nodes', cadena);
+                        //console.log($(".progress-bar").eq(j), j);
+                        var status = new createStatusbar($(".progress-bar").eq(j));
+                        createTabs(ip);
+                        sendFileToServer(fd, status);
+                    }
+                });
             });
-            fd.append('nodes', cadena);
-            var status = new createStatusbar($(".progress-bar").eq(i));
-            sendFileToServer(fd, status);
+            
         }
     }
 }
@@ -224,4 +236,43 @@ $(document).ready(function() {
     $("#uploadbutton").on('click', function(e){
         handleFileUpload(files_to_upload, obj);
     });
+/*});
+
+
+$(document).ready(function() {*/
+    //from http://www.jacklmoore.com/notes/jquery-tabs/
+    $("ul.tabs").each(function() {
+        var $active, $content, $links = $(this).find('a');
+
+        // If the location.hash matches one of the links, use that as the active tab.
+        // If no match is found, use the first link as the initial active tab.
+        $active = $($links.filter('[href="' + location.hash + '"]')[0] || $links[0]);
+        $active.addClass('active');
+
+        $content = $($active[0].hash);
+
+        // Hide the remaining content
+        $links.not($active).each(function() {
+            $(this.hash).hide();
+        });
+
+        // Bind the click event handler
+        $(this).on('click', 'a', function(e) {
+            // Make the old tab inactive.
+            $active.removeClass('active');
+            $content.hide();
+
+            // Update the variables with the new link and content
+            $active = $(this);
+            $content = $(this.hash);
+
+            // Make the tab active.
+            $active.addClass('active');
+            $content.show();
+
+            // Prevent the anchor's default click action
+            //e.preventDefault();
+        });
+    });
 });
+

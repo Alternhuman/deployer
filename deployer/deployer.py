@@ -187,7 +187,7 @@ class NodesHandler(websocket.WebSocketHandler):
 		open_ws.add(self)
 		m = marco.Marco()
 		try:
-			nodes = m.request_for("marco-bootstrap-slave")
+			nodes = m.request_for("deployer")
 			self.write_message(json.dumps({"Nodes":[n.address[0] for n in nodes]}))
 		except marco.MarcoTimeOutException:
 			self.write_message(json.dumps({"Error": "Error in marco detection"}))
