@@ -240,31 +240,18 @@ class LoggerHandler(WebSocketHandler):
 			if opensockets.get(user_id) is None:
 				opensockets[user_id] = []
 			opensockets[user_id].append(self)
-			print("Opening socket")
 
 	def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout"):
-		#print("on_line")
-		#print (message)
-		if stop:
-			print("stopping")
-			msg={}
-			msg["user"] = user
-			msg["ip"] = ip
-			msg["command"] = command
-			msg["identifier"] = identifier
-			msg["stop"] = True
-			msg["stream_name"] = stream_name
-			
-		else:
-			msg = {}
-			msg["user"] = user
-			msg["command"] = command
-			msg["message"] = message
-			msg["ip"] = ip
-			msg["identifier"] = identifier
-			msg["stop"] = False
-			msg["stream_name"] = stream_name
-		#print(msg)
+		
+		msg = {}
+		msg["user"] = user
+		msg["command"] = command
+		msg["message"] = message
+		msg["ip"] = ip
+		msg["identifier"] = identifier
+		msg["stop"] = False
+		msg["stream_name"] = stream_name
+		
 		self.write_message(json.dumps(msg))
 
 	def on_close(self):
@@ -290,8 +277,8 @@ if __name__ == "__main__":
 
 	pid = os.getpid()
 
-	if not os.path.exists('/var/run/deployer'):
-		makedirs('/var/run/deployer')
+	if not os.path.exists('/var/run/marcopolo'):
+		makedirs('/var/run/marcopolo')
 
 	f = open(conf.PIDFILE_RECEIVER, 'w')
 	f.write(str(pid))
