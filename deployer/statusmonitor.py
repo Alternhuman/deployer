@@ -98,12 +98,21 @@ settings = {
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
 }
 
-class IndexHandler(web.RequestHandler):
+class ProbeHandler(web.RequestHandler):
     def get(self):
         self.write("OK")
 
+class ProbeSocketHandler(websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True
+
+    def open(self):
+        self.write_message("OK")
+        self.close()
+
 app = web.Application([
-    (r'/', IndexHandler),
+    (r'/probe', ProbeHandler),
+    (r'/ws/probe/', ProbeSocketHandler),
     (r'/ws', SocketHandler),
 ], **settings)
 

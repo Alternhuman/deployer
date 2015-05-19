@@ -283,8 +283,20 @@ function createPanel(number, ip){
   dispatchswap.statechange({"Free":1, "InUse":0,"Shared":0});
   dispatch.statechange({"Free":1, "InUse":0,"Shared":0});
 
-  var ws = new WebSocket(uri);
+  try{
+    var ws = new WebSocket(uri);
+  }catch(e){
+    console.log("Cannot create the WebSocket");
+  }
 
+    ws.onerror = function(evt){
+      var probe = "https://"+loc+":1341/probe";
+      console.log("Could not connect to socket")
+      $("#hostname-"+number)
+      .closest(".panel-heading")
+      .append("<p>No se ha podido realizar la conexión al WebSocket. Comprueba tu conexión de red y asegúrate de que puedes establecer una conexión segura accediendo <a style='color:#fff' href='"+probe+"'>aquí</a></p>");
+  
+    }
     ws.onmessage = function(evt){
 
       var data = JSON.parse(evt.data);

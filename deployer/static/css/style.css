@@ -56,3 +56,8 @@
 .logger-badge{
     background: #f00;
 }
+
+.panel-heading p a{
+    color:#fff;
+    text-decoration: underline;
+}

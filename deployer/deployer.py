@@ -211,6 +211,19 @@ class Nodes(RequestHandler):
 			self.write_message(json.dumps({"Error": "Error in marco detection"}))
 		
 
+class ProbeHandler(RequestHandler):
+	def get(self):
+		self.write("You should be able to open a WebSocket connection right now")
+		#TODO: Test the ws in the page
+
+class ProbeWSHandler(websocket.WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+
+	def open(self):
+		self.write_message("OK")
+		self.close()
+		
 routes = [
 	(r'/', IndexHandler),
 	(r'/nodes', Nodes),
@@ -219,6 +232,9 @@ routes = [
 	(r"/login", LoginHandler),
     (r"/logout", Logout),
 	(r'/upload', UploadAndDeployHandler),
+	#probes
+	(r'/probe', ProbeHandler),
+	(r'/ws/probe', ProbeWSHandler)
 ]
 
 settings = {

@@ -260,17 +260,31 @@ class LoggerHandler(WebSocketHandler):
 			if self in opensockets[ws]:
 				opensockets[ws].remove(self)
 
+class ProbeWSHandler(WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+
+	def open(self):
+		self.write_message("OK")
+		self.close()
+
 routes =  [
 	(r'/deploy', DeployHandler),
 ]
 
+routes_ws = [
+	(r'/', ProbeHandler),
+	(r'/ws/probe', ProbeWSHandler),
+	(r'/ws/', LoggerHandler)
+]
 
 app = Application(routes, **settings)
-class IndexHandler2(RequestHandler):
+
+class ProbeHandler(RequestHandler):
 	def get(self):
 		self.write("Hola")
 
-wsapp = Application([(r'/', IndexHandler2),(r'/ws/', LoggerHandler)], **settings);
+wsapp = Application(routes_ws, **settings);
 
 if __name__ == "__main__":
 	import conf, ssl
