@@ -2,12 +2,12 @@ var connectedSockets = []
 
 var ws;
 function createSocket(url, callback){
-    console.log(url);
+    //console.log(url);
     if(connectedSockets.indexOf(url) > -1){
-        console.log("Returning")
+        //console.log("Returning")
         return;
     }
-    console.log("Creating socket");
+    //console.log("Creating socket");
     connectedSockets.push(url);
 
     var loc = window.location;
@@ -27,7 +27,7 @@ function createSocket(url, callback){
     console.log($.cookie("user"));
     ws.onopen=function(evt){
         ws.send($.cookie("user"));
-        console.log("Calling callback");
+        //console.log("Calling callback");
         callback();
     };
 }
@@ -46,7 +46,7 @@ function createTabs(host){
 
 function createOutput(host, identifier, command){
     $tab = tabs[host];
-    //console.log($tab);
+    console.log(tabs);
     $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-default'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
 
 }
@@ -87,7 +87,9 @@ function parseTabs() {
             return;
         }*/
         //$active.addClass('active');
-
+        if ($active[0] === undefined)
+            return
+       
         $content = $($active[0].hash);
 
         // Hide the remaining content

@@ -149,13 +149,13 @@ function handleFileUpload(files, obj) {
         
         if(ips.length > 0){
             ips.each(function(index){
-                console.log(index, ips.length)
+                //console.log(index, ips.length)
                 cadena += $(this).html() + ",";
                 var ip = $(this).html();
                 createSocket(ip, function(){
-                    console.log("Callback called");
+                    //console.log("Callback called");
                     if(index >= ips.length - 1){
-                        console.log("Inside")
+                        //console.log("Inside")
                         fd.append('nodes', cadena);
                         var status = new createStatusbar($(".progress-bar").eq(i));
                         createTabs(ip);

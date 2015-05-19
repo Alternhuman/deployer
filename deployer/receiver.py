@@ -42,7 +42,7 @@ def getip(protocol, host):
 	print(host)
 	hostname = urlparse.urlparse("%s://%s" % (protocol, host)).hostname
 	ip_address = socket.gethostbyname(hostname)
-	return "192.168.1.133"
+	return "172.20.1.88"
 	return ip_address
 
 opensockets={}
