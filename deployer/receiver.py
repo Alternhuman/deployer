@@ -97,7 +97,7 @@ class ProcessReactor(object):
 			self.on_data(data)
 
 		else:
-			#print("Lost connection to subprocess")
+			print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
 			self.stop_output()
 			#print("Stopping")
@@ -239,7 +239,7 @@ class LoggerHandler(WebSocketHandler):
 			msg["command"] = command
 			msg["identifier"] = identifier
 			msg["stop"] = True
-			self.write_message(json.dumps(msg))
+			
 		else:
 			msg = {}
 			msg["user"] = user
@@ -248,7 +248,8 @@ class LoggerHandler(WebSocketHandler):
 			msg["ip"] = ip
 			msg["identifier"] = identifier
 			msg["stop"] = False
-			self.write_message(json.dumps(msg))
+		print(msg)
+		self.write_message(json.dumps(msg))
 
 	def on_close(self):
 		success = False

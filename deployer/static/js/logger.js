@@ -23,7 +23,7 @@ function createSocket(url, callback){
         if($("#"+msg.identifier).length < 1){
             createOutput(msg.ip, msg.identifier, msg.command);
         }
-        addOutput(msg.ip, msg.identifier, msg.message, msg.stop);
+        addOutput(msg.ip, msg.identifier, msg.message, "stdio", msg.stop);
     };
     //console.log($.cookie("user"));
     ws.onopen=function(evt){
@@ -74,10 +74,11 @@ function addOutput(host, identifier, message, stream, stop){
     $tab = tabs[host];
     if (stop == true){
         $("#"+$tab.selector).find("#"+identifier).find(".panel").removeClass("panel-primary").addClass("panel-default");
+    }else{
+        $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p>"+escapeHtml(message)+"</p>")
+        //console.log("Output");
+        $("#"+$tab.selector).find("#"+identifier);
     }
-    $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p>"+escapeHtml(message)+"</p>")
-    //console.log("Output");
-    $("#"+$tab.selector).find("#"+identifier);
 }
 
 function parseTabs() {
