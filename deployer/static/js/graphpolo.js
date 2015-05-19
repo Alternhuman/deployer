@@ -5,9 +5,11 @@ $(document).ready(function(){
     url:"/nodes",
     type: 'GET',
     success: function(data, textStatus, x){
-      //console.log(data);
+      $("#count").text(data.nodes.length)
+      $("#listanodos").html("");
       for(var ip in data.nodes){
         createPanel(nodes++, data.nodes[ip]);
+        $("#listanodos").append(nodo(data.nodes[ip]));
       }
     },
     error: function(x, status, error){
@@ -60,7 +62,6 @@ function createPanel(number, ip){
   var uri = "wss:";
   uri += "//" + loc + ":1341/ws";
 
-  
 
 
     // //Registro de callbacks para los eventos
@@ -117,6 +118,12 @@ function createPanel(number, ip){
   var width = $("#memdiv-"+number).width() / 2.5,
       height = $("#memdiv-"+number).width() / 2.5,
       radius = Math.min(width, height) / 2;
+      //console.log(width)
+    if(width < 100){
+      width = 200;
+      height = width;
+      radius = Math.min(width, height) / 2;
+    }
 
   /*Colores de cada tipo de memoria. Se eligen según un rango de colores dados*/
   var color = d3.scale.ordinal()
@@ -187,7 +194,11 @@ function createPanel(number, ip){
     var width = $("#memdiv-"+number).width()/2.5,
         height = $("#memdiv-"+number).width()/2.5,
         radius = Math.min(width, height) / 2;
-
+    if(width < 100){
+      width = 200;
+      height = width;
+      radius = Math.min(width, height) / 2;
+    }
     /*Colores de cada tipo de memoria. Se eligen según un rango de colores dados*/
     var color = d3.scale.ordinal()
         .domain(groups)
