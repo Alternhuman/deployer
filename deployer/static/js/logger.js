@@ -23,7 +23,7 @@ function createSocket(url, callback){
         if($("#"+msg.identifier).length < 1){
             createOutput(msg.ip, msg.identifier, msg.command);
         }
-        addOutput(msg.ip, msg.identifier, msg.message);
+        addOutput(msg.ip, msg.identifier, msg.message, msg.stop);
     };
     //console.log($.cookie("user"));
     ws.onopen=function(evt){
@@ -51,7 +51,7 @@ function createTabs(host){
 function createOutput(host, identifier, command){
     $tab = tabs[host];
     //console.log(tabs);
-    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-default'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
+    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
 
 }
 //TODO: http://stackoverflow.com/a/12034334/2628463
@@ -70,9 +70,11 @@ return String(string).replace(/[&<>"'\/]/g, function (s) {
   return entityMap[s];
 });
 }
-function addOutput(host, identifier, message, stream){
+function addOutput(host, identifier, message, stream, stop){
     $tab = tabs[host];
-
+    if (stop == true){
+        $("#"+$tab.selector).find("#"+identifier).find(".panel").removeClass("panel-primary").addClass("panel-default");
+    }
     $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p>"+escapeHtml(message)+"</p>")
     //console.log("Output");
     $("#"+$tab.selector).find("#"+identifier);

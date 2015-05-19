@@ -99,17 +99,23 @@ class ProcessReactor(object):
 		else:
 			#print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
+			self.stop_output()
 			#print("Stopping")
 			#sys.exit(1)
 
 	def on_data(self, data):
 		for line in self.line_buffer.read_lines(data):
+			print(line.decode('utf-8'))
 			self.on_line(line.decode('utf-8'))
 
 	def on_line(self, line):
 		#print(self.user.pw_name)
 		for ws in self.opensockets[self.user.pw_name]:
-			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier)
+			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False)
+
+	def stop_output(self):
+		for ws in self.opensockets[self.user.pw_name]:
+			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True)
 
 
 class ExecuteCommand():
@@ -222,15 +228,27 @@ class LoggerHandler(WebSocketHandler):
 			opensockets[user_id].append(self)
 			print("Opening socket")
 
-	def on_line(self, user, command, message, ip, identifier):
+	def on_line(self, user, command, message, ip, identifier, stop=False):
 		#print("on_line")
-		msg = {}
-		msg["user"] = user
-		msg["command"] = command
-		msg["message"] = message
-		msg["ip"] = ip
-		msg["identifier"] = identifier
-		self.write_message(json.dumps(msg))
+		print (message)
+		if stop:
+			print("stopping")
+			msg={}
+			msg["user"] = user
+			msg["ip"] = ip
+			msg["command"] = command
+			msg["identifier"] = identifier
+			msg["stop"] = True
+			self.write_message(json.dumps(msg))
+		else:
+			msg = {}
+			msg["user"] = user
+			msg["command"] = command
+			msg["message"] = message
+			msg["ip"] = ip
+			msg["identifier"] = identifier
+			msg["stop"] = False
+			self.write_message(json.dumps(msg))
 
 	def on_close(self):
 		success = False
