@@ -2,13 +2,13 @@ var connectedSockets = []
 
 var ws;
 function createSocket(url, callback){
-    //console.log(url);
+    
     if(connectedSockets.indexOf(url) > -1){
-        //console.log("Returning")
+        
         callback();
         return;
     }
-    //console.log("Creating socket");
+    
     connectedSockets.push(url);
 
     var loc = window.location;
@@ -25,10 +25,10 @@ function createSocket(url, callback){
         }
         addOutput(msg.ip, msg.identifier, msg.message, msg.stream_name, msg.stop);
     };
-    //console.log($.cookie("user"));
+    
     ws.onopen=function(evt){
         ws.send($.cookie("user"));
-        //console.log("Calling callback");
+        
         callback();
     };
 }
@@ -50,7 +50,7 @@ function createTabs(host){
 
 function createOutput(host, identifier, command){
     $tab = tabs[host];
-    //console.log(tabs);
+    
     $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
 
 }
@@ -77,7 +77,7 @@ function addOutput(host, identifier, message, stream, stop){
     }else{
         console.log("message"+message);
         $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p class='"+stream+"'>"+escapeHtml(message)+"</p>")
-        //console.log("Output");
+        
         $("#"+$tab.selector).find("#"+identifier);
     }
 }
@@ -112,7 +112,7 @@ function parseTabs() {
         $(this).unbind('click');
         // Bind the click event handler
         $(this).on('click', 'a', function(e) {
-            //console.log("Clicked");
+            
             $("ul.nav-tabs li.active").removeClass('active');
             $(this).closest('li').addClass('active');
             // Make the old tab inactive.
@@ -122,7 +122,7 @@ function parseTabs() {
             // Update the variables with the new link and content
             $active = $(this);
             $content = $(this.hash);
-            //console.log($content)
+            
             // Make the tab active.
             $active.addClass('active');
             $content.show();

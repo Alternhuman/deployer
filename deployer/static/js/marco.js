@@ -70,7 +70,7 @@ $(document).ready(function() {
 //http://hayageek.com/drag-and-drop-file-upload-jquery/
 
 function sendFileToServer(formData, status) {
-    console.log("sendFileToServer")
+
     var uploadURL = "/upload"; //Upload URL
     var extraData = {}; //Extra Data.
     var jqXHR = $.ajax({
@@ -84,7 +84,7 @@ function sendFileToServer(formData, status) {
                     if (event.lengthComputable) {
                         percent = Math.ceil(position / total * 100);
                     }
-                    //console.log("Percent"+percent);
+
                     status.setProgress(percent);
                 }, false);
             }
@@ -148,10 +148,10 @@ function handleFileUpload(files, obj) {
         var cadena = "";
         var ips = $(".chosen").children(".ip")
         var j = i;
-        console.log(ips);
+
         if(ips.length > 0){
             ips.each(function(index){
-                //console.log(index, ips.length)
+
                 cadena += $(this).html() + ",";
                 var ip = $(this).html();
 
@@ -160,8 +160,7 @@ function handleFileUpload(files, obj) {
                     if(index >= ips.length - 1){
 
                         fd.append('nodes', cadena);
-                        console.log($(".progress-bar"));
-                        console.log($(".progress-bar").eq(j), j);
+                        //console.log($(".progress-bar").eq(j), j);
                         var status = new createStatusbar($(".progress-bar").eq(j));
                         createTabs(ip);
                         sendFileToServer(fd, status);
@@ -237,7 +236,6 @@ $(document).ready(function() {
     });
 
     $("#uploadbutton").on('click', function(e){
-        console.log("click")
         handleFileUpload(files_to_upload, obj);
     });
 });
