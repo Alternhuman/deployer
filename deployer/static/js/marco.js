@@ -12,23 +12,6 @@ function nodo(info){
 
 $(document).ready(function() {
 
-    var loc = window.location;
-    var uri = loc.protocol == "https:" ? "wss:" : "ws:";
-    uri += "//" + loc.host + loc.pathname + "ws/nodes";
-    var ws = new WebSocket(uri);
-
-    ws.onmessage = function(evt) {
-        var parsed_data = JSON.parse(evt.data)
-        $("#listanodos").html("");
-        if (parsed_data["Nodes"]) {
-            $("#count").html(parsed_data["Nodes"].length);
-
-            for (var node in parsed_data["Nodes"]) {
-                $("#listanodos").append(nodo(parsed_data["Nodes"][node]));
-            }
-        } 
-    };
-
     $("#listanodos").on('click', "input[type=checkbox]", function(){
         $(this).closest(".node").toggleClass("chosen").toggleClass("not-chosen");
     });
