@@ -1,0 +1,3 @@
+http://stackoverflow.com/questions/16008670/python-how-to-hash-a-string-into-8-digits
+http://stackoverflow.com/questions/25359937/how-to-get-server-ip-address-in-tornado
+
