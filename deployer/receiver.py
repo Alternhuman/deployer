@@ -301,7 +301,7 @@ if __name__ == "__main__":
 	httpServer = HTTPServer(app, ssl_options={
 		"certfile": conf.RECEIVERCERT,
 		"keyfile": conf.RECEIVERKEY,
-		"cert_reqs": ssl.CERT_OPTIONAL,
+		"cert_reqs": ssl.CERT_REQUIRED,
 		"ca_certs": conf.APPCERT,
 		})
 
