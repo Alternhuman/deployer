@@ -30,7 +30,7 @@ from tornado.websocket import WebSocketHandler
 import json
 
 import socket
-import string
+import string, random
 import hashlib
 
 if int(sys.version[0]) < 3:
@@ -67,10 +67,11 @@ class ProcessReactor(object):
 		self.command = ' '.join(*args)
 		self.ip = ip
 		def randomString():
-			import random
+
 			return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(3))
 
-		self.identifier = "AAA"#int(hashlib.sha1(self.command+randomString()).hexdigest(), 16) % (10 ** 8)
+		#self.identifier = "AAA"#int(hashlib.sha1(self.command+randomString()).hexdigest(), 16) % (10 ** 8)
+		self.identifier = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
 		self.opensockets  = opensockets
 		kwargs['stdout'] = subprocess.PIPE
 		#print(args)

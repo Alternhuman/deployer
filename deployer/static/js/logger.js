@@ -5,6 +5,7 @@ function createSocket(url, callback){
     //console.log(url);
     if(connectedSockets.indexOf(url) > -1){
         //console.log("Returning")
+        callback();
         return;
     }
     //console.log("Creating socket");
@@ -35,12 +36,15 @@ function createSocket(url, callback){
 var tabs = [];
 
 function createTabs(host){
-    var identifier = "tab"+(Object.keys(tabs).length);
-    $("ul.nav-tabs").append("<li><a href='#"+identifier+"'>"+host+"</a></li>");
+    if(!(host in tabs)){
+        var identifier = "tab"+(Object.keys(tabs).length);
+        $("ul.nav-tabs").append("<li><a href='#"+identifier+"'>"+host+"</a></li>");
 
-    $("#window").append("<div id='"+identifier+"' style='display:none'></div>");
-    tabs[host] = $(identifier);
-    parseTabs();
+        $("#window").append("<div id='"+identifier+"' style='display:none'></div>");
+        tabs[host] = $(identifier);
+        parseTabs();
+    }
+    
 }
 
 
