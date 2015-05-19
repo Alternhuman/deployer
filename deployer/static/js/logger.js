@@ -1,5 +1,21 @@
 var connectedSockets = []
+var newConnections=0;
 
+function newConnection(){
+    newConnections++;
+    $("span.badge.logger-badge").text(newConnections).show();
+}
+
+function resetConnectionsCounter(){
+    newConnections=0;
+    $("span.badge.logger-badge").hide();
+}
+
+$(document).ready(function(){
+    $(".logger-link").on('click', function(){
+        resetConnectionsCounter();
+    });
+});
 
 function createSocket(url, callback){
     //The socket is only created once
@@ -20,8 +36,10 @@ function createSocket(url, callback){
     ws.onmessage = function(evt) {
         var msg = JSON.parse(evt.data);
         //If it is the first output received, the output frame is created
-        if($("#"+msg.identifier).length < 1)
+        if($("#"+msg.identifier).length < 1){
             createOutput(msg.ip, msg.identifier, msg.command);
+            newConnection();
+        }
         
         addOutput(msg.ip, msg.identifier, msg.message, msg.stream_name, msg.stop);
     };
