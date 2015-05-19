@@ -306,9 +306,9 @@ if __name__ == "__main__":
 
 	httpServer.listen(conf.RECEIVER_PORT)
 
-	wsapp.listen(1370, ssl_options={"certfile": conf.APPCERT,
+	wsapp.listen(conf.RECEIVER_WEBSOCKET_PORT, ssl_options={"certfile": conf.APPCERT,
         "keyfile": conf.APPKEY})
 
-	#print("Starting receiver on port %d" % conf.RECEIVER_PORT)
+	print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
 	
 	io_loop.start()

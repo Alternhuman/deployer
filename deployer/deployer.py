@@ -76,7 +76,7 @@ class IndexHandler(BaseHandler):
 			self.redirect("/login")
 		else:
 			user = tornado.escape.xhtml_escape(self.current_user)
-			self.render("templates/index2.jade", user=user)
+			self.render("templates/index.jade", user=user)
 			
 
 
