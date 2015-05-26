@@ -3,7 +3,7 @@
 from os import kill, remove
 import os, signal
 
-PIDFILE = '/var/run/deployer/deployer.pid'
+PIDFILE = '/var/run/deployer/deployer.pid'#TODO: Are you sure?
 
 try:
 	f = open(PIDFILE, 'r')
