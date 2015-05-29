@@ -52,6 +52,21 @@ def getip(protocol, host):
 	ip_address = socket.gethostbyname(hostname)
 	return "172.20.1.88"
 
+
+import signal
+
+
+
+def sigint_handler(signal, frame):
+	io_loop.add_callback(shutdown)
+
+def shutdown():
+	print("Stopping gracefully")
+	polo.Polo().unpublish_service("deployer", delete_file=True)
+	io_loop.stop()
+
+signal.signal(signal.SIGINT, sigint_handler)
+
 opensockets={}
 
 io_loop = ioloop.IOLoop.instance()
@@ -332,5 +347,8 @@ if __name__ == "__main__":
 		except polo.PoloInternalException as e:
 			print(e)
 			time.sleep(1)
+		except polo.PoloException as i:
+			print(i)
+			break
 
 	io_loop.start()
