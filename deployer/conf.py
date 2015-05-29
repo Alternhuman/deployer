@@ -24,3 +24,5 @@ RECEIVER_WEBSOCKET_PORT = 1370
 
 PIDFILE_DEPLOYER = '/var/run/marcopolo/deployer.pid'
 PIDFILE_RECEIVER = '/var/run/marcopolo/receiver.pid'
+
+INTERFACE='eth0'

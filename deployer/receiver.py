@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from tornado.web import Application, RequestHandler
@@ -33,17 +33,24 @@ import socket
 import string, random
 import hashlib
 
+sys.path.append("/opt/marcopolo")
+from bindings.polo import polo
+
+from netifaces import AF_INET
+import netifaces as ni
 if int(sys.version[0]) < 3:
 	import urlparse
 else:
 	import urllib.parse as urlparse
 ip = ""
 def getip(protocol, host):
+	
+	return ni.ifaddresses(conf.INTERFACE).get(AF_INET)[0].get('addr')
+	
 	print(host)
 	hostname = urlparse.urlparse("%s://%s" % (protocol, host)).hostname
 	ip_address = socket.gethostbyname(hostname)
 	return "172.20.1.88"
-	return ip_address
 
 opensockets={}
 
@@ -171,15 +178,20 @@ class DeployHandler(RequestHandler):
 		if folder == '':
 			folder = user_pwd.pw_dir
 
+		if not os.path.isdir(folder):
+			return
+
+		if not os.path.exists(folder):
+			makedirs(folder)
+			chown(folder, user.pw_uid, user.pw_gid)
+
 
 		final_directory = os.path.join(folder, fname)
-		#print(final_directory)
 		
 		overwrite = self.get_argument('overwrite', 'false')
-		#print(overwrite)
+		
 		overwrite = False if overwrite.lower() == 'false' else True;
 
-		#print("Overwrite: " + str(overwrite))
 		from concurrent import futures
 
 		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
@@ -233,6 +245,8 @@ class LoggerHandler(WebSocketHandler):
 		ip = getip(self.request.protocol, self.request.host)
 
 	def on_message(self, message):
+
+		print("Message")
 		from tornado.web import decode_signed_value
 		user_id = decode_signed_value(settings["cookie_secret"], 'user', message).decode('utf-8')
 		#print(user_id)
@@ -311,5 +325,8 @@ if __name__ == "__main__":
         "keyfile": conf.APPKEY})
 
 	print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
-	
+	try:
+		polo.Polo().publish_service("deployer", root=True) #TODO: unpublish
+	except Exception:
+		pass
 	io_loop.start()

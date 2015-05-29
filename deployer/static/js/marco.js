@@ -162,7 +162,7 @@ function handleFileUpload(files, obj) {
 
         if(ips.length > 0){
             ips.each(function(index){
-
+                console.log("Here");
                 cadena += $(this).html() + ",";
                 var ip = $(this).html();
 

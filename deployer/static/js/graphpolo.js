@@ -7,6 +7,12 @@ $(document).ready(function(){
     success: function(data, textStatus, x){
       $("#count").text(data.nodes.length)
       $("#listanodos").html("");
+      $("#statusmonitor").html("");
+      if(data.nodes.length == 0){
+        var htmlstring = '<div class="container"><div class="row"><p>No se han encontrado nodos</p></div></div>';
+        $("#statusmonitor").html(htmlstring);
+        $("#listanodos").html("<p>No se han encontrado nodos</p>")
+      }
       for(var ip in data.nodes){
         createPanel(nodes++, data.nodes[ip]);
 
@@ -16,7 +22,9 @@ $(document).ready(function(){
       }
     },
     error: function(x, status, error){
-      //console.log(x, status, error);
+
+      var htmlstring = '<div class="container"><div class="row"><p>Error en la detección de nodos</p></div></div>';
+        $("#statusmonitor").html(htmlstring);
     },
     dataType: 'json'
   });

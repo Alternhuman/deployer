@@ -2,6 +2,11 @@ extends ./base.jade
 
 block content
   div.page#statusmonitor
+    div.container
+      div.row
+        div(width="20%", style="display:block;margin-left:auto;margin-right:auto;")
+          img(width="20%", style="display:block;margin-left:auto;margin-right:auto;", src="{{ static_url('img/wait.gif') }}")
+          p(width="20%", style="text-align:center;display:block;margin-left:auto;margin-right:auto;") Buscando nodos
   div.page#deployer 
     div.container
       div.row

@@ -53,7 +53,7 @@ function createSocket(url, callback){
     ws.onopen=function(evt){
         //The authentication is based on the HMAC message stored in the cookie
         ws.send($.cookie("user"));
-        
+        console.log("Here");
         callback();
     };
 }
