@@ -5,7 +5,7 @@ from tornado.web import Application, RequestHandler
 import tornado.web
 from tornado.httpserver import HTTPServer 
 from tornado import ioloop
-import os
+import os, time
 from shlex import split
 from subprocess import Popen
 import subprocess
@@ -325,8 +325,12 @@ if __name__ == "__main__":
         "keyfile": conf.APPKEY})
 
 	print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
-	try:
-		polo.Polo().publish_service("deployer", root=True) #TODO: unpublish
-	except Exception:
-		pass
+	while True:
+		try:
+			polo.Polo().publish_service("deployer", root=True) #TODO: unpublish
+			break
+		except polo.PoloInternalException as e:
+			print(e)
+			time.sleep(1)
+
 	io_loop.start()
