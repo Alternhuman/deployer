@@ -5,6 +5,7 @@ import tornado
 from tornado.web import Application,RequestHandler,StaticFileHandler,asynchronous
 from tornado import web, websocket, ioloop, template
 from tornado.httpserver import HTTPServer
+from tornado.gen import engine
 
 import os, random, string, json, mimetypes, ssl, conf
 from tempfile import tempdir
@@ -12,19 +13,19 @@ import tempfile
 
 import sys, signal
 from os import path, makedirs
+
+
+import requests
+from requests.adapters import HTTPAdapter 
+from requests_futures.sessions import FuturesSession
+from pyjade.ext.tornado import patch_tornado
+patch_tornado() #Allows pyjade to work with Tornado
+
 sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
 
 from bindings.marco import marco
 from marco_conf.utils import Node
 import utils
-
-import requests
-from requests.adapters import HTTPAdapter 
-from requests_futures.sessions import FuturesSession
-
-
-from pyjade.ext.tornado import patch_tornado
-patch_tornado() #Allows pyjade to work with Tornado
 
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
@@ -43,8 +44,8 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
         conn.assert_hostname = False
 
 # By changing the adapter no hostname is checked
-websession = requests.session()
-websession.mount('https://', NotCheckingHostnameHTTPAdapter()) 
+#websession = requests.session()
+#websession.mount('https://', NotCheckingHostnameHTTPAdapter()) 
 
 futures_session = FuturesSession()
 futures_session.mount('https://', NotCheckingHostnameHTTPAdapter())
@@ -55,13 +56,19 @@ if not os.path.exists(conf.TMPDIR):
 
 __UPLOADS__ = conf.TMPDIR # temporal directory were files will be stored
 
-open_ws = set()
+open_ws = set() #Set of the current alive websockets
 
 class BaseHandler(RequestHandler):
-
+    """
+    The base class which the rest of HTTP handlers extends.
+    Provides secure cookie decryption and error handling
+    """
     def get_current_user(self):
         """
         Decrypts the secure cookie
+
+        :return: The name of the user or None
+        :rtype: string
         """
         return self.get_secure_cookie("user")
 
@@ -71,13 +78,17 @@ class BaseHandler(RequestHandler):
 
 class IndexHandler(BaseHandler):
     """
-    In charge of handling GET requests. Provides the client with the necessary .html/css/js
+    In charge of handling GET requests.
+    Provides the client with the necessary .html/css/js
     """
     @web.addslash #Appends a '/' at the end of the request
     def get(self):
-        
+        """
+        Checks if the user is logged and sends the index files (basic HTML, CSS and JS).
+        If the user is not already logged in, it is redirected to the main page. 
+        """
         if not self.current_user:
-            self.redirect("/login")
+            self.redirect("/login/")
         else:
             user = tornado.escape.xhtml_escape(self.current_user)
             self.render("templates/index.jade", user=user)
@@ -87,40 +98,68 @@ class LoginHandler(BaseHandler):
     Handles login authentication through secure cookies and PAM
     """
     def get(self):
+        """
+        Returns the login page if the user is not logged.
+        Otherwise redirects to the index site.
+        """
         if self.current_user:
             self.redirect("/")
         else:
             self.render("templates/login.jade")
 
     def post(self):
-
+        """
+        Processes login requests using PAM. If the user and password combination
+        is valid, the response is given a secure cookie, and the user gets 
+        redirected to the new index site.
+        Otherwise, a 403 page is returned.
+        """
         if utils.authenticate(self.get_argument("name"), self.get_argument("pass")):
             self.set_secure_cookie("user", self.get_argument("name"))
             self.redirect("/")
         else:
-            self.set_status(403) #TODO
+            self.set_status(403)
             self.render("templates/badpass.jade")
 
 class Logout(BaseHandler):
     """
-    Removes the secure cookie
+    Removes the secure cookie.
     """
     def get(self):
+        """
+        Removes the secure cookie and redirects the user to the index folder.
+        """
         self.clear_cookie("user")
         self.redirect("/")
 
 class UploadAndDeployHandler(BaseHandler):
-    from tornado.gen import engine
     """
-    Listens for POST requests and performs the deployment asynchronously
+    Listens for POST requests and performs the deployment asynchronously.
     """
     @asynchronous #The post is asynchronous due to the potencially long deploying time
     @engine
     def post(self):
+        """
+        Receives a set of parameters through an asynchronous POST request:
+
+        - file : A binary stream of data which corresponds to a file uploaded by the user.
+
+        - folder : The folder where the file has to be stored
+
+        - tomcat : Specifies that the service is a Tomcat container and that it must be added to the offered services
+
+        - overwrite : If true, the file will overwrite a previous file with the same name
+
+        - command : A command to execute when after the deployment
+
+        - nodes : The nodes where the file and command are to be deployed
+
+        Writes a status code to the client in return
+        """
         file1 = self.request.files['file'][0] #Only one file at a time
 
         original_fname = file1['filename']
-        print(os.path.join(__UPLOADS__, original_fname))
+        #print(os.path.join(__UPLOADS__, original_fname))
         output_file = open(os.path.join(__UPLOADS__, original_fname), 'wb')
         output_file.write(file1['body'])
         output_file.close()
@@ -132,16 +171,20 @@ class UploadAndDeployHandler(BaseHandler):
         #The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
         thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
         
-        @tornado.gen.coroutine
-        def call_deploy(node):
-            yield thread_pool.submit(self.deploy, node=node,
-             request=self, filename=original_fname, 
-             command=self.get_argument('command', ''), 
-             user=self.current_user, 
-             folder=self.get_argument('folder',''),
-             tomcat=self.get_argument('tomcat', ''),
-             overwrite=self.get_argument('overwrite', 'false'))
+        # @tornado.gen.coroutine
+        # def call_deploy(node):
+        #     yield thread_pool.submit(self.deploy, node=node,
+        #      request=self, filename=original_fname, 
+        #      command=self.get_argument('command', ''), 
+        #      user=self.current_user, 
+        #      folder=self.get_argument('folder',''),
+        #      tomcat=self.get_argument('tomcat', ''),
+        #      overwrite=self.get_argument('overwrite', 'false'))
         
+        #For each node a future is received
+
+        futures_set = set()
+
         for node in nodes:
             future = self.deploy(node=node,
              request=self, 
@@ -151,6 +194,14 @@ class UploadAndDeployHandler(BaseHandler):
              folder=self.get_argument('folder',''),
              tomcat=self.get_argument('tomcat', ''),
              overwrite=self.get_argument('overwrite', 'false'))
+            futures_set.add(future)
+
+        for future in futures_set:
+
+            response = future.result()
+            print(dir(future))
+            print(response.status_code)
+
 
             #TODO: handle callback
             #deployment = tornado.gen.Task(call_deploy, node)
@@ -159,12 +210,36 @@ class UploadAndDeployHandler(BaseHandler):
     
     @asynchronous
     def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat="", overwrite='false'):
-        
+        """
+        Performs the deployment asynchronously.
+
+        :param: :class:`str` The IP address of the node
+        :param: :class:`BaseHandler` The related POST request which invoked this method *Deprecated*
+        :param: str filename The name of the file to upload
+        :param: str command The command to execute after deployment
+        :param: str user The name of the user who performs the request
+        :param: str folder The deployment folder
+        :param: str idpolo The id of the polo service to publish
+        :param: str tomcat Specifies whether the file should be deployed as a tomcat service
+        :param: str overwrite Specifies if the file can overwrite existing files
+
+        :returns: :class:`concurrent.future` A future that encapsulates the asynchronous execution 
+        """
         def get_content_type(filename):
+            """
+            Guesses the MIME type of the file so it can be sent with the POST request
+
+            :param: str filename The name of the file to process
+            """
             return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
         url = "https://"+node+":"+str(conf.RECEIVER_PORT)+"/deploy/"
-        files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
+        
+        files = {'file': (filename, 
+                    open(os.path.join(__UPLOADS__, filename), 'rb'), 
+                    get_content_type(filename))
+                }
+        
         commands = {'command':command, 
                     'user':user, 
                     'folder': folder, 
@@ -180,9 +255,20 @@ class NodesHandler(websocket.WebSocketHandler):
     Handler for the Polo websocket connection
     """
     def check_origin(self, origin):
+        """
+        Overrides the parent method to return True for any request, since we are
+        working without names
+
+        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :returns: bool True
+        """
         return True
 
     def open(self):
+        """
+        Processes a new WebSocket connection, storing it in open_ws.
+        Returns the nodes offering the deployer service
+        """
         open_ws.add(self)
         m = marco.Marco()
         try:
@@ -201,7 +287,14 @@ class NodesHandler(websocket.WebSocketHandler):
         pass
 
 class Nodes(RequestHandler):
+    """
+    Performs a synchronous Marco request for the deployer service
+    """
+    #TODO: Make async
     def get(self):
+        """
+        Returns a JSON string with the nodes offering the deployer service
+        """
         m = marco.Marco()
         try:
             nodes = m.request_for("deployer")
@@ -211,19 +304,30 @@ class Nodes(RequestHandler):
         
 
 class ProbeHandler(RequestHandler):
+    """
+    A test connection to trigger the web browser certificate validation,
+    since WebSockets cannot request user confirmation by themselves.
+    """
     def get(self):
         self.write("You should be able to open a WebSocket connection right now")
         #TODO: Test the ws in the page
 
 class ProbeWSHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
+        """
+        Overrides the parent method to return True for any request, since we are
+        working without names
+
+        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :returns: bool True
+        """
         return True
 
     def open(self):
         self.write_message("OK")
         self.close()
 
-#TODO: Fix '/' 
+
 routes = [
     (r'/', IndexHandler),
     (r'/nodes/?', Nodes),

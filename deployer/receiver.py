@@ -50,8 +50,12 @@ else:
 
 ip = ""
 
-def getip(protocol, host):
-	
+
+
+def getip(protocol=None, host=None):
+	"""
+	Returns the IP associated with the configured interface
+	"""
 	return ni.ifaddresses(conf.INTERFACE).get(AF_INET)[0].get('addr')
 
 def sigint_handler(signal, frame):
@@ -73,10 +77,18 @@ opensockets={}
 io_loop = ioloop.IOLoop.instance()
 
 class LineBuffer(object):
+	"""
+	Processes each linke in the desired buffer
+
+	From Juan Luis Boya
+	"""
 	def __init__(self):
 		self.buffer = b''
 
 	def read_lines(self, input):
+		"""
+		Processes each line and appends it to the buffer
+		"""
 		while b'\n' in input:
 			before, after = input.split(b'\n', 1)
 			yield self.buffer + before
@@ -86,48 +98,94 @@ class LineBuffer(object):
 
 class ProcessReactor(object):
 	def __init__(self, user, directory, *args, **kwargs):
-		self.user = user
-		self.command = ' '.join(*args)
-		self.ip = ip
-		def randomString():
+		"""
+		Starts the command and sets the redirection of the desired buffers
+		:param: :class:pwd user The pwd structure with the information of the user which issued the command
+		:param: str directory The directory to use as cwd
+		:param: :class:list args A list of supplementary arguments
+		:param: :class:dict kwargs A dictionary of keyword arguments
 
+		The function redirects STDOUT and STDERR to a pipe, and then executes the command using Popen.
+		The output pipe descriptor is made non-blocking and included in the instance of the IOLoop. 
+		"""
+
+		self.user = user #user which executes the command
+		self.command = ' '.join(*args) # The name of the command
+		self.ip = ip # The IP of the server
+
+		def randomString():
+			"""
+			Generates a random token
+
+			:returns: A random string which acts as a token
+			"""
 			return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(3))
 
+		# Generates a random token to identify the execution
 		self.identifier = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
+		
 		self.opensockets  = opensockets
+		
+		#The buffers are redirected
 		kwargs['stdout'] = subprocess.PIPE
 		kwargs['stderr'] = subprocess.PIPE
 		
 		def demote(uid, gid):
+			"""
+			The UID and GID of the child process is changed to match those of the user
+			who issued the command. Otherwise the operation would be executed as root.
+			"""
 			os.setgid(gid)
 			os.setuid(uid)
 
-		self.process = subprocess.Popen(preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, *args, **kwargs)
-		
-		self.fd = self.process.stdout.fileno()
-		fl = fcntl.fcntl(self.fd, fcntl.F_GETFL)
-		fcntl.fcntl(self.fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
+		self.process = subprocess.Popen(preexec_fn=demote(user.pw_uid, user.pw_gid), #function executed before the call
+										cwd=directory, # The current working directory is changed
+										*args, **kwargs)
+		
+		#The fileno of the stdout buffer is used to make it non-blocking
+		self.fd = self.process.stdout.fileno()
+		fl = fcntl.fcntl(self.fd, fcntl.F_GETFL) #The file access mode is returned
+		fcntl.fcntl(self.fd, fcntl.F_SETFL, fl | os.O_NONBLOCK) # The flags of the file are modified, appending the non-blocking flag blogin
+
+		#The same for stderr
 		self.fd_err = self.process.stderr.fileno()
 		fl_err = fcntl.fcntl(self.fd_err, fcntl.F_GETFL)
 		fcntl.fcntl(self.fd_err, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
+		#Creation of the line buffer
 		self.line_buffer = LineBuffer()
+
+		#Two handlers are registered, each for one of the output buffers. can_read and can_read_stderr act as the callback for events related to both of them
 		io_loop.add_handler(self.process.stdout, self.can_read, io_loop.READ)
 		io_loop.add_handler(self.process.stderr, self.can_read_stderr, io_loop.READ)
 		
 
 	def can_read(self, fd, events):
+		"""
+		Processes the stdout event
+		:param: int fd The file descriptor of the stdout buffer
+		:param: int events The event flags (bitwise OR of the constants IOLoop.READ, IOLoop.WRITE, and IOLoop.ERROR)
+		"""
 		data = self.process.stdout.read(1024)
 		
+
 		if len(data) > 0:
+			"""If the length of the data is larger than zero, the information is sent to all
+			the listening sockets"""
 			self.on_data(data, "stdout")
 
 		else:
 			print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
 			self.stop_output()
+	
 	def can_read_stderr(self, fd, events):
+		"""
+		Processes the stderr event
+		:param: int fd The file descriptor of the stderr buffer
+		:param: int events The event flags (bitwise OR of the constants IOLoop.READ, IOLoop.WRITE, and IOLoop.ERROR)
+		"""
 		data = self.process.stderr.read(1024)
 
 		if len(data) > 0:
@@ -139,17 +197,28 @@ class ProcessReactor(object):
 			self.stop_output()
 
 	def on_data(self, data, stream_name):
-		
+		"""
+		Decodes the data and passes it to on_line
+		:param: byte[] data an array of bytes with the message
+		:param: str stream_name The name of the stream
+		"""
 		for line in self.line_buffer.read_lines(data):
-			
 			self.on_line(line.decode('utf-8'), stream_name)
 
 	def on_line(self, line, stream_name):
-		#print(self.user.pw_name)
+		"""
+		Sends the line to the open websocket
+		:param: str line The message line
+		:param: str stream_name The name of the stream
+		"""
 		for ws in self.opensockets[self.user.pw_name]:
 			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False, stream_name)
 
+
 	def stop_output(self):
+		"""
+		Sends a special message to close the websocket connection
+		"""
 		for ws in self.opensockets[self.user.pw_name]:
 			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True)
 
@@ -202,7 +271,7 @@ class DeployHandler(RequestHandler):
 		overwrite = False if overwrite.lower() == 'false' else True;
 
 
-		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
+		thread_pool = futures.ThreadPoolExecutor(max_workers=4) #TODO
 		thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
 		
 		self.finish('OK')
@@ -230,8 +299,8 @@ class DeployHandler(RequestHandler):
 		output_file.close()
 		if command is not "":
 			p = ProcessReactor(user, directory, split(command))
-			#process = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			#out, err = process.communicate()
+			#TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			#TODOout, err = process.communicate()
 
 
 settings = {
@@ -241,25 +310,55 @@ settings = {
 }
 
 class LoggerHandler(WebSocketHandler):
+	"""
+	Processes the logging messages
+	"""
 	def check_origin(self, origin):
+		"""
+        Overrides the parent method to return True for any request, since we are
+        working without names
+
+        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :returns: bool True
+        """
 		return True
 	
 	def open(self):
+		#TODO: remove
 		global ip
 		ip = getip(self.request.protocol, self.request.host)
 
 	def on_message(self, message):
-
-		print("Message")
+		"""
+		A message is sent by the client after creating the connection. The method verifies the user
+		secret cookie and appends the connection to the opensockets dictionary.
+		"""
 		user_id = decode_signed_value(settings["cookie_secret"], 'user', message).decode('utf-8')
 		
+		"""
+		If the user_id is other than None the verification has succeded, and the connection is appended to the 
+		rest of the websockets related to the user.
+		"""
 		if not user_id is None:
 			if opensockets.get(user_id) is None:
-				opensockets[user_id] = []
+				opensockets[user_id] = []#TODO: change to set
 			opensockets[user_id].append(self)
+		else:
+			pass
+		#TODO: Return error code
 
 	def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout"):
-		
+		"""
+		The io_loop calls the function when a new message appears.
+		:param: str user The name of the user
+		:param: str command The command in execution
+		:param: str message The message to deliver
+		:param: str ip The ip of the server, so the client knows where the message comes from
+		:param: bool stop Determines if the connection must be closed or not *deprecated*
+		:param: str stream_name The name of the stream
+		"""
+		#TODO Could the client side of the ws guess the address
+		#TODO: Remove stop
 		msg = {}
 		msg["user"] = user
 		msg["command"] = command
@@ -272,41 +371,63 @@ class LoggerHandler(WebSocketHandler):
 		self.write_message(json.dumps(msg))
 
 	def on_close(self):
+		"""
+		Removes the connection from the opensockets dictionary
+		"""
 		success = False
-		for ws in opensockets:
+		for ws in opensockets and success == False:
 			if self in opensockets[ws]:
 				opensockets[ws].remove(self)
+				success = True
 
 class ProbeWSHandler(WebSocketHandler):
 	def check_origin(self, origin):
+		"""
+        Overrides the parent method to return True for any request, since we are
+        working without names
+
+        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :returns: bool True
+        """
 		return True
 
 	def open(self):
+		"""
+		Returns a confirmation message
+		"""
 		self.write_message("OK")
 		self.close()
 
 
 class ProbeHandler(RequestHandler):
 	def get(self):
-		self.write("Hola")
+		self.write("You should be able to create websocket connections now")
 
 
+def process_data():
+	"""
+	
+	"""
+	global data_dict, data_json
+
+	data_dict = get_data()
+	data_json = json.dumps(data_dict,separators=(',',':'))
 
 data_dict = {}
 data_json = ""
 
 response_dict = {}
 open_sockets =  []
-
-def process_data():
-	global data_dict, data_json
-
-	data_dict = get_data()
-	data_json = json.dumps(data_dict,separators=(',',':'))
-
 class SocketHandler(WebSocketHandler):
 
     def check_origin(self, origin):
+    	"""
+        Overrides the parent method to return True for any request, since we are
+        working without names
+
+        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :returns: bool True
+        """
         return True
 
     def open(self):
@@ -349,7 +470,7 @@ app = Application(routes, **settings)
 wsapp = Application(routes_ws, **settings);
 
 if __name__ == "__main__":
-
+	ip = getip()
 	pid = os.getpid()
 
 	if not os.path.exists('/var/run/marcopolo'):
