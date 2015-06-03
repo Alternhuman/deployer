@@ -22,9 +22,7 @@ def sigterm_handler(signal, frame):
     sys.exit(0)
 
 def get_data():
-
-        global response_dict
-
+        response_dict = {}
         response_dict["time"] = strftime("%a, %d %b %Y %H:%M:%S", localtime())
 
         response_dict["hostname"] = subprocess.Popen("hostname", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
@@ -63,6 +61,8 @@ def get_data():
         
         response_dict["cpus"] = cpus_float
 
+        return response_dict
+
 class SocketHandler(websocket.WebSocketHandler):
 
     def check_origin(self, origin):
@@ -98,23 +98,23 @@ settings = {
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
 }
 
-class ProbeHandler(web.RequestHandler):
-    def get(self):
-        self.write("OK")
+# class ProbeHandler(web.RequestHandler):
+#     def get(self):
+#         self.write("OK")
 
-class ProbeSocketHandler(websocket.WebSocketHandler):
-    def check_origin(self, origin):
-        return True
+# class ProbeSocketHandler(websocket.WebSocketHandler):
+#     def check_origin(self, origin):
+#         return True
 
-    def open(self):
-        self.write_message("OK")
-        self.close()
+#     def open(self):
+#         self.write_message("OK")
+#         self.close()
 
-app = web.Application([
-    (r'/probe', ProbeHandler),
-    (r'/ws/probe/', ProbeSocketHandler),
-    (r'/ws', SocketHandler),
-], **settings)
+# app = web.Application([
+#     (r'/probe', ProbeHandler),
+#     (r'/ws/probe/', ProbeSocketHandler),
+#     (r'/ws', SocketHandler),
+# ], **settings)
 
 if __name__ == "__main__":
     import signal, os, logging

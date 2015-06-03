@@ -36,7 +36,7 @@ function createSocket(url, callback){
     var uri = loc.protocol == "https:" ? "wss:" : "ws:";
     uri += "//" + "localhost:1370" + "/ws/";*/
     var ws;
-    var uri = "wss://"+url+":1370/ws/"; //The socket always travels through HTTPS
+    var uri = "wss://"+url+":1370/ws/logger/"; //The socket always travels through HTTPS
     ws = new WebSocket(uri);
 
     ws.onmessage = function(evt) {

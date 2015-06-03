@@ -132,8 +132,6 @@ class UploadAndDeployHandler(BaseHandler):
         #The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
         thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
         
-        #print("Print" + self.get_argument('overwrite', False));
-        
         @tornado.gen.coroutine
         def call_deploy(node):
             yield thread_pool.submit(self.deploy, node=node,
@@ -154,7 +152,7 @@ class UploadAndDeployHandler(BaseHandler):
              tomcat=self.get_argument('tomcat', ''),
              overwrite=self.get_argument('overwrite', 'false'))
 
-
+            #TODO: handle callback
             #deployment = tornado.gen.Task(call_deploy, node)
         
         self.finish("file" + original_fname + " is uploaded and on deploy")
@@ -165,7 +163,7 @@ class UploadAndDeployHandler(BaseHandler):
         def get_content_type(filename):
             return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
-        url = "https://"+node+":"+str(conf.RECEIVER_PORT)+"/deploy"
+        url = "https://"+node+":"+str(conf.RECEIVER_PORT)+"/deploy/"
         files = {'file': (filename, open(os.path.join(__UPLOADS__, filename), 'rb'), get_content_type(filename))}
         commands = {'command':command, 
                     'user':user, 
@@ -181,7 +179,6 @@ class NodesHandler(websocket.WebSocketHandler):
     """
     Handler for the Polo websocket connection
     """
-    #TODO: polo will have events to notify of new nodes. New crazy idea...
     def check_origin(self, origin):
         return True
 
@@ -190,7 +187,7 @@ class NodesHandler(websocket.WebSocketHandler):
         m = marco.Marco()
         try:
             nodes = m.request_for("deployer")
-            self.write_message(json.dumps({"Nodes":[n.address[0] for n in nodes]}))
+            self.write_message(json.dumps({"Nodes":[n.address for n in nodes]}))
         except marco.MarcoTimeOutException:
             self.write_message(json.dumps({"Error": "Error in marco detection"}))
                 
@@ -208,7 +205,7 @@ class Nodes(RequestHandler):
         m = marco.Marco()
         try:
             nodes = m.request_for("deployer")
-            self.write(json.dumps({'nodes':[n.address[0] for n in nodes]}))
+            self.write(json.dumps({'nodes':[n.address for n in nodes]}))
         except marco.MarcoTimeOutException:
             self.write_message(json.dumps({"Error": "Error in marco detection"}))
         
@@ -225,18 +222,19 @@ class ProbeWSHandler(websocket.WebSocketHandler):
     def open(self):
         self.write_message("OK")
         self.close()
-        
+
+#TODO: Fix '/' 
 routes = [
     (r'/', IndexHandler),
-    (r'/nodes', Nodes),
+    (r'/nodes/?', Nodes),
     (r'/static/(.*)', StaticFileHandler, {"path":"./static"}),
-    (r'/ws/nodes', NodesHandler),
+    (r'/ws/nodes/?', NodesHandler),
     (r"/login/?", LoginHandler),
     (r"/logout/?", Logout),
-    (r'/upload', UploadAndDeployHandler),
+    (r'/upload/?', UploadAndDeployHandler),
     #probes
-    (r'/probe', ProbeHandler),
-    (r'/ws/probe', ProbeWSHandler)
+    (r'/probe/?', ProbeHandler),
+    (r'/ws/probe/?', ProbeWSHandler)
 ]
 
 settings = {

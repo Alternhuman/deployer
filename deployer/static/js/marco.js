@@ -82,7 +82,7 @@ $(document).ready(function() {
 
 function sendFileToServer(formData, status) {
 
-    var uploadURL = "/upload"; //Upload URL
+    var uploadURL = "/upload/"; //Upload URL
     var extraData = {}; //Extra Data.
     var jqXHR = $.ajax({
         xhr: function() {
@@ -249,10 +249,7 @@ $(document).ready(function() {
     $("#uploadbutton").on('click', function(e){
         handleFileUpload(files_to_upload, obj);
     });
-/*});
 
-
-$(document).ready(function() {*/
     //from http://www.jacklmoore.com/notes/jquery-tabs/
     $("ul.tabs").each(function() {
         var $active, $content, $links = $(this).find('a');

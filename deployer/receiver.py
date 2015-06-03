@@ -1,37 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tornado.web import Application, RequestHandler
+from tornado.web import Application, RequestHandler, StaticFileHandler
+from tornado import ioloop
+from tornado.websocket import WebSocketHandler
 import tornado.web
 from tornado.httpserver import HTTPServer 
 from tornado import ioloop
+from tornado.gen import coroutine
+
 import os, time
 from shlex import split
 from subprocess import Popen
 import subprocess
 import pwd
-from tornado.gen import coroutine
 import sys
+
+
 sys.path.append(os.path.realpath(__file__))
 import conf
-
+from statusmonitor import get_data
+from tornado.ioloop import PeriodicCallback
 import signal
 from os import path, makedirs
 
-from tornado.web import RequestHandler, Application, StaticFileHandler
-from tornado import ioloop
-from tornado.websocket import WebSocketHandler
 import subprocess
 import fcntl
-import os
 import sys
-#from asynclogger import ExecuteCommand
-from tornado.websocket import WebSocketHandler
 import json
 
 import socket
 import string, random
 import hashlib
+from concurrent import futures
+from tornado.web import decode_signed_value
+import logging
+import conf, ssl
+
 
 sys.path.append("/opt/marcopolo")
 from bindings.polo import polo
@@ -42,27 +47,23 @@ if int(sys.version[0]) < 3:
 	import urlparse
 else:
 	import urllib.parse as urlparse
+
 ip = ""
+
 def getip(protocol, host):
 	
 	return ni.ifaddresses(conf.INTERFACE).get(AF_INET)[0].get('addr')
-	
-	print(host)
-	hostname = urlparse.urlparse("%s://%s" % (protocol, host)).hostname
-	ip_address = socket.gethostbyname(hostname)
-	return "172.20.1.88"
-
-
-import signal
-
-
 
 def sigint_handler(signal, frame):
 	io_loop.add_callback(shutdown)
 
 def shutdown():
 	print("Stopping gracefully")
-	polo.Polo().unpublish_service("deployer", delete_file=True)
+	try:
+		polo.Polo().unpublish_service("deployer", delete_file=True)
+		polo.Polo().unpublish_service("statusmonitor", delete_file=True)
+	except e:
+		pass
 	io_loop.stop()
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -92,12 +93,11 @@ class ProcessReactor(object):
 
 			return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(3))
 
-		#self.identifier = "AAA"#int(hashlib.sha1(self.command+randomString()).hexdigest(), 16) % (10 ** 8)
 		self.identifier = ''.join(random.choice(string.ascii_uppercase) for i in range(12))
 		self.opensockets  = opensockets
 		kwargs['stdout'] = subprocess.PIPE
 		kwargs['stderr'] = subprocess.PIPE
-		#print(args)
+		
 		def demote(uid, gid):
 			os.setgid(gid)
 			os.setuid(uid)
@@ -139,9 +139,9 @@ class ProcessReactor(object):
 			self.stop_output()
 
 	def on_data(self, data, stream_name):
-		#print(data)
+		
 		for line in self.line_buffer.read_lines(data):
-			#print(line.decode('utf-8'))
+			
 			self.on_line(line.decode('utf-8'), stream_name)
 
 	def on_line(self, line, stream_name):
@@ -152,12 +152,6 @@ class ProcessReactor(object):
 	def stop_output(self):
 		for ws in self.opensockets[self.user.pw_name]:
 			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True)
-
-
-# class ExecuteCommand():
-# 	def __init__(self, user, ioloop, opensockets):
-# 		self.user = user.pw_name
-# 		self.processreactor = ProcessReactor(user, ioloop, opensockets, ['cat', 'lines.txt'])
 
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
@@ -207,7 +201,6 @@ class DeployHandler(RequestHandler):
 		
 		overwrite = False if overwrite.lower() == 'false' else True;
 
-		from concurrent import futures
 
 		thread_pool = futures.ThreadPoolExecutor(max_workers=4)
 		thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
@@ -218,11 +211,8 @@ class DeployHandler(RequestHandler):
 	def execute(self, command, file_desc, filename, directory, user, tomcat=False, overwrite="false"):
 		
 		if os.path.isfile(filename) and not overwrite:
-			#print("File already exists and cannot overwrite")
 			return
-		else:
-			#print("Overwriting all the things!")
-			pass
+
 		def demote(user_uid, user_gid):
 			os.setgid(user_gid)
 			os.setuid(user_uid)
@@ -230,7 +220,6 @@ class DeployHandler(RequestHandler):
 		if os.path.exists(os.path.dirname(filename)):
 			output_file = open(filename, 'wb')
 		else:
-			#print("Path does not exist")
 			return
 
 		output_file.write(file_desc['body'])
@@ -262,9 +251,8 @@ class LoggerHandler(WebSocketHandler):
 	def on_message(self, message):
 
 		print("Message")
-		from tornado.web import decode_signed_value
 		user_id = decode_signed_value(settings["cookie_secret"], 'user', message).decode('utf-8')
-		#print(user_id)
+		
 		if not user_id is None:
 			if opensockets.get(user_id) is None:
 				opensockets[user_id] = []
@@ -296,19 +284,64 @@ class ProbeWSHandler(WebSocketHandler):
 	def open(self):
 		self.write_message("OK")
 		self.close()
+
+
 class ProbeHandler(RequestHandler):
 	def get(self):
 		self.write("Hola")
 
 
+
+data_dict = {}
+data_json = ""
+
+response_dict = {}
+open_sockets =  []
+
+def process_data():
+	global data_dict, data_json
+
+	data_dict = get_data()
+	data_json = json.dumps(data_dict,separators=(',',':'))
+
+class SocketHandler(WebSocketHandler):
+
+    def check_origin(self, origin):
+        return True
+
+    def open(self):
+        print("Connection open from " + self.request.remote_ip)
+        if not self in open_sockets:
+            open_sockets.append(self) #http://stackoverflow.com/a/19571205
+        self.callback = PeriodicCallback(self.send_data, 1000)
+
+        self.callback.start()
+
+    def send_data(self):
+        self.write_message(data_json)
+        return
+
+        
+    def on_close(self):
+        self.callback.stop()
+        if self in open_sockets:
+            open_sockets.remove(self)
+
+    def send_update(self):
+        pass
+
+
+
 routes =  [
-	(r'/deploy', DeployHandler),
+	(r'/deploy/?', DeployHandler),
 ]
 
 routes_ws = [
-	(r'/', ProbeHandler),
 	(r'/ws/probe/', ProbeWSHandler),
-	(r'/ws/', LoggerHandler)
+	(r'/ws/status/', SocketHandler),
+	(r'/ws/logger/', LoggerHandler),
+	(r'/probe/', ProbeHandler),
+	(r'/', ProbeHandler),
 ]
 
 app = Application(routes, **settings)
@@ -316,7 +349,6 @@ app = Application(routes, **settings)
 wsapp = Application(routes_ws, **settings);
 
 if __name__ == "__main__":
-	import conf, ssl
 
 	pid = os.getpid()
 
@@ -332,17 +364,22 @@ if __name__ == "__main__":
 		"keyfile": conf.RECEIVERKEY,
 		"cert_reqs": ssl.CERT_REQUIRED,
 		"ca_certs": conf.APPCERT,
-		})
+	})
 
 	httpServer.listen(conf.RECEIVER_PORT)
 
-	wsapp.listen(conf.RECEIVER_WEBSOCKET_PORT, ssl_options={"certfile": conf.APPCERT,
-        "keyfile": conf.APPKEY})
+	wsapp.listen(conf.RECEIVER_WEBSOCKET_PORT, 
+			ssl_options={"certfile": conf.APPCERT,
+	        			 "keyfile": conf.APPKEY})
+
+	getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
+	getDataCallback.start()
 
 	print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
 	while True:
 		try:
-			polo.Polo().publish_service("deployer", root=True) #TODO: unpublish
+			polo.Polo().publish_service("deployer", root=True)
+			polo.Polo().publish_service("statusmonitor", root=True)
 			break
 		except polo.PoloInternalException as e:
 			print(e)

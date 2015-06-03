@@ -1,4 +1,7 @@
 'use strict'
+
+var PORT=1370
+
 $(document).ready(function(){
 
   $.ajax({
@@ -71,7 +74,7 @@ function createPanel(number, ip){
   //Construcción de la URI y conexión al WebSocket
   var loc = ip;
   var uri = "wss:";
-  uri += "//" + loc + ":1341/ws";
+  uri += "//" + loc + ":"+PORT+"/ws/status/";
 
 
 
@@ -301,7 +304,7 @@ function createPanel(number, ip){
   }
 
     ws.onerror = function(evt){
-      var probe = "https://"+loc+":1341/probe";
+      var probe = "https://"+loc+":"+PORT+"/probe/";
       console.log("Could not connect to socket")
       $("#hostname-"+number)
       .closest(".panel-heading")
