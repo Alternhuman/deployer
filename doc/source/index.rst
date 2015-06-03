@@ -3,15 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to deployer's documentation!
-====================================
+Welcome to marcodeployer's documentation!
+=========================================
+
+MarcoDeployer is a set of tools which ease the deployment of software in different nodes. MarcoDeployer uses MarcoPolo to detect nodes in the network and WebSockets to stream results live. MarcoDeployer includes the following functionality:
+
+
+
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-
+   Installation <installation>
+   User manual <manual>
+   Reference <reference>
 
 Indices and tables
 ==================

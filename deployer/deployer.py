@@ -38,7 +38,9 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
     """
     def cert_verify(self, conn, *args, **kwargs):
         """
-        Avoids the verification of the SSL Hostname field 
+        Avoids the verification of the SSL Hostname field
+
+        :param: conn The connection object
         """
         super().cert_verify(conn, *args, **kwargs)
         conn.assert_hostname = False
@@ -250,6 +252,7 @@ class UploadAndDeployHandler(BaseHandler):
         
         return futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
         
+
 class NodesHandler(websocket.WebSocketHandler):
     """
     Handler for the Polo websocket connection
@@ -257,9 +260,10 @@ class NodesHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
         """
         Overrides the parent method to return True for any request, since we are
-        working without names
+        working without names. 
 
-        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :see: :meth:`check_origin<tornado.websocket.WebSocketHandler.check_origin>`
+
         :returns: bool True
         """
         return True
@@ -318,9 +322,12 @@ class ProbeWSHandler(websocket.WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :see: :meth:`check_origin<tornado.websocket.WebSocketHandler.check_origin>`
+
         :returns: bool True
         """
+
+        #:ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
         return True
 
     def open(self):
