@@ -14,12 +14,11 @@ function sendInput(input, hosts){
 	}
 }
 
-function appendShellOutput(input, ip, stream_name, stop){
-	console.log(stop)
+function appendShellOutput(input, ip, stream_name, stop, command){
 	if(stop == false)
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+escapeHtml(input)+"</p>");
 	else
-		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+"End of output"+"</p>");
+		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+"End of "+stream_name+" for "+command+"</p>");
 	
 	/*console.log(input);
 	console.log(ip);

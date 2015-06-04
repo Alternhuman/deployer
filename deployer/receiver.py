@@ -112,9 +112,8 @@ class ProcessReactor(object):
 		self.user = user #user which executes the command
 		self.command = ' '.join(*args) # The name of the command
 		self.ip = ip # The IP of the server
-		print(kwargs)
+		print(self.command)
 		self.shell =  kwargs.get("shell", False)
-		print(self.shell)
 		def randomString():
 			"""
 			Generates a random token
@@ -180,7 +179,7 @@ class ProcessReactor(object):
 		else:
 			print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stdout)
-			self.stop_output()
+			self.stop_output("stdout")
 	
 	def can_read_stderr(self, fd, events):
 		"""
@@ -196,7 +195,7 @@ class ProcessReactor(object):
 		else:
 			print("Lost connection to subprocess")
 			io_loop.remove_handler(self.process.stderr)
-			self.stop_output()
+			self.stop_output("stderr")
 
 	def on_data(self, data, stream_name):
 		"""
@@ -217,12 +216,12 @@ class ProcessReactor(object):
 			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False, stream_name, shell=self.shell)
 
 
-	def stop_output(self):
+	def stop_output(self, stream_name="unknown"):
 		"""
 		Sends a special message to close the websocket connection
 		"""
 		for ws in self.opensockets[self.user.pw_name]:
-			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True, shell=self.shell)
+			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True, stream_name, shell=self.shell)
 
 
 
@@ -302,6 +301,7 @@ class DeployHandler(RequestHandler):
 			os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
 		output_file.close()
 		if command is not "":
+			print(split(command))
 			p = ProcessReactor(user, directory, split(command))
 			#TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			#TODOout, err = process.communicate()
@@ -369,7 +369,7 @@ class LoggerHandler(WebSocketHandler):
 		msg["message"] = message
 		msg["ip"] = ip
 		msg["identifier"] = identifier
-		msg["stop"] = False
+		msg["stop"] = stop
 		msg["stream_name"] = stream_name
 		msg["shell"] = kwargs.get("shell", False)
 		print(msg["shell"])
@@ -413,8 +413,12 @@ class ShellHandler(LoggerHandler):
 			if user_id is not None:
 				user_id = user_id.decode('utf-8')
 				user_pwd = pwd.getpwnam(user_id)
-				p = ProcessReactor(user_pwd, user_pwd.pw_dir, split(message_dict["command"]), shell=True)
-
+				try:
+					print(split(message_dict["command"]))
+					command = message_dict["command"]
+					p = ProcessReactor(user_pwd, user_pwd.pw_dir, split(command), shell=True)
+				except Exception as e:
+					print(e)
 
 class ProbeWSHandler(WebSocketHandler):
 	def check_origin(self, origin):
