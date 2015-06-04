@@ -13,11 +13,17 @@ function sendInput(input, hosts){
 	}
 }
 
-function appendShellOutput(input, ip, stream_name, stop, command){
-	if(stop == false)
+function appendShellOutput(input, ip, stream_name, stop, command, identifier){
+	
+
+	if(stop == false){
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+escapeHtml(input)+"</p>");
-	else
+		//if(!shellTabs[ip].find(".panel-body").hasClass(identifier)){
+		shellTabs[ip].find(".panel-heading").addClass(identifier);
+	}else{
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+"End of "+stream_name+" for "+command+"</p>");
+		shellTabs[ip].find(".panel-heading").removeClass(identifier)
+	}
 }
 
 var shellTabs = {};
@@ -26,7 +32,7 @@ function createShellTab(ip){
 	
     var identifier = "tab"+(Object.keys(shellTabs).length);
 
-    $("#shellwindow").append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading'><span class='ipaddr doexecute'>"+ip+"</span><input class='pull-right executecheckbox' type='checkbox' name='execute' checked></input></div><div class='panel-body output'></div></div></div>");
+    $("#shellwindow").append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading' style='display:block;overflow:auto'><span class='ipaddr doexecute'>"+ip+"</span><button style='width:10%;margin-left:10px;' class='btn btn-danger stopexecution pull-right'><div class='glyphicon glyphicon-remove'></button><input class='pull-right executecheckbox' type='checkbox' name='execute' checked></input></div><div class='panel-body output'></div></div></div>");
     
     shellTabs[ip] = $("#"+identifier);
 
@@ -62,4 +68,26 @@ $(document).ready(function(){
 			$node.removeClass("doexecute");
 		}
 	});
+
+	$("#shellwindow").on("click", ".stopexecution", function(){
+		console.log($(this).parent());
+		console.log($(this).parent().attr('class').split(" "));
+		var classes=$(this).parent().attr('class').split(" ");
+		var ip = $(this).siblings(".ipaddr").text();
+
+		for (var i = classes.length - 1; i >= 0; i--) {
+			if(classes[i] != "panel-heading"){
+				console.log(classes[i]);
+				var ws = opensockets[ip];
+        		ws.send(JSON.stringify({"remove":classes[i], "user_id":$.cookie("user")}));
+			}
+		};
+
+		/*$($(this).parent().attr('class').split(" ")).each(function(){
+			console.log(this);
+		});*/
+		/*$($(this).parent().attr('class')).each(function(){
+			console.log(this);
+		});*/
+	})
 });

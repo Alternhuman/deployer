@@ -278,13 +278,28 @@ class ShellHandler(LoggerHandler):
 		elif message_dict.get("remove", None) is not None:
 			print("remove")
 			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
-			
-			identifier = message_dict.get("remove", None)
-			if identifier is not None:
-				print("identifier", identifier)
-				process = next((x for x in processes if x.identifier == identifier), None)
-				if process is not None:
-					process.stop()
+			if user_id is not None:
+				identifier = message_dict.get("remove", None)
+				if identifier is not None:
+					print("identifier", identifier)
+					process = next((x for x in processes if x.identifier == identifier), None)
+					if process is not None:
+						process.stop()
+
+		elif message_dict.get("removeshell", None) is None:
+			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
+			if user_id is not None:
+				
+				identifiers = message_dict.get("removeshell")
+				if identifiers is not None:
+					try:
+						identifiers_dict = json.loads(message_dict["removeshell"])
+						for identifier in identifiers:
+							process = next((x for x in processes if x.identifier == identifier), None)
+							if process is not None:
+								process.stop()
+					except ValueError as v:
+						print(v)
 
 
 class ProbeWSHandler(WebSocketHandler):

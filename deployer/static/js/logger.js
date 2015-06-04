@@ -42,7 +42,7 @@ function createSocket(url, callback){
         var msg = JSON.parse(evt.data);
         //If it is the first output received, the output frame is created
         if(msg.shell == true){
-            appendShellOutput(msg.message, msg.ip, msg.stream_name, msg.stop, msg.command);
+            appendShellOutput(msg.message, msg.ip, msg.stream_name, msg.stop, msg.command, msg.identifier);
         }else{
             if($("#"+msg.identifier).length < 1){
                 createOutput(msg.ip, msg.identifier, msg.command);
@@ -84,7 +84,7 @@ function createTabs(host){
 function createOutput(host, identifier, command){
     $tab = tabs[host];
     
-    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading' style='display:block;overflow:auto'><p height='80%'>"+command+"</p><button style='width:10%;' class='btn btn-danger stop-button pull-right'><div class='glyphicon glyphicon-remove'></div></button></input></div><div class='panel-body output'></div></div></div>");
+    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading' style='display:block;overflow:auto'><p height='80%'>"+command+"</p><button style='width:10%;' class='btn btn-danger stop-button pull-right'><div class='glyphicon glyphicon-remove'></button></div></button></input></div><div class='panel-body output'></div></div></div>");
 
 }
 
