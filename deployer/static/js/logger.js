@@ -22,7 +22,6 @@ $(document).ready(function(){
 });
 
 
-
 function createSocket(url, callback){
     //The socket is only created once
     if(connectedSockets.indexOf(url) > -1){
@@ -32,11 +31,11 @@ function createSocket(url, callback){
     
     connectedSockets.push(url);
 
-    /*var loc = window.location;
+    var loc = window.location;
     var uri = loc.protocol == "https:" ? "wss:" : "ws:";
-    uri += "//" + "localhost:1370" + "/ws/";*/
+    uri += "//" +url+":1370" + "/ws/logger/";
     var ws;
-    var uri = "wss://"+url+":1370/ws/logger/"; //The socket always travels through HTTPS
+    //var uri = "wss://"+url+":1370/ws/logger/"; //The socket always travels through HTTPS
     ws = new WebSocket(uri);
 
     ws.onmessage = function(evt) {

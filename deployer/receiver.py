@@ -66,8 +66,8 @@ def shutdown():
 	try:
 		polo.Polo().unpublish_service("deployer", delete_file=True)
 		polo.Polo().unpublish_service("statusmonitor", delete_file=True)
-	except e:
-		pass
+	except Exception as e:
+		print(e)
 	io_loop.stop()
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -496,7 +496,6 @@ if __name__ == "__main__":
 	getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
 	getDataCallback.start()
 
-	print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
 	while True:
 		try:
 			polo.Polo().publish_service("deployer", root=True)
@@ -508,5 +507,5 @@ if __name__ == "__main__":
 		except polo.PoloException as i:
 			print(i)
 			break
-
+	print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
 	io_loop.start()
