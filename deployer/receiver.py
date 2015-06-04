@@ -78,7 +78,7 @@ io_loop = ioloop.IOLoop.instance()
 
 class LineBuffer(object):
 	"""
-	Processes each linke in the desired buffer
+	Processes each line in the desired buffer
 
 	From Juan Luis Boya
 	"""
@@ -113,6 +113,8 @@ class ProcessReactor(object):
 		self.command = ' '.join(*args) # The name of the command
 		self.ip = ip # The IP of the server
 
+		self.shell =  kwargs.get("shell", False)
+		
 		def randomString():
 			"""
 			Generates a random token
@@ -212,7 +214,7 @@ class ProcessReactor(object):
 		:param: str stream_name The name of the stream
 		"""
 		for ws in self.opensockets[self.user.pw_name]:
-			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False, stream_name)
+			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False, stream_name, shell=self.shell)
 
 
 	def stop_output(self):
@@ -221,6 +223,8 @@ class ProcessReactor(object):
 		"""
 		for ws in self.opensockets[self.user.pw_name]:
 			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True)
+
+
 
 class DeployHandler(RequestHandler):
 	@tornado.web.asynchronous
@@ -347,7 +351,7 @@ class LoggerHandler(WebSocketHandler):
 			pass
 		#TODO: Return error code
 
-	def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout"):
+	def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout", *args, **kwargs):
 		"""
 		The io_loop calls the function when a new message appears.
 		:param: str user The name of the user
@@ -367,6 +371,7 @@ class LoggerHandler(WebSocketHandler):
 		msg["identifier"] = identifier
 		msg["stop"] = False
 		msg["stream_name"] = stream_name
+		msg["shell"] = kwargs.get("shell", False)
 		
 		self.write_message(json.dumps(msg))
 
@@ -380,6 +385,34 @@ class LoggerHandler(WebSocketHandler):
 				opensockets[ws].remove(self)
 				success = True
 				break #TODO:  Remove success
+
+class ShellHandler(LoggerHandler):
+	
+	def on_message(self, message):
+		message_json = message.decode('utf-8')
+
+		try:
+			message_dict = json.loads(message_json)
+		except ValueError as v:
+			return
+
+		if message_dict.get("register", None) is not None:
+			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict["register"]).decode('utf-8')
+			
+			if not user_id is None:
+				if opensockets.get(user_id) is None:
+					opensockets[user_id] = []#TODO: change to set
+				opensockets[user_id].append(self)
+			else:
+				pass
+
+		elif message_dict.get("command", None) is not None:
+			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", "")).decode('utf-8')
+			
+			if user_id is not None:
+				user_pwd = pwd.getpwnam(user_id)
+				p = ProcessReactor(user_pwd, user_pwd.pw_dir, split(message_dict["command"]), shell=True)
+
 
 class ProbeWSHandler(WebSocketHandler):
 	def check_origin(self, origin):
