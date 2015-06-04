@@ -2,6 +2,8 @@
 
 var PORT=1370
 
+var opensockets = {};
+
 $(document).ready(function(){
 
   $.ajax({
@@ -24,7 +26,7 @@ $(document).ready(function(){
         });
 
         createShell(data.nodes[ip]);
-        createSocket(data.nodes[ip]);
+        opensockets[data.nodes[ip]] = createSocket(data.nodes[ip]); //TODO: consider the array
       }
     },
     error: function(x, status, error){

@@ -337,7 +337,7 @@ class LoggerHandler(WebSocketHandler):
 		A message is sent by the client after creating the connection. The method verifies the user
 		secret cookie and appends the connection to the opensockets dictionary.
 		"""
-		user_id = decode_signed_value(settings["cookie_secret"], 'user', message).decode('utf-8')
+		user_id = decode_signed_value(settings["cookie_secret"], 'user', json.loads(message).get("register", "")).decode('utf-8')
 		
 		"""
 		If the user_id is other than None the verification has succeded, and the connection is appended to the 
@@ -407,9 +407,11 @@ class ShellHandler(LoggerHandler):
 				pass
 
 		elif message_dict.get("command", None) is not None:
-			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", "")).decode('utf-8')
+			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
 			
+
 			if user_id is not None:
+				user_id = user_id.decode('utf-8')
 				user_pwd = pwd.getpwnam(user_id)
 				p = ProcessReactor(user_pwd, user_pwd.pw_dir, split(message_dict["command"]), shell=True)
 
@@ -494,7 +496,8 @@ routes =  [
 routes_ws = [
 	(r'/ws/probe/', ProbeWSHandler),
 	(r'/ws/status/', SocketHandler),
-	(r'/ws/logger/', LoggerHandler),
+	#(r'/ws/logger/', LoggerHandler),
+	(r'/ws/logger/', ShellHandler),
 	(r'/probe/', ProbeHandler),
 	(r'/', ProbeHandler),
 ]

@@ -41,20 +41,30 @@ function createSocket(url, callback){
     ws.onmessage = function(evt) {
         var msg = JSON.parse(evt.data);
         //If it is the first output received, the output frame is created
-        if($("#"+msg.identifier).length < 1){
-            createOutput(msg.ip, msg.identifier, msg.command);
-            newConnection();
+        if(msg.shell == true){
+            appendShellOutput(msg.message, msg.ip, msg.stream_name, msg.stop);
+        }else{
+            if($("#"+msg.identifier).length < 1){
+                createOutput(msg.ip, msg.identifier, msg.command);
+                newConnection();
+            }
+                
+            addOutput(msg.ip, msg.identifier, msg.message, msg.stream_name, msg.stop);
         }
-        
-        addOutput(msg.ip, msg.identifier, msg.message, msg.stream_name, msg.stop);
     };
     
     ws.onopen=function(evt){
         //The authentication is based on the HMAC message stored in the cookie
-        ws.send($.cookie("user"));
+        ws.send(JSON.stringify({register:$.cookie("user")}));
         if(callback != undefined)
             callback();
     };
+
+    ws.onerror= function(evt){
+        //
+    };
+
+    return ws;
 }
 
 var tabs = [];
