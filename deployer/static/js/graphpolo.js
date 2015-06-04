@@ -24,6 +24,7 @@ $(document).ready(function(){
         });
 
         createShell(data.nodes[ip]);
+        createSocket(data.nodes[ip]);
       }
     },
     error: function(x, status, error){

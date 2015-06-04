@@ -6,10 +6,12 @@ function probeSocket(uri, callback, errcallback){
     
     probews.onmessage= function(evt){
         callback(evt);
+        probews.close();
     }
     
     probews.onerror = function(evt){
         errcallback(evt);
+        probews.close();
     }
     
 }
@@ -166,7 +168,9 @@ function handleFileUpload(files, obj) {
                 cadena += $(this).html() + ",";
                 var ip = $(this).html();
 
-                createSocket(ip, function(){
+                /*createSocket(ip,*/
+
+                (function(){
 
                     if(index >= ips.length - 1){
 
@@ -176,7 +180,7 @@ function handleFileUpload(files, obj) {
                         createTabs(ip);
                         sendFileToServer(fd, status);
                     }
-                });
+                })();
             });
             
         }

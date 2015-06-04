@@ -32,10 +32,10 @@ function createSocket(url, callback){
     connectedSockets.push(url);
 
     var loc = window.location;
-    var uri = loc.protocol == "https:" ? "wss:" : "ws:";
+    var uri = loc.protocol == "https:" ? "wss:" : "ws:"; //HTTPS detection
     uri += "//" +url+":1370" + "/ws/logger/";
     var ws;
-    //var uri = "wss://"+url+":1370/ws/logger/"; //The socket always travels through HTTPS
+    
     ws = new WebSocket(uri);
 
     ws.onmessage = function(evt) {
@@ -52,8 +52,8 @@ function createSocket(url, callback){
     ws.onopen=function(evt){
         //The authentication is based on the HMAC message stored in the cookie
         ws.send($.cookie("user"));
-        console.log("Here");
-        callback();
+        if(callback != undefined)
+            callback();
     };
 }
 
