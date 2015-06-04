@@ -112,9 +112,9 @@ class ProcessReactor(object):
 		self.user = user #user which executes the command
 		self.command = ' '.join(*args) # The name of the command
 		self.ip = ip # The IP of the server
-
+		print(kwargs)
 		self.shell =  kwargs.get("shell", False)
-		
+		print(self.shell)
 		def randomString():
 			"""
 			Generates a random token
@@ -222,7 +222,7 @@ class ProcessReactor(object):
 		Sends a special message to close the websocket connection
 		"""
 		for ws in self.opensockets[self.user.pw_name]:
-			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True)
+			ws.on_line(self.user.pw_name, self.command, None, self.ip, self.identifier, True, shell=self.shell)
 
 
 
@@ -372,7 +372,7 @@ class LoggerHandler(WebSocketHandler):
 		msg["stop"] = False
 		msg["stream_name"] = stream_name
 		msg["shell"] = kwargs.get("shell", False)
-		
+		print(msg["shell"])
 		self.write_message(json.dumps(msg))
 
 	def on_close(self):
