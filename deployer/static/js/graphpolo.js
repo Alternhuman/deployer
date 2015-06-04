@@ -5,7 +5,7 @@ var PORT=1370
 $(document).ready(function(){
 
   $.ajax({
-    url:"/nodes",
+    url:"/nodes/",
     type: 'GET',
     success: function(data, textStatus, x){
       $("#count").text(data.nodes.length)
@@ -22,6 +22,8 @@ $(document).ready(function(){
         nodo(data.nodes[ip], function(data){
           $("#listanodos").append(data);
         });
+
+        createShell(data.nodes[ip]);
       }
     },
     error: function(x, status, error){

@@ -66,7 +66,7 @@ function createTabs(host){
 
         $("#window").append("<div id='"+identifier+"' style='display:none'></div>");
         tabs[host] = $(identifier);
-        parseTabs();
+        parseTabs("ul.nav-tabs");
     }
 }
 
@@ -103,8 +103,8 @@ function addOutput(host, identifier, message, stream, stop){
     
 }
 
-function parseTabs() {
-    $("ul.nav-tabs").each(function() {
+function parseTabs(selector) {
+    $(selector).each(function() {
 
         var $active, $content, $links = $(this).find('a');
 
@@ -127,7 +127,7 @@ function parseTabs() {
         // Bind the click event handler
         $(this).on('click', 'a', function(e) {
             
-            $("ul.nav-tabs li.active").removeClass('active');
+            $(selector+" li.active").removeClass('active');
             $(this).closest('li').addClass('active');
             // Make the old tab inactive.
             $active.removeClass('active');
@@ -148,5 +148,5 @@ function parseTabs() {
 };
 
 $(document).ready(function(){
-    parseTabs();
+    parseTabs("ul.nav-tabs");
 });

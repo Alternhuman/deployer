@@ -375,10 +375,11 @@ class LoggerHandler(WebSocketHandler):
 		Removes the connection from the opensockets dictionary
 		"""
 		success = False
-		for ws in opensockets and success == False:
+		for ws in opensockets:
 			if self in opensockets[ws]:
 				opensockets[ws].remove(self)
 				success = True
+				break #TODO:  Remove success
 
 class ProbeWSHandler(WebSocketHandler):
 	def check_origin(self, origin):

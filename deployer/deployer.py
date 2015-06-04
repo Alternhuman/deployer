@@ -198,11 +198,11 @@ class UploadAndDeployHandler(BaseHandler):
              overwrite=self.get_argument('overwrite', 'false'))
             futures_set.add(future)
 
-        for future in futures_set:
+        # for future in futures_set:
 
-            response = future.result()
-            print(dir(future))
-            print(response.status_code)
+        #     response = future.result()
+        #     print(dir(future))
+        #     print(response.status_code)
 
 
             #TODO: handle callback
