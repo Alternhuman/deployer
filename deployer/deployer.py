@@ -46,9 +46,6 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
         conn.assert_hostname = False
 
 # By changing the adapter no hostname is checked
-#websession = requests.session()
-#websession.mount('https://', NotCheckingHostnameHTTPAdapter()) 
-
 futures_session = FuturesSession()
 futures_session.mount('https://', NotCheckingHostnameHTTPAdapter())
 
@@ -172,17 +169,7 @@ class UploadAndDeployHandler(BaseHandler):
         
         #The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
         thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
-        
-        # @tornado.gen.coroutine
-        # def call_deploy(node):
-        #     yield thread_pool.submit(self.deploy, node=node,
-        #      request=self, filename=original_fname, 
-        #      command=self.get_argument('command', ''), 
-        #      user=self.current_user, 
-        #      folder=self.get_argument('folder',''),
-        #      tomcat=self.get_argument('tomcat', ''),
-        #      overwrite=self.get_argument('overwrite', 'false'))
-        
+
         #For each node a future is received
 
         futures_set = set()
@@ -196,21 +183,25 @@ class UploadAndDeployHandler(BaseHandler):
              folder=self.get_argument('folder',''),
              tomcat=self.get_argument('tomcat', ''),
              overwrite=self.get_argument('overwrite', 'false'))
-            futures_set.add(future)
+            
+            futures_set.add((future, node))
 
-        # for future in futures_set:
+        error = []
+       
+        for future, node in futures_set:
+            try:
+                response = future.result()
+                print(response.status_code)
+                if response.status_code > 400:
+                    error.append((node, response.reason))
+            except Exception as e:
+                error.append((node, "Could not connect to the node"))
 
-        #     response = future.result()
-        #     print(dir(future))
-        #     print(response.status_code)
-
-
-            #TODO: handle callback
-            #deployment = tornado.gen.Task(call_deploy, node)
-        
-        self.finish("file" + original_fname + " is uploaded and on deploy")
+        if len(error) > 0:
+            self.finish("Errors occurred " + " ".join(["Node:"+node+"." for node, reason in error]))
+        else:
+            self.finish("file" + original_fname + " is uploaded and on deploy")
     
-    @asynchronous
     def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat="", overwrite='false'):
         """
         Performs the deployment asynchronously.
@@ -250,8 +241,12 @@ class UploadAndDeployHandler(BaseHandler):
                     'overwrite':overwrite
                     }
         
-        return futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
+        try:
+            f =  futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
         
+            return f
+        except Exception as e:
+            print("It happened here")
 
 class NodesHandler(websocket.WebSocketHandler):
     """

@@ -299,7 +299,7 @@ class DeployHandler(RequestHandler):
 		else:
 			os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
 		output_file.close()
-		if command is not "":
+		if len(command) > 0:
 			p = ProcessReactor(user, directory, split(command))
 			#TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			#TODOout, err = process.communicate()
