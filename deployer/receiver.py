@@ -57,6 +57,7 @@ data_json = ""
 response_dict = {}
 statusmonitor_open_sockets =  []
 getDataCallback = None
+processes = set()
 
 from utils import getip 
 
@@ -157,6 +158,7 @@ class DeployHandler(RequestHandler):
 		output_file.close()
 		if len(command) > 0:
 			p = ProcessReactor(user, directory, io_loop, ip, opensockets, split(command))
+			processes.add(p)
 			#TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			#TODOout, err = process.communicate()
 
@@ -269,8 +271,21 @@ class ShellHandler(LoggerHandler):
 				try:
 					command = message_dict["command"]
 					p = ProcessReactor(user_pwd, user_pwd.pw_dir, io_loop, ip, opensockets, split(command), shell=True)
+					processes.add(p)
 				except Exception as e:
 					print(e)
+
+		elif message_dict.get("remove", None) is not None:
+			print("remove")
+			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
+			
+			identifier = message_dict.get("remove", None)
+			if identifier is not None:
+				print("identifier", identifier)
+				process = next((x for x in processes if x.identifier == identifier), None)
+				if process is not None:
+					process.stop()
+
 
 class ProbeWSHandler(WebSocketHandler):
 	def check_origin(self, origin):

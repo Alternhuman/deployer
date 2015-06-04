@@ -74,7 +74,7 @@ function createTabs(host){
         var identifier = "tab"+(Object.keys(tabs).length);
         $("ul.nav-tabs").append("<li><a href='#"+identifier+"'>"+host+"</a></li>");
 
-        $("#window").append("<div id='"+identifier+"' style='display:none'></div>");
+        $("#window").append("<div class='tab' id='"+identifier+"' style='display:none'></div>");
         tabs[host] = $(identifier);
         parseTabs("ul.nav-tabs");
     }
@@ -84,7 +84,7 @@ function createTabs(host){
 function createOutput(host, identifier, command){
     $tab = tabs[host];
     
-    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading'>"+command+"</div><div class='panel-body output'></div></div></div>");
+    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading' style='display:block;overflow:auto'><p height='80%'>"+command+"</p><button style='width:10%;' class='btn btn-danger stop-button pull-right'><div class='glyphicon glyphicon-remove'></div></button></input></div><div class='panel-body output'></div></div></div>");
 
 }
 
@@ -111,6 +111,10 @@ function addOutput(host, identifier, message, stream, stop){
     else
         $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p class='"+stream+"'>"+escapeHtml(message)+"</p>");
     
+}
+
+function stopOutput(host, identifier){
+    console.log(opensockets[host]);
 }
 
 function parseTabs(selector) {
@@ -159,4 +163,15 @@ function parseTabs(selector) {
 
 $(document).ready(function(){
     parseTabs("ul.nav-tabs");
+
+    $("#window").on('click', '.stop-button', function(){
+        console.log("Click");
+        var identifier = $(this).closest(".col-xs-6").attr('id');
+        var id = $(this).closest(".tab").attr('id');
+        var link = $("ul.nav-tabs").find("li").find('a[href="#'+id+'"]');
+        console.log(link.text());
+        console.log(identifier)
+        var ws = opensockets[link.text()];
+        ws.send(JSON.stringify({"remove":identifier, "user_id":$.cookie("user")}));
+    })
 });

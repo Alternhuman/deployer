@@ -84,7 +84,15 @@ class ProcessReactor(object):
 		#Two handlers are registered, each for one of the output buffers. can_read and can_read_stderr act as the callback for events related to both of them
 		self.ioloop.add_handler(self.process.stdout, self.can_read, self.ioloop.READ)
 		self.ioloop.add_handler(self.process.stderr, self.can_read_stderr, self.ioloop.READ)
-		
+	
+	def kill(self):
+		if self.process.returncode is None:
+			self.process.kill()
+
+	def stop(self):
+		if self.process.returncode is None:
+			self.process.terminate()
+			self.ioloop.call_later(60, self.kill)
 
 	def can_read(self, fd, events):
 		"""
