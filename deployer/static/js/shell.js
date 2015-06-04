@@ -9,16 +9,22 @@ function processCommand(input){
 
 function sendInput(input, hosts){
 	for(host in hosts){
-		console.log(opensockets[hosts[host]]);
+		//console.log(opensockets[hosts[host]]);
 		opensockets[hosts[host]].send(JSON.stringify({user_id:$.cookie("user"),command:input}));
 	}
 }
 
 function appendShellOutput(input, ip, stream_name, stop){
-	console.log(input);
+	console.log(stop)
+	if(stop == false)
+		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+escapeHtml(input)+"</p>");
+	else
+		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+"End of output"+"</p>");
+	
+	/*console.log(input);
 	console.log(ip);
-	console.log(stream_name);
-	console.log(stop);
+	console.log(stream_name);*/
+	//console.log(stop);
 }
 
 var shellTabs = {};
