@@ -6,6 +6,8 @@ from crypt import crypt
 from re import compile as compile_regex
 
 import pam
+import netifaces as ni
+from netifaces import AF_INET
 
 #http://code.activestate.com/recipes/578489-system-authentication-against-etcshadow-or-etcpass/
 def authenticate(name, password):
@@ -33,3 +35,10 @@ def authenticate(name, password):
 		return False
 
 	return crypt(password, salt) == shadow
+
+
+def getip(interface, protocol=None, host=None):
+	"""
+	Returns the IP associated with the configured interface
+	"""
+	return ni.ifaddresses(interface).get(AF_INET)[0].get('addr')
