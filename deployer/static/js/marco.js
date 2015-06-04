@@ -164,7 +164,7 @@ function handleFileUpload(files, obj) {
 
         if(ips.length > 0){
             ips.each(function(index){
-                console.log("Here");
+                
                 cadena += $(this).html() + ",";
                 var ip = $(this).html();
 
@@ -175,7 +175,7 @@ function handleFileUpload(files, obj) {
                     if(index >= ips.length - 1){
 
                         fd.append('nodes', cadena);
-                        //console.log($(".progress-bar").eq(j), j);
+                        
                         var status = new createStatusbar($(".progress-bar").eq(j));
                         createTabs(ip);
                         sendFileToServer(fd, status);

@@ -137,7 +137,7 @@ function createPanel(number, ip){
   var width = $("#memdiv-"+number).width() / 2.5,
       height = $("#memdiv-"+number).width() / 2.5,
       radius = Math.min(width, height) / 2;
-      //console.log(width)
+      
     if(width < 100){
       width = 200;
       height = width;
@@ -310,7 +310,7 @@ function createPanel(number, ip){
 
     ws.onerror = function(evt){
       var probe = "https://"+loc+":"+PORT+"/probe/";
-      console.log("Could not connect to socket")
+      
       $("#hostname-"+number)
       .closest(".panel-heading")
       .append("<p>No se ha podido realizar la conexión al WebSocket. Comprueba tu conexión de red y asegúrate de que puedes establecer una conexión segura accediendo <a style='color:#fff' href='"+probe+"'>aquí</a></p>");

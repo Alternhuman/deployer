@@ -9,7 +9,6 @@ function processCommand(input){
 
 function sendInput(input, hosts){
 	for(host in hosts){
-		//console.log(opensockets[hosts[host]]);
 		opensockets[hosts[host]].send(JSON.stringify({user_id:$.cookie("user"),command:input}));
 	}
 }
@@ -19,11 +18,6 @@ function appendShellOutput(input, ip, stream_name, stop, command){
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+escapeHtml(input)+"</p>");
 	else
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+"End of "+stream_name+" for "+command+"</p>");
-	
-	/*console.log(input);
-	console.log(ip);
-	console.log(stream_name);*/
-	//console.log(stop);
 }
 
 var shellTabs = {};
@@ -59,7 +53,7 @@ $(document).ready(function(){
 	$("#shellwindow").on('click', ".executecheckbox", function(){
 		$panel = $(this).closest(".panel");
 		$node = $(this).siblings(".ipaddr").first();
-		console.log($(this).siblings())
+		
 		if($(this).is(":checked")){
 			$panel.removeClass("panel-default").addClass("panel-primary");
 			$node.addClass("doexecute");

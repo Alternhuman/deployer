@@ -112,7 +112,6 @@ class ProcessReactor(object):
 		self.user = user #user which executes the command
 		self.command = ' '.join(*args) # The name of the command
 		self.ip = ip # The IP of the server
-		print(self.command)
 		self.shell =  kwargs.get("shell", False)
 		def randomString():
 			"""
@@ -301,7 +300,6 @@ class DeployHandler(RequestHandler):
 			os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
 		output_file.close()
 		if command is not "":
-			print(split(command))
 			p = ProcessReactor(user, directory, split(command))
 			#TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			#TODOout, err = process.communicate()
@@ -372,7 +370,6 @@ class LoggerHandler(WebSocketHandler):
 		msg["stop"] = stop
 		msg["stream_name"] = stream_name
 		msg["shell"] = kwargs.get("shell", False)
-		print(msg["shell"])
 		self.write_message(json.dumps(msg))
 
 	def on_close(self):
@@ -414,7 +411,6 @@ class ShellHandler(LoggerHandler):
 				user_id = user_id.decode('utf-8')
 				user_pwd = pwd.getpwnam(user_id)
 				try:
-					print(split(message_dict["command"]))
 					command = message_dict["command"]
 					p = ProcessReactor(user_pwd, user_pwd.pw_dir, split(command), shell=True)
 				except Exception as e:
