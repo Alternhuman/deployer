@@ -55,13 +55,14 @@ data_dict = {}
 data_json = ""
 
 response_dict = {}
-open_sockets =  []
+statusmonitor_open_sockets =  []
+getDataCallback = None
 
 from utils import getip 
 
 def sigterm_handler(signal, frame):
     ioloop.IOLoop.instance().stop()
-    for socket in open_sockets:
+    for socket in statusmonitor_open_sockets:
         socket.close()
     sys.exit(0)
 
@@ -295,14 +296,29 @@ class ProbeHandler(RequestHandler):
 		self.write("You should be able to create websocket connections now")
 
 
+def start_callback():
+	global getDataCallback
+	if getDataCallback is None:
+		getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
+		getDataCallback.start()
+	elif not getDataCallback.is_running():
+		getDataCallback.start()
+
+def stop_callback():
+	global getDataCallback
+	if getDataCallback is not None:
+		if len(statusmonitor_open_sockets) == 0:
+			getDataCallback.stop()
+
 def process_data():
 	"""
 	
 	"""
 	global data_dict, data_json
+	if len(statusmonitor_open_sockets) > 0:
+		data_dict = get_data()
+		data_json = json.dumps(data_dict,separators=(',',':'))
 
-	data_dict = get_data()
-	data_json = json.dumps(data_dict,separators=(',',':'))
 
 
 class SocketHandler(WebSocketHandler):
@@ -319,11 +335,12 @@ class SocketHandler(WebSocketHandler):
 
     def open(self):
         print("Connection open from " + self.request.remote_ip)
-        if not self in open_sockets:
-            open_sockets.append(self) #http://stackoverflow.com/a/19571205
+        if not self in statusmonitor_open_sockets:
+            statusmonitor_open_sockets.append(self) #http://stackoverflow.com/a/19571205
         self.callback = PeriodicCallback(self.send_data, 1000)
 
         self.callback.start()
+        start_callback()
 
     def send_data(self):
         self.write_message(data_json)
@@ -332,8 +349,10 @@ class SocketHandler(WebSocketHandler):
         
     def on_close(self):
         self.callback.stop()
-        if self in open_sockets:
-            open_sockets.remove(self)
+        if self in statusmonitor_open_sockets:
+            statusmonitor_open_sockets.remove(self)
+
+        stop_callback()
 
     def send_update(self):
         pass
@@ -355,6 +374,7 @@ routes_ws = [
 app = Application(routes, **settings)
 
 wsapp = Application(routes_ws, **settings);
+
 
 if __name__ == "__main__":
 	ip = getip(conf.INTERFACE)
@@ -380,8 +400,8 @@ if __name__ == "__main__":
 			ssl_options={"certfile": conf.APPCERT,
 	        			 "keyfile": conf.APPKEY})
 
-	getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
-	getDataCallback.start()
+	#getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
+	#getDataCallback.start()
 
 	while True:
 		try:

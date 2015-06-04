@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import tornado
-from tornado.web import Application,RequestHandler,StaticFileHandler,asynchronous
-from tornado import web, websocket, ioloop, template
+from tornado.web import Application, RequestHandler, \
+StaticFileHandler, asynchronous
+from tornado import web, websocket, ioloop
 from tornado.httpserver import HTTPServer
 from tornado.gen import engine
 
-import os, random, string, json, mimetypes, ssl, conf
-from tempfile import tempdir
-import tempfile
+import os, json, mimetypes, conf
+
+
 
 import sys, signal
-from os import path, makedirs
+from os import makedirs
 
-import requests
-from requests.adapters import HTTPAdapter 
+
+from requests.adapters import HTTPAdapter
 from requests_futures.sessions import FuturesSession
 from pyjade.ext.tornado import patch_tornado
 patch_tornado() #Allows pyjade to work with Tornado
@@ -23,8 +24,15 @@ patch_tornado() #Allows pyjade to work with Tornado
 sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
 
 from bindings.marco import marco
-from marco_conf.utils import Node
+#from marco_conf.utils import Node
 import utils
+
+# TODOimport random, string, tempfile
+# from tornado import template
+# from tempfile import tempdir
+# import ssl
+# from os import path
+# import requests
 
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
@@ -82,8 +90,10 @@ class IndexHandler(BaseHandler):
     @web.addslash #Appends a '/' at the end of the request
     def get(self):
         """
-        Checks if the user is logged and sends the index files (basic HTML, CSS and JS).
-        If the user is not already logged in, it is redirected to the main page. 
+        Checks if the user is logged and sends the index files
+        (basic HTML, CSS and JS).
+        If the user is not already logged in, it is redirected 
+        to the main page. 
         """
         if not self.current_user:
             self.redirect("/login/")
@@ -112,7 +122,9 @@ class LoginHandler(BaseHandler):
         redirected to the new index site.
         Otherwise, a 403 page is returned.
         """
-        if utils.authenticate(self.get_argument("name"), self.get_argument("pass")):
+        if utils.authenticate(self.get_argument("name"), 
+                              self.get_argument("pass")):
+
             self.set_secure_cookie("user", self.get_argument("name"))
             self.redirect("/")
         else:
@@ -134,7 +146,8 @@ class UploadAndDeployHandler(BaseHandler):
     """
     Listens for POST requests and performs the deployment asynchronously.
     """
-    @asynchronous #The post is asynchronous due to the potencially long deploying time
+    #The post is asynchronous due to the potencially long deploying time
+    @asynchronous
     @engine
     def post(self):
         """
@@ -166,8 +179,10 @@ class UploadAndDeployHandler(BaseHandler):
         nodes = self.get_argument('nodes', '').split(',')[:-1] #TODO: no final comma
         from concurrent import futures
         
-        #The deployment process is performed asynchronously using a ThreadPool, which will handle the request asynchronously
-        thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
+        """The deployment process is performed asynchronously 
+        using a ThreadPool, which will handle the request asynchronously"""
+        #TODO: remove?
+        #thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
 
         #For each node a future is received
 
@@ -179,8 +194,8 @@ class UploadAndDeployHandler(BaseHandler):
              filename=original_fname, 
              command=self.get_argument('command', ''), 
              user=self.current_user, 
-             folder=self.get_argument('folder',''),
-             tomcat=self.get_argument('tomcat', ''),
+             folder=self.get_argument('folder', ''), 
+             tomcat=self.get_argument('tomcat', ''), 
              overwrite=self.get_argument('overwrite', 'false'))
             
             futures_set.add((future, node))
@@ -190,14 +205,15 @@ class UploadAndDeployHandler(BaseHandler):
         for future, node in futures_set:
             try:
                 response = future.result()
-                print(response.status_code)
+                
                 if response.status_code > 400:
                     error.append((node, response.reason))
             except Exception as e:
                 error.append((node, "Could not connect to the node"))
 
         if len(error) > 0:
-            self.finish("Errors occurred " + " ".join(["Node:"+node+"." for node, reason in error]))
+            self.finish("Errors occurred " + 
+                " ".join(["Node:"+node+"." for node, reason in error]))
         else:
             self.finish("file" + original_fname + " is uploaded and on deploy")
     
@@ -241,7 +257,7 @@ class UploadAndDeployHandler(BaseHandler):
                     }
         
         try:
-            f =  futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
+            f = futures_session.post(url, files=files, data=commands, verify=conf.RECEIVERCERT, cert=(conf.APPCERT, conf.APPKEY))
         
             return f
         except Exception as e:
@@ -345,7 +361,7 @@ routes = [
 settings = {
     "debug": True,
     "static_path": conf.STATIC_PATH,
-    "login_url":"/login" ,
+    "login_url":"/login/",
     "cookie_secret":"2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
 }
 
