@@ -47,7 +47,7 @@ var nodes=0;
 var groups = [
   "Free",
   "InUse",
-  "Shared"
+  "Cached"
 ];
 
 var gauges = [];
@@ -56,11 +56,11 @@ function createPanel(number, ip){
   gauges[number] = [];
 
   //initialize();
-  var htmlstring = '<div class="container"><div class="panel panel-primary"><div class="panel-heading"><h3 id="hostname-'+number+'" class="panel-title">Host</h3><p id="time-'+number+'"></p></div><br>';
+  var htmlstring = '<div class="container"><div class="panel panel-primary"><div class="panel-heading"><h3 id="hostname-'+number+'" class="panel-title">Host</h3><p id="time-'+number+'" class="pull-right"></p><p id="uptime-'+number+'"></p><p id="network-'+number+'"></p></div><br>';
 
-  htmlstring += '<div class="row"><div id="memdiv-'+number+'" class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">Memoria</h3></div></div><div class="panel-body"><div class="col-sm-6"><div id="memgraph-'+number+'"></div></div><div class="col-sm-6"><div id="swapgraph-'+number+'"></div></div></div></div><div class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">Top</h3></div></div><div class="panel-body"><div id="top-processes-'+number+'"></div></div></div></div>'
+  htmlstring += '<div class="row"><div id="memdiv-'+number+'" class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">Memoria</h3></div></div><div class="panel-body"><div class="col-sm-6"><div id="memgraph-'+number+'"></div></div><div class="col-sm-6"><div id="swapgraph-'+number+'"></div></div><div class="col-sm-12"><div class="col-sm-4 memorylegend free">Free</div><div class="col-sm-4 memorylegend used">Used</div><div class="col-sm-4 memorylegend cached">Cached</div></div></div></div><div class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">Top (name, %CPU, %MEM)</h3></div></div><div class="panel-body"><div id="top-processes-'+number+'"></div></div></div></div>'
 
-  htmlstring += '<div class="row"><div class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">Temperatura</h3></div></div><div class="panel-body"><div class="col-sm-6" id="temperature-div-'+number+'"><p id="temperature-'+number+'"></p></div></div></div><div class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">CPU</h3></div></div><div class="panel-body"><div class="col-sm-6" id="cpus-'+number+'"></div></div><div class="panel-body"><div class="col-sm-12" id="cpu-'+number+'"></div></div></div></div></div><p id="top-'+number+'"></p><p id="uptime-'+number+'"></p><p id="kernel-name-'+number+'"></p></div></div>'
+  htmlstring += '<div class="row"><div class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">Temperatura</h3></div></div><div class="panel-body"><div class="col-sm-6" id="temperature-div-'+number+'"><p id="temperature-'+number+'"></p></div></div></div><div class="col-sm-6"><div class="panel panel-primary"><div class="panel-heading"><h3 class="panel-title">CPU</h3></div></div><div class="panel-body"><div class="col-sm-6" id="cpus-'+number+'"></div></div><div class="panel-body"><div class="col-sm-12" id="cpu-'+number+'"></div></div></div></div></div><p id="top-'+number+'"></p><p id="kernel-name-'+number+'"></p></div></div>'
 
   $("#statusmonitor").append(htmlstring);
 
@@ -200,9 +200,9 @@ function createPanel(number, ip){
     });
     
     if(d["InUse"] > 0)
-        texto.text((100 - ((d["Free"]/(d["Free"]+d["InUse"])) * 100)).toFixed(2) + "% en uso");
+        texto.text((100 - ((d["Free"]/(d["Free"]+d["InUse"])) * 100)).toFixed(2) + "%");
     else
-        texto.text("0% en uso");
+        texto.text("0%");
   });
 
 });
@@ -268,7 +268,7 @@ function createPanel(number, ip){
   dispatchswap.on("statechange.pie", function(d) {
 
     
-    if(d.Free == 0 && d.InUse == 0 && d.Shared == 0){
+    if(d.Free == 0 && d.InUse == 0 && d.Cached == 0){
       dispatchswap.stop();
     }
     /*Evento de cambio*/
@@ -284,9 +284,9 @@ function createPanel(number, ip){
     });
     
     if(d["InUse"] > 0)
-        texto.text((100-d["Free"]/(d["Free"]+d["InUse"]) * 100).toFixed(2) + "% en uso");
+        texto.text((100-d["Free"]/(d["Free"]+d["InUse"]) * 100).toFixed(2) + "%");
     else
-        texto.text("0% en uso");
+        texto.text("0%");
     
     });
 
@@ -295,12 +295,12 @@ function createPanel(number, ip){
 
 
   //Carga de los gráficos
-  dispatch.load([{"Free":0,"Shared":0}]);
-  dispatchswap.load([{"Free":0,"Shared":0}]);
+  dispatch.load([{"Free":0,"Cached":0}]);
+  dispatchswap.load([{"Free":0,"Cached":0}]);
   dispatchtemperature.load(MAXTEMP);
 
-  dispatchswap.statechange({"Free":1, "InUse":0,"Shared":0});
-  dispatch.statechange({"Free":1, "InUse":0,"Shared":0});
+  dispatchswap.statechange({"Free":1, "InUse":0,"Cached":0});
+  dispatch.statechange({"Free":1, "InUse":0,"Cached":0});
 
   try{
     var ws = new WebSocket(uri);
@@ -324,19 +324,34 @@ function createPanel(number, ip){
 
       $("#temperature-"+number).html("Temperature: "+data["temperature"]);
 
-      dispatch.statechange({"Free":+data["memfree"], "InUse":data["memtotal"]-data["memfree"],"Shared":+data["membuffered"]});
-      dispatchswap.statechange({"Free":+data["swapfree"], "InUse":data["swaptotal"]-data["swapfree"],"Shared":0});
+      dispatch.statechange({"Free":+data["memfree"], "InUse":data["memtotal"]-data["memfree"],"Cached":+data["memcached"]});
+      dispatchswap.statechange({"Free":+data["swapfree"], "InUse":data["swaptotal"]-data["swapfree"],"Cached":0});
       dispatchtemperature.statechange(+data["temperature"]);
       
 
       
-      $("#time-"+number).html("Tiempo del equipo: "+new Date(data["time"]));
+      $("#time-"+number).text("Tiempo del equipo: "+new Date(data["time"]));
+      
+      var uptime_data = data["load_average"].split("-");
+      $("#uptime-"+number).text("Uptime: "+uptime_data[0]+". Load average: "+uptime_data[1].replace(/,$/, "")+" "+uptime_data[2].replace(/,$/, "")+" "+uptime_data[3].replace(/,$/, ""));
+
+      $("#network-"+number).text("Bytes received: "+(data["rx"]/(1024*1024)).toFixed(2));
+      $("#network-"+number).text($("#network-"+number).text()+". Bytes sent:"+(data["tx"]/(1024*1024)).toFixed(2));
       //$("#time-"+number).append("Desfase de " + (new Date() - new Date(data["time"]) + "ms"));
       //clock(number, new Date(data["time"]));
       var procesos = "";
       
       $.each(data["top_list"].split("\n"), function(index, value, array){
-          procesos += value != "" ? "<li class='list-group-item'>"+value+"</li>" : "";
+        if (value != ""){
+          //procesos += value != "" ? "<li class='list-group-item'>"+value+"</li>" : "";
+          var values = value.split("-");
+          if(values.length > 0)
+            procesos += "<li class='list-group-item'>"+values[2]+" <span class='top-percentage'>("+values[1]+"%) </span><span class='top-percentage'>("+values[0]+"%)</span></li>";
+        }else{
+          procesos += "";
+        }
+
+
       });
       
       $("#top-processes-"+number).html("<ul class='scrollable-top list-group'>"+procesos+"</ul>");

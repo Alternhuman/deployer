@@ -70,3 +70,23 @@
 #command input{
     font-family: "Lucida Console", Monaco, monospace;
 }
+
+.memorylegend{
+    text-align: center;
+    color: #fff;
+}
+
+.free{
+    background-color: #98ABC5;
+}
+.used{
+    background-color: #8A89A6;
+}
+
+.cached{
+    background-color: #7B6888;
+}
+
+.top-percentage{
+    color: rgba(14, 14, 14, 0.6);
+}
