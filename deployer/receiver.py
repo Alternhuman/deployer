@@ -320,7 +320,6 @@ def process_data():
 		data_json = json.dumps(data_dict,separators=(',',':'))
 
 
-
 class SocketHandler(WebSocketHandler):
 
     def check_origin(self, origin):
