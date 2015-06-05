@@ -335,8 +335,8 @@ function createPanel(number, ip){
       var uptime_data = data["load_average"].split("-");
       $("#uptime-"+number).text("Uptime: "+uptime_data[0]+". Load average: "+uptime_data[1].replace(/,$/, "")+" "+uptime_data[2].replace(/,$/, "")+" "+uptime_data[3].replace(/,$/, ""));
 
-      $("#network-"+number).text("Bytes received: "+(data["rx"]/(1024*1024)).toFixed(2));
-      $("#network-"+number).text($("#network-"+number).text()+". Bytes sent:"+(data["tx"]/(1024*1024)).toFixed(2));
+      $("#network-"+number).text("Megabytes received: "+(data["rx"]/(1024*1024)).toFixed(2));
+      $("#network-"+number).text($("#network-"+number).text()+". Megabytes sent:"+(data["tx"]/(1024*1024)).toFixed(2));
       //$("#time-"+number).append("Desfase de " + (new Date() - new Date(data["time"]) + "ms"));
       //clock(number, new Date(data["time"]));
       var procesos = "";
