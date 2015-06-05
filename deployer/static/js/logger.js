@@ -84,7 +84,7 @@ function createTabs(host){
 function createOutput(host, identifier, command){
     $tab = tabs[host];
     
-    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading' style='display:block;overflow:auto'><p height='80%'>"+command+"</p><button style='width:10%;' class='btn btn-danger stop-button pull-right'><div class='glyphicon glyphicon-remove'></button></div></button></input></div><div class='panel-body output'></div></div></div>");
+    $("#"+$tab.selector).append("<div id='"+identifier+"' class='col-xs-6'><div class='panel panel-primary'><div class='panel-heading' style='display:block;overflow:auto'><p height='80%'>"+command+"</p><button style='width:10%;' class='btn btn-danger stop-button pull-right'><div class='glyphicon glyphicon-remove'></button></div><div class='panel-body output'></div></div></div></div>");
 
 }
 
