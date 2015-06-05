@@ -35,7 +35,7 @@ import hashlib
 from concurrent import futures
 from tornado.web import decode_signed_value
 import logging
-import conf, ssl
+import ssl
 
 
 sys.path.append("/opt/marcopolo")
@@ -61,11 +61,11 @@ processes = {}
 
 from utils import getip 
 
-def sigterm_handler(signal, frame):
-    ioloop.IOLoop.instance().stop()
-    for socket in statusmonitor_open_sockets:
-        socket.close()
-    sys.exit(0)
+#TODO def sigterm_handler(signal, frame):
+#     ioloop.IOLoop.instance().stop()
+#     for socket in statusmonitor_open_sockets:
+#         socket.close()
+#     sys.exit(0)
 
 def sigint_handler(signal, frame):
 	io_loop.add_callback(shutdown)
@@ -73,8 +73,8 @@ def sigint_handler(signal, frame):
 def shutdown():
 	print("Stopping gracefully")
 	try:
-		polo.Polo().unpublish_service("deployer", delete_file=True)
-		polo.Polo().unpublish_service("statusmonitor", delete_file=True)
+		polo.Polo().unpublish_service(conf.RECEIVER_SERVICE_NAME, delete_file=True)
+		polo.Polo().unpublish_service(conf.STATUS_MONITOR_SERVICE_NAME, delete_file=True)
 	except Exception as e:
 		print(e)
 	io_loop.stop()
@@ -444,9 +444,10 @@ if __name__ == "__main__":
 	#getDataCallback.start()
 
 	while True:
+
 		try:
-			polo.Polo().publish_service("deployer", root=True)
-			polo.Polo().publish_service("statusmonitor", root=True)
+			polo.Polo().publish_service(conf.RECEIVER_SERVICE_NAME, root=True)
+			polo.Polo().publish_service(conf.STATUS_MONITOR_SERVICE_NAME, root=True)
 			break
 		except polo.PoloInternalException as e:
 			print(e)

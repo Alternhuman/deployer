@@ -28,3 +28,7 @@ PIDFILE_RECEIVER = '/var/run/marcopolo/receiver.pid'
 INTERFACE='eth0'
 
 REFRESH_FREQ = 1000.0
+
+STATUS_MONITOR_SERVICE_NAME = "statusmonitor"
+DEPLOYER_SERVICE_NAME = "deployer"
+RECEIVER_SERVICE_NAME = "receiver"

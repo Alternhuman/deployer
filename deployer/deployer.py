@@ -24,6 +24,7 @@ patch_tornado() #Allows pyjade to work with Tornado
 sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
 
 from bindings.marco import marco
+from bindings.polo import polo
 #from marco_conf.utils import Node
 import utils
 
@@ -366,8 +367,27 @@ settings = {
 }
 
 app = Application(routes, **settings)
+io_loop = ioloop.IOLoop.instance()
+
+
+def shutdown():
+    print("Stopping gracefully")
+    try:
+        polo.Polo().unpublish_service(conf.RECEIVER_SERVICE_NAME, delete_file=True)
+        polo.Polo().unpublish_service(conf.STATUS_MONITOR_SERVICE_NAME, delete_file=True)
+    except Exception as e:
+        print(e)
+    io_loop.stop()
+
+def sigint_handler(signal, frame):
+    io_loop.add_callback(shutdown)
+
+signal.signal(signal.SIGINT, sigint_handler)
 
 if __name__ == "__main__":
+    
+    
+
     
     pid = os.getpid()
 
@@ -385,6 +405,18 @@ if __name__ == "__main__":
     })
 
     httpServer.listen(conf.DEPLOYER_PORT)
+
+    while True:
+        try:
+            polo.Polo().publish_service(conf.DEPLOYER_SERVICE_NAME, root=True)
+            break
+        except polo.PoloInternalException as e:
+            print(e)
+            time.sleep(1)
+        except polo.PoloException as i:
+            print(i)
+            break
+
     print("Serving on port %d" % conf.DEPLOYER_PORT)
-    ioloop.IOLoop.instance().start()
+    io_loop.start()
     #TODO consider multicore server
