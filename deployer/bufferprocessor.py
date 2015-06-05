@@ -63,7 +63,7 @@ class ProcessReactor(object):
 			os.setgid(gid)
 			os.setuid(uid)
 
-
+		kwargs['shell'] = False
 		self.process = subprocess.Popen(preexec_fn=demote(user.pw_uid, user.pw_gid), #function executed before the call
 										cwd=directory, # The current working directory is changed
 										*args, **kwargs)
