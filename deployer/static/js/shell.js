@@ -70,17 +70,22 @@ $(document).ready(function(){
 	});
 
 	$("#shellwindow").on("click", ".stopexecution", function(){
-		console.log($(this).parent());
-		console.log($(this).parent().attr('class').split(" "));
+		//console.log($(this).parent());
+		//console.log($(this).parent().attr('class').split(" "));
 		var classes=$(this).parent().attr('class').split(" ");
 		var ip = $(this).siblings(".ipaddr").text();
 
+		var m = classes.indexOf("panel-heading");
+		if(m != -1){
+			classes.splice(m, 1);
+		}
+		console.log(classes);
+
 		for (var i = classes.length - 1; i >= 0; i--) {
-			if(classes[i] != "panel-heading"){
-				console.log(classes[i]);
-				var ws = opensockets[ip];
-        		ws.send(JSON.stringify({"remove":classes[i], "user_id":$.cookie("user")}));
-			}
+			//if(classes[i] != "panel-heading"){
+			var ws = opensockets[ip];
+        	ws.send(JSON.stringify({"removeshell":classes, "user_id":$.cookie("user")}));
+			//}
 		};
 
 		/*$($(this).parent().attr('class').split(" ")).each(function(){

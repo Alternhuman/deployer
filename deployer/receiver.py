@@ -57,7 +57,7 @@ data_json = ""
 response_dict = {}
 statusmonitor_open_sockets =  []
 getDataCallback = None
-processes = set()
+processes = {}
 
 from utils import getip 
 
@@ -157,8 +157,10 @@ class DeployHandler(RequestHandler):
 			os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
 		output_file.close()
 		if len(command) > 0:
-			p = ProcessReactor(user, directory, io_loop, ip, opensockets, split(command))
-			processes.add(p)
+			p = ProcessReactor(user, directory, io_loop, ip, opensockets, split(command), shell=False)
+			if processes.get(user.pw_name, None) is None:
+				processes[user.pw_name] = set()
+			processes[user.pw_name].add(p)
 			#TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			#TODOout, err = process.communicate()
 
@@ -250,7 +252,7 @@ class ShellHandler(LoggerHandler):
 			message_dict = json.loads(message_json)
 		except ValueError as v:
 			return
-
+		#print(message_dict)
 		if message_dict.get("register", None) is not None:
 			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict["register"]).decode('utf-8')
 			
@@ -271,7 +273,9 @@ class ShellHandler(LoggerHandler):
 				try:
 					command = message_dict["command"]
 					p = ProcessReactor(user_pwd, user_pwd.pw_dir, io_loop, ip, opensockets, split(command), shell=True)
-					processes.add(p)
+					if processes.get(user_id, None) is None:
+						processes[user_id] = set()
+					processes[user_id].add(p)
 				except Exception as e:
 					print(e)
 
@@ -282,24 +286,31 @@ class ShellHandler(LoggerHandler):
 				identifier = message_dict.get("remove", None)
 				if identifier is not None:
 					print("identifier", identifier)
-					process = next((x for x in processes if x.identifier == identifier), None)
+					process = next((x for x in processes.get(user_id, set()) if x.identifier == identifier), None)
 					if process is not None:
 						process.stop()
+						processes[user_id].remove(process)
 
-		elif message_dict.get("removeshell", None) is None:
+		elif message_dict.get("removeshell", None) is not None:
+			print("removeshell")
 			user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
 			if user_id is not None:
-				
-				identifiers = message_dict.get("removeshell")
+				identifiers = message_dict.get("removeshell", None)
 				if identifiers is not None:
 					try:
-						identifiers_dict = json.loads(message_dict["removeshell"])
+						identifiers_dict = message_dict["removeshell"]
 						for identifier in identifiers:
-							process = next((x for x in processes if x.identifier == identifier), None)
+							print(identifier)
+							print(processes.get(user_id, set()))
+							process = next((x for x in processes.get(user_id, set()) if x.identifier == identifier), None)
 							if process is not None:
+								print("Killing")
 								process.stop()
+								processes[user_id].remove(process) #TODO: Callback?
 					except ValueError as v:
 						print(v)
+					except KeyError as k:
+						print(k)
 
 
 class ProbeWSHandler(WebSocketHandler):

@@ -87,10 +87,13 @@ class ProcessReactor(object):
 	
 	def kill(self):
 		if self.process.returncode is None:
+			print("Sending kill signal")
 			self.process.kill()
 
 	def stop(self):
+		print(self.process.pid)
 		if self.process.returncode is None:
+			print("Sending terminate signal")
 			self.process.terminate()
 			self.ioloop.call_later(60, self.kill)
 
