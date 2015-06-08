@@ -54,7 +54,7 @@ def get_data():
 
     response_dict["load_average"] = subprocess.Popen("uptime | awk 'BEGIN { OFS = \"-\" } ; { print $3,$8,$9,$10 }'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
     response_dict["rx"] = subprocess.Popen("ifconfig eth0 | grep \"RX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
-    response_dict["tx"] = subprocess.Popen("ifconfig eth0 | grep \"TX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+    response_dict["tx"] = subprocess.Popen("ifconfig eth0 | grep \"TX bytes\" | awk '{ print $6 }' | cut -d\":\" -f2", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
     #cpus = subprocess.Popen("mpstat -P ALL | grep -A 5 "+'"%idle"'+ "| tail -n +3 | awk -F"+' " "'+" '{print $ 12 }'",shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
     cpus = subprocess.Popen("top -d 0.4 -b -n2 | grep \"Cpu\" | tail -n 4 | awk '{print $2 + $4}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split('\n')
 

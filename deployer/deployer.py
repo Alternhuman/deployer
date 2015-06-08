@@ -373,8 +373,7 @@ io_loop = ioloop.IOLoop.instance()
 def shutdown():
     print("Stopping gracefully")
     try:
-        polo.Polo().unpublish_service(conf.RECEIVER_SERVICE_NAME, delete_file=True)
-        polo.Polo().unpublish_service(conf.STATUS_MONITOR_SERVICE_NAME, delete_file=True)
+        polo.Polo().unpublish_service(conf.DEPLOYER_SERVICE_NAME, delete_file=True)
     except Exception as e:
         print(e)
     io_loop.stop()
