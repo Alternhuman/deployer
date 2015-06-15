@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
-
+from __future__ import division
+from __future__ import absolute_import
 import subprocess
 from time import strftime, localtime
 

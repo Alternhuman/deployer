@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from __future__ import absolute_import
 import tornado
 from tornado.web import Application, RequestHandler, \
 StaticFileHandler, asynchronous
@@ -10,21 +10,19 @@ from tornado.gen import engine
 
 import os, json, mimetypes, conf
 
-
-
 import sys, signal
 from os import makedirs
-
+import time
 
 from requests.adapters import HTTPAdapter
 from requests_futures.sessions import FuturesSession
 from pyjade.ext.tornado import patch_tornado
 patch_tornado() #Allows pyjade to work with Tornado
 
-sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
+#sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
 
-from bindings.marco import marco
-from bindings.polo import polo
+from marcopolo.bindings.marco import Marco, MarcoTimeOutException
+from marcopolo.bindings.polo import Polo, PoloInternalException, PoloException
 #from marco_conf.utils import Node
 import utils
 
@@ -50,7 +48,7 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
 
         :param: conn The connection object
         """
-        super().cert_verify(conn, *args, **kwargs)
+        super(NotCheckingHostnameHTTPAdapter, self).cert_verify(conn, *args, **kwargs)
         conn.assert_hostname = False
 
 # By changing the adapter no hostname is checked
@@ -285,11 +283,11 @@ class NodesHandler(websocket.WebSocketHandler):
         Returns the nodes offering the deployer service
         """
         open_ws.add(self)
-        m = marco.Marco()
+        m = Marco()
         try:
             nodes = m.request_for("deployer")
             self.write_message(json.dumps({"Nodes":[n.address for n in nodes]}))
-        except marco.MarcoTimeOutException:
+        except MarcoTimeOutException:
             self.write_message(json.dumps({"Error": "Error in marco detection"}))
                 
     def send_data(self):
@@ -310,11 +308,11 @@ class Nodes(RequestHandler):
         """
         Returns a JSON string with the nodes offering the deployer service
         """
-        m = marco.Marco()
+        m = Marco()
         try:
             nodes = m.request_for("deployer")
             self.write(json.dumps({'nodes':[n.address for n in nodes]}))
-        except marco.MarcoTimeOutException:
+        except MarcoTimeOutException:
             self.write_message(json.dumps({"Error": "Error in marco detection"}))
         
 
@@ -373,7 +371,7 @@ io_loop = ioloop.IOLoop.instance()
 def shutdown():
     print("Stopping gracefully")
     try:
-        polo.Polo().unpublish_service(conf.DEPLOYER_SERVICE_NAME, delete_file=True)
+        Polo().unpublish_service(conf.DEPLOYER_SERVICE_NAME, delete_file=True)
     except Exception as e:
         print(e)
     io_loop.stop()
@@ -407,12 +405,12 @@ if __name__ == "__main__":
 
     while True:
         try:
-            polo.Polo().publish_service(conf.DEPLOYER_SERVICE_NAME, root=True)
+            Polo().publish_service(conf.DEPLOYER_SERVICE_NAME, root=True)
             break
-        except polo.PoloInternalException as e:
+        except PoloInternalException as e:
             print(e)
             time.sleep(1)
-        except polo.PoloException as i:
+        except PoloException as i:
             print(i)
             break
 
