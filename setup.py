@@ -6,7 +6,6 @@ The deployer application
 """
 
 from setuptools import setup, find_packages
-from distutils.core import setuptools
 from distutils.command.clean import clean
 from distutils.command.install import install
 from codecs import open
@@ -28,7 +27,7 @@ def detect_init():
         return 1
 
 def enable_service(service):
-    sys.stdout.write("Enabling service " + service +"...")
+    sys.stdout.write("Enabling service " + service +"...\n")
     if init_bin == 0:
         subprocess.call(["systemctl", "enable", service], shell=False)
     else:
@@ -53,7 +52,7 @@ if __name__ == "__main__":
     python_version = int(sys.version[0])
 
     for param in sys.argv:
-        if param in custom_marcopolo_params:
+        if param in custom_deployer_params:
             deployer_params.append(param)
             sys.argv.remove(param)
 
@@ -72,11 +71,12 @@ if __name__ == "__main__":
                 yield os.path.join(dirpath.split('/', 1)[1], f)
 
     data_files = [
-                    ('/usr/lib/deployer/static/css', [f for f in copy_dir('static/css', 'deployer')]),
-                    ('/usr/lib/deployer/static/fonts', [f for f in copy_dir('static/fonts', 'deployer')]),
-                    ('/usr/lib/deployer/static/img', [f for f in copy_dir('static/img', 'deployer')]),
-                    ('/usr/lib/deployer/static/js', [f for f in copy_dir('static/js', 'deployer')]),
-                    ('/usr/lib/deployer/certs', [os.path.join("certs", f) for f in os.listdir("certs")])
+                    ('/usr/lib/marcodeployer/static/css', glob.glob("marcodeployer/static/css/*")),
+                    ('/usr/lib/marcodeployer/static/fonts', glob.glob("marcodeployer/static/fonts/*")),
+                    ('/usr/lib/marcodeployer/static/img',  glob.glob("marcodeployer/static/img/*")),
+                    ('/usr/lib/marcodeployer/static/js',  glob.glob("marcodeployer/static/js/*")),
+                    ('/usr/lib/marcodeployer/certs', [os.path.join("certs", f) for f in os.listdir("certs")]),
+                    ('/usr/lib/marcodeployer/templates', glob.glob("marcodeployer/templates/*.jade"))
                  ]
     
     # if "--marcopolo-disable-daemons" not in marcopolo_params:

@@ -8,7 +8,7 @@ from tornado import web, websocket, ioloop
 from tornado.httpserver import HTTPServer
 from tornado.gen import engine
 
-import os, json, mimetypes, conf
+import os, json, mimetypes
 
 import sys, signal
 from os import makedirs
@@ -19,19 +19,12 @@ from requests_futures.sessions import FuturesSession
 from pyjade.ext.tornado import patch_tornado
 patch_tornado() #Allows pyjade to work with Tornado
 
-#sys.path.append('/opt/marcopolo/') #Temporary fix to append the path
-
 from marcopolo.bindings.marco import Marco, MarcoTimeOutException
 from marcopolo.bindings.polo import Polo, PoloInternalException, PoloException
-#from marco_conf.utils import Node
-import utils
 
-# TODOimport random, string, tempfile
-# from tornado import template
-# from tempfile import tempdir
-# import ssl
-# from os import path
-# import requests
+from marcodeployer import utils, conf
+
+
 
 
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
@@ -77,8 +70,12 @@ class BaseHandler(RequestHandler):
         """
         return self.get_secure_cookie("user")
 
+    #def render(self, template, **kwargs):
+    #    print(os.path.join(conf.TEMPLATES_DIR, template))
+    #    super(BaseHandler, self).render(os.path.join(conf.TEMPLATES_DIR, template), **kwargs)
+
     def write_error(self, status_code, **kwargs):
-        self.render("templates/500.jade")
+        self.render(os.path.join("/usr/lib/marcodeployer/templates/500.jade"))
 
 
 class IndexHandler(BaseHandler):
@@ -98,7 +95,7 @@ class IndexHandler(BaseHandler):
             self.redirect("/login/")
         else:
             user = tornado.escape.xhtml_escape(self.current_user)
-            self.render("templates/index.jade", user=user)
+            self.render("/usr/lib/marcodeployer/templates/index.jade", user=user)
 
 class LoginHandler(BaseHandler):
     """
@@ -112,7 +109,7 @@ class LoginHandler(BaseHandler):
         if self.current_user:
             self.redirect("/")
         else:
-            self.render("templates/login.jade")
+            self.render("login.jade")
 
     def post(self):
         """
@@ -128,7 +125,7 @@ class LoginHandler(BaseHandler):
             self.redirect("/")
         else:
             self.set_status(403)
-            self.render("templates/badpass.jade")
+            self.render("badpass.jade")
 
 class Logout(BaseHandler):
     """
@@ -347,7 +344,7 @@ class ProbeWSHandler(websocket.WebSocketHandler):
 routes = [
     (r'/', IndexHandler),
     (r'/nodes/?', Nodes),
-    (r'/static/(.*)', StaticFileHandler, {"path":"./static"}),
+    (r'/static/(.*)', StaticFileHandler, {"path":conf.STATIC_PATH}),
     (r'/ws/nodes/?', NodesHandler),
     (r"/login/?", LoginHandler),
     (r"/logout/?", Logout),
@@ -381,10 +378,10 @@ def sigint_handler(signal, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-if __name__ == "__main__":
-    
-    
 
+    
+    
+def main(args=None):
     
     pid = os.getpid()
 
@@ -417,3 +414,6 @@ if __name__ == "__main__":
     print("Serving on port %d" % conf.DEPLOYER_PORT)
     io_loop.start()
     #TODO consider multicore server
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -2,7 +2,7 @@ from os.path import dirname, join
 import tempfile
 
 directory = dirname(__file__)
-cert_dir = "certs"
+cert_dir = "/usr/lib/marcodeployer/certs"
 
 certs = join(directory, cert_dir)
 
@@ -14,7 +14,8 @@ RECEIVERKEY = join(certs, "receiver.key")
 
 TMPDIR = join(tempfile.gettempdir(), "tmp_deployer")
 
-STATIC_PATH = join(dirname(__file__), "static")
+#STATIC_PATH = join(dirname(__file__), "static")
+STATIC_PATH = "/usr/lib/marcodeployer/static"
 
 TOMCAT_PATH = '/var/lib/tomcat7/webapps/'
 
@@ -32,3 +33,5 @@ REFRESH_FREQ = 1000.0
 STATUS_MONITOR_SERVICE_NAME = "statusmonitor"
 DEPLOYER_SERVICE_NAME = "deployer"
 RECEIVER_SERVICE_NAME = "receiver"
+
+TEMPLATES_DIR = "/usr/lib/marcodeployer/templates/"

@@ -18,8 +18,8 @@ import sys
 
 
 sys.path.append(os.path.realpath(__file__))
-import conf
-from statusmonitor import get_data
+
+
 from tornado.ioloop import PeriodicCallback
 import signal
 from os import path, makedirs
@@ -39,15 +39,8 @@ import ssl
 
 from marcopolo.bindings.polo import Polo, PoloInternalException, PoloException
 
-from bufferprocessor import ProcessReactor
-
 import six
 from six.moves.urllib import parse as urlparse
-
-#if int(sys.version[0]) < 3:
-#   import urlparse
-#else:
-#   import urllib.parse as urlparse
 
 ip = ""
 opensockets={}
@@ -60,7 +53,10 @@ statusmonitor_open_sockets =  []
 getDataCallback = None
 processes = {}
 
-from utils import getip 
+from marcodeployer.bufferprocessor import ProcessReactor
+from marcodeployer.statusmonitor import get_data
+from marcodeployer.utils import getip 
+from marcodeployer import conf
 
 #TODO def sigterm_handler(signal, frame):
 #     ioloop.IOLoop.instance().stop()
@@ -417,7 +413,7 @@ app = Application(routes, **settings)
 wsapp = Application(routes_ws, **settings);
 
 
-if __name__ == "__main__":
+def main(args=None):
     ip = getip(conf.INTERFACE)
     pid = os.getpid()
 
@@ -458,3 +454,7 @@ if __name__ == "__main__":
             break
     print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
     io_loop.start()
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
