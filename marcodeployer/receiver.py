@@ -417,8 +417,8 @@ def main(args=None):
     ip = getip(conf.INTERFACE)
     pid = os.getpid()
 
-    if not os.path.exists('/var/run/marcopolo'):
-        makedirs('/var/run/marcopolo')
+    #if not os.path.exists('/var/run/marcopolo'):
+    #    makedirs('/var/run/marcopolo')
 
     f = open(conf.PIDFILE_RECEIVER, 'w')
     f.write(str(pid))

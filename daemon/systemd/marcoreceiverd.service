@@ -5,10 +5,12 @@ After=polo.service
 
 [Service]
 
+ExecStart=marcoreceiverd
+
 Type=simple
 User=root
 Group=root
-PIDFile=/var/run/marcodeployerd.pid
+PIDFile=/var/run/marcoreceiverd.pid
 
 [Install]
 WantedBy=multi-user.target
