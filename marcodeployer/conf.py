@@ -35,3 +35,10 @@ DEPLOYER_SERVICE_NAME = "deployer"
 RECEIVER_SERVICE_NAME = "receiver"
 
 TEMPLATES_DIR = "/usr/lib/marcodeployer/templates/"
+
+LOGGING_DIR = "/var/log/marcopolo"
+DEPLOYER_LOG_FILE = "/var/log/marcodeployer/marcodeployerd"
+RECEIVER_LOG_FILE = "/var/log/marcodeployer/marcodeployerd"
+
+DEPLOYER_LOGLEVEL = "DEBUG"
+RECEIVER_LOGLEVEL = "DEBUG"

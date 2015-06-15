@@ -68,12 +68,12 @@ def sigint_handler(signal, frame):
     io_loop.add_callback(shutdown)
 
 def shutdown():
-    print("Stopping gracefully")
+    logging.info("Stopping gracefully")
     try:
         Polo().unpublish_service(conf.RECEIVER_SERVICE_NAME, delete_file=True)
         Polo().unpublish_service(conf.STATUS_MONITOR_SERVICE_NAME, delete_file=True)
     except Exception as e:
-        print(e)
+        logging.warning(e)
     io_loop.stop()
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -274,10 +274,10 @@ class ShellHandler(LoggerHandler):
                         processes[user_id] = set()
                     processes[user_id].add(p)
                 except Exception as e:
-                    print(e)
+                    logging.warning(e)
 
         elif message_dict.get("remove", None) is not None:
-            print("remove")
+            logging.debug("remove")
             user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
             if user_id is not None:
                 identifier = message_dict.get("remove", None)
@@ -289,7 +289,7 @@ class ShellHandler(LoggerHandler):
                         processes[user_id].remove(process)
 
         elif message_dict.get("removeshell", None) is not None:
-            print("removeshell")
+            logging.debug("removeshell")
             user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
             if user_id is not None:
                 identifiers = message_dict.get("removeshell", None)
@@ -297,17 +297,17 @@ class ShellHandler(LoggerHandler):
                     try:
                         identifiers_dict = message_dict["removeshell"]
                         for identifier in identifiers:
-                            print(identifier)
-                            print(processes.get(user_id, set()))
+                            logging.debug(identifier)
+                            logging.debug(processes.get(user_id, set()))
                             process = next((x for x in processes.get(user_id, set()) if x.identifier == identifier), None)
                             if process is not None:
-                                print("Killing")
+                                logging.debug("Killing")
                                 process.stop()
                                 processes[user_id].remove(process) #TODO: Callback?
                     except ValueError as v:
-                        print(v)
+                        logging.warning(v)
                     except KeyError as k:
-                        print(k)
+                        logging.warning(k)
 
 
 class ProbeWSHandler(WebSocketHandler):
@@ -371,7 +371,7 @@ class SocketHandler(WebSocketHandler):
         return True
 
     def open(self):
-        print("Connection open from " + self.request.remote_ip)
+        logging.info("Connection open from " + self.request.remote_ip)
         if not self in statusmonitor_open_sockets:
             statusmonitor_open_sockets.append(self) #http://stackoverflow.com/a/19571205
         self.callback = PeriodicCallback(self.send_data, 1000)
@@ -419,10 +419,15 @@ def main(args=None):
 
     #if not os.path.exists('/var/run/marcopolo'):
     #    makedirs('/var/run/marcopolo')
+    logging.basicConf(filename=conf.RECEIVER_LOG_FILE, level=getattr(logging, conf.RECEIVER_LOGLEVEL.upper()))
 
-    f = open(conf.PIDFILE_RECEIVER, 'w')
-    f.write(str(pid))
-    f.close()
+    try:
+        f = open(conf.PIDFILE_RECEIVER, 'w')
+        f.write(str(pid))
+        f.close()
+    except Exception as e:
+        logging.error(e)
+        exit(1)
 
     httpServer = HTTPServer(app, ssl_options={
         "certfile": conf.RECEIVERCERT,
@@ -437,22 +442,19 @@ def main(args=None):
             ssl_options={"certfile": conf.APPCERT,
                          "keyfile": conf.APPKEY})
 
-    #getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
-    #getDataCallback.start()
 
     while True:
-
         try:
             Polo().publish_service(conf.RECEIVER_SERVICE_NAME, root=True)
             Polo().publish_service(conf.STATUS_MONITOR_SERVICE_NAME, root=True)
             break
         except PoloInternalException as e:
-            print(e)
+            logging.warning(e)
             time.sleep(1)
         except PoloException as i:
-            print(i)
+            logging.warning(i)
             break
-    print("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
+    logging.info("Starting receiver on port %d. WebSockets on %d" % (conf.RECEIVER_PORT, conf.RECEIVER_WEBSOCKET_PORT))
     io_loop.start()
 
 

@@ -13,10 +13,10 @@ import os, sys, subprocess
 import glob
 
 custom_deployer_params = [
-                            "--deployer-disable-daemons",
-                            "--deployer-disable-deployer",
-                            "--deployer-enable-receiver",
-                            "--deployer-no-start"
+                            "--marcodeployer-disable-daemons",
+                            "--marcodeployer-disable-deployer",
+                            "--marcodeployer-enable-receiver",
+                            "--marcodeployer-no-start"
                          ]
 
 def detect_init():
@@ -79,38 +79,21 @@ if __name__ == "__main__":
                     ('/usr/lib/marcodeployer/templates', glob.glob("marcodeployer/templates/*.jade"))
                  ]
     
-    # if "--marcopolo-disable-daemons" not in marcopolo_params:
-    #     init_bin = detect_init()
-    #     if python_version == 2:
-    #         if init_bin == 1:
-    #             daemon_files = [
-    #                              ('/etc/init.d/', ["daemon/systemv/marcod", "daemon/systemv/polod"])
-    #                            ]
 
-    #         else:
-    #             daemon_files = [('/etc/systemd/system/', ["daemon/marco.service", "daemon/polo.service"]),
-    #                              ('/usr/local/bin/', glob.glob("daemon/*.py"))
-    #                            ]
-            
-    #         data_files.extend(daemon_files)
+    if "--marcodeployer-disable-daemons" not in marcopolo_params:
+         init_bin = detect_init()
 
-    #         twistd_files = [('/etc/marcopolo/daemon', ["daemon/twistd/marco_twistd.tac", 
-    #                                                    "daemon/twistd/polo_twistd.tac"])
-    #                        ]
-    #         data_files.extend(twistd_files)
+        if init_bin == 1:
+            daemon_files = [
+                            ('/etc/init.d/', ["daemon/systemv/marcodeployerd", 
+                                              "daemon/systemv/marcoreceiverd"])
+                            ]
 
-    #     elif python_version == 3:
-    #         if init_bin == 1:
-    #             daemon_files = [
-    #                              ('/etc/init.d/', ["daemon/python3/systemv/marcod", "daemon/python3/systemv/polod"])
-    #                            ]
-
-    #         else:
-    #             daemon_files = [('/etc/systemd/system/', ["daemon/python3/marco.service", "daemon/python3/polo.service"]),
-    #                              ('/usr/local/bin/', glob.glob("daemon/python3/*.py"))
-    #                            ]
-            
-    #         data_files.extend(daemon_files)
+        else:
+            daemon_files = [
+                            ('/etc/systemd/system/', ["daemon/systemd/marcodeployerd.service", 
+                                                      "daemon/systemd/marcoreceiverd.service"])
+                           ]
 
     description = "The deployer for the marcopolo environment"
 
@@ -157,16 +140,16 @@ if __name__ == "__main__":
         }
     )
 
-    # if "--marcopolo-disable-daemons" not in marcopolo_params:
-    #     if "--marcopolo-disable-marco" not in marcopolo_params:
-    #         enable_service("marcod")
-    #         if "--marcopolo-no-start" not in marcopolo_params:
-    #             start_service("marcod")
+    if "--marcodeployer-disable-daemons" not in marcopolo_params:
+         if "--marcodeployer-disable-deployer" not in marcopolo_params:
+             enable_service("marcodeployerd")
+             if "--marcodeployer-no-start" not in marcopolo_params:
+                 start_service("marcodeployerd")
 
-    #     if "--marcopolo-enable-polo" in marcopolo_params:
-    #         enable_service("polod")
-    #         if "--marcopolo-no-start" not in marcopolo_params:
-    #             start_service("polod")
+         if "--marcodeployer-enable-receiver" in marcopolo_params:
+             enable_service("marcoreceiverd")
+             if "--marcodeployer-no-start" not in marcopolo_params:
+                 start_service("marcoreceiverd")
 
-    # if not os.path.exists("/var/log/marcopolo"):
-    #     os.makedirs('/var/log/marcopolo')
+    if not os.path.exists("/var/log/marcodeployer"):
+        os.makedirs('/var/log/marcodeployer')

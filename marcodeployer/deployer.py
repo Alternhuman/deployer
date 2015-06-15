@@ -24,6 +24,7 @@ from marcopolo.bindings.marco import Marco, MarcoTimeOutException
 from marcopolo.bindings.polo import Polo, PoloInternalException, PoloException
 
 from marcodeployer import utils, conf
+import logging
 
 
 
@@ -167,7 +168,7 @@ class UploadAndDeployHandler(BaseHandler):
         file1 = self.request.files['file'][0] #Only one file at a time
 
         original_fname = file1['filename']
-        #print(os.path.join(__UPLOADS__, original_fname))
+       
         output_file = open(os.path.join(__UPLOADS__, original_fname), 'wb')
         output_file.write(file1['body'])
         output_file.close()
@@ -389,10 +390,15 @@ def main(args=None):
     #if not os.path.exists('/var/run/marcopolo'):
     #    makedirs('/var/run/marcopolo')
 
-    f = open(conf.PIDFILE_DEPLOYER, 'w')
-    f.write(str(pid))
-    f.close()
+    logging.basicConf(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
 
+    try:
+        f = open(conf.PIDFILE_DEPLOYER, 'w')
+        f.write(str(pid))
+        f.close()
+    except Exception as e:
+        logging.error(e)
+        exit(1)
     #TODO Replace with SSLContext (this option is maintained for compatibility reasons)
     httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
@@ -412,7 +418,7 @@ def main(args=None):
             print(i)
             break
 
-    print("Serving on port %d" % conf.DEPLOYER_PORT)
+    logging.info("Serving on port %d" % conf.DEPLOYER_PORT)
     io_loop.start()
     #TODO consider multicore server
 
