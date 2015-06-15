@@ -1,0 +1,14 @@
+[Unit]
+Description=A deployment utility
+Requires=polo.service
+After=polo.service
+
+[Service]
+
+Type=simple
+User=root
+Group=root
+PIDFile=/var/run/marcodeployerd.pid
+
+[Install]
+WantedBy=multi-user.target

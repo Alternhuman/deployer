@@ -23,8 +23,8 @@ DEPLOYER_PORT = 1342
 RECEIVER_PORT = 1339
 RECEIVER_WEBSOCKET_PORT = 1370
 
-PIDFILE_DEPLOYER = '/var/run/marcopolo/deployer.pid'
-PIDFILE_RECEIVER = '/var/run/marcopolo/receiver.pid'
+PIDFILE_DEPLOYER = '/var/run/marcodeployerd.pid'
+PIDFILE_RECEIVER = '/var/run/marcoreceiverd.pid'
 
 INTERFACE='eth0'
 

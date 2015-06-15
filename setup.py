@@ -151,8 +151,8 @@ if __name__ == "__main__":
         data_files=data_files,
         entry_points={
             'console_scripts':[
-                'marcodeployer = marcodeployer.deployer:main',
-                'marcoreceiver = marcodeployer.receiver:main'
+                'marcodeployerd = marcodeployer.deployer:main',
+                'marcoreceiverd = marcodeployer.receiver:main'
             ]
         }
     )

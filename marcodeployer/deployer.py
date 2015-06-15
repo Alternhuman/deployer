@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 import tornado
 from tornado.web import Application, RequestHandler, \
@@ -385,8 +386,8 @@ def main(args=None):
     
     pid = os.getpid()
 
-    if not os.path.exists('/var/run/marcopolo'):
-        makedirs('/var/run/marcopolo')
+    #if not os.path.exists('/var/run/marcopolo'):
+    #    makedirs('/var/run/marcopolo')
 
     f = open(conf.PIDFILE_DEPLOYER, 'w')
     f.write(str(pid))
