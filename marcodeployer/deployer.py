@@ -72,12 +72,12 @@ class BaseHandler(RequestHandler):
         """
         return self.get_secure_cookie("user")
 
-    #def render(self, template, **kwargs):
-    #    print(os.path.join(conf.TEMPLATES_DIR, template))
-    #    super(BaseHandler, self).render(os.path.join(conf.TEMPLATES_DIR, template), **kwargs)
+    def render(self, template, **kwargs):
+        #print(os.path.join(conf.TEMPLATES_DIR, template))
+        super(BaseHandler, self).render(os.path.join(conf.TEMPLATES_DIR, template), **kwargs)
 
     def write_error(self, status_code, **kwargs):
-        self.render(os.path.join("/usr/lib/marcodeployer/templates/500.jade"))
+        self.render(os.path.join("500.jade"))
 
 
 class IndexHandler(BaseHandler):
@@ -97,7 +97,7 @@ class IndexHandler(BaseHandler):
             self.redirect("/login/")
         else:
             user = tornado.escape.xhtml_escape(self.current_user)
-            self.render("/usr/lib/marcodeployer/templates/index.jade", user=user)
+            self.render("index.jade", user=user)
 
 class LoginHandler(BaseHandler):
     """
@@ -390,7 +390,7 @@ def main(args=None):
     #if not os.path.exists('/var/run/marcopolo'):
     #    makedirs('/var/run/marcopolo')
 
-    logging.basicConf(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
+    logging.basicConfig(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
 
     try:
         f = open(conf.PIDFILE_DEPLOYER, 'w')
@@ -412,10 +412,10 @@ def main(args=None):
             Polo().publish_service(conf.DEPLOYER_SERVICE_NAME, root=True)
             break
         except PoloInternalException as e:
-            print(e)
+            logging.warning(e)
             time.sleep(1)
         except PoloException as i:
-            print(i)
+            logging.warning(i)
             break
 
     logging.info("Serving on port %d" % conf.DEPLOYER_PORT)

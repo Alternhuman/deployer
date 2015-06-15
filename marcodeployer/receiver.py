@@ -419,7 +419,7 @@ def main(args=None):
 
     #if not os.path.exists('/var/run/marcopolo'):
     #    makedirs('/var/run/marcopolo')
-    logging.basicConf(filename=conf.RECEIVER_LOG_FILE, level=getattr(logging, conf.RECEIVER_LOGLEVEL.upper()))
+    logging.basicConfig(filename=conf.RECEIVER_LOG_FILE, level=getattr(logging, conf.RECEIVER_LOGLEVEL.upper()))
 
     try:
         f = open(conf.PIDFILE_RECEIVER, 'w')

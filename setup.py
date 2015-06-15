@@ -39,9 +39,11 @@ def enable_service(service):
 def start_service(service):
     sys.stdout.write("Starting service " + service + "...")
     if init_bin == 0:
+        subprocess.call(["systemctl", "stop", service], shell=False)
         subprocess.call(["systemctl", "start", service], shell=False)
-    else:
-        subprocess.call(["update-rc.d", service, "start"], shell=False)
+    else: 
+        subprocess.call(["service", service, "stop"], shell=False)
+        subprocess.call(["service", service, "start"], shell=False)
 
     sys.stdout.write("Started!\n")
 
@@ -80,8 +82,8 @@ if __name__ == "__main__":
                  ]
     
 
-    if "--marcodeployer-disable-daemons" not in marcopolo_params:
-         init_bin = detect_init()
+    if "--marcodeployer-disable-daemons" not in deployer_params:
+        init_bin = detect_init()
 
         if init_bin == 1:
             daemon_files = [
@@ -94,6 +96,8 @@ if __name__ == "__main__":
                             ('/etc/systemd/system/', ["daemon/systemd/marcodeployerd.service", 
                                                       "daemon/systemd/marcoreceiverd.service"])
                            ]
+
+    data_files.extend(daemon_files)
 
     description = "The deployer for the marcopolo environment"
 
@@ -140,15 +144,15 @@ if __name__ == "__main__":
         }
     )
 
-    if "--marcodeployer-disable-daemons" not in marcopolo_params:
-         if "--marcodeployer-disable-deployer" not in marcopolo_params:
+    if "--marcodeployer-disable-daemons" not in deployer_params:
+         if "--marcodeployer-disable-deployer" not in deployer_params:
              enable_service("marcodeployerd")
-             if "--marcodeployer-no-start" not in marcopolo_params:
+             if "--marcodeployer-no-start" not in deployer_params:
                  start_service("marcodeployerd")
 
-         if "--marcodeployer-enable-receiver" in marcopolo_params:
+         if "--marcodeployer-enable-receiver" in deployer_params:
              enable_service("marcoreceiverd")
-             if "--marcodeployer-no-start" not in marcopolo_params:
+             if "--marcodeployer-no-start" not in deployer_params:
                  start_service("marcoreceiverd")
 
     if not os.path.exists("/var/log/marcodeployer"):
