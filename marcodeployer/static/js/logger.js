@@ -42,6 +42,7 @@ function createSocket(url, callback){
         var msg = JSON.parse(evt.data);
         //If it is the first output received, the output frame is created
         if(msg.shell == true){
+            console.log(msg.ip);
             appendShellOutput(msg.message, msg.ip, msg.stream_name, msg.stop, msg.command, msg.identifier);
         }else{
             if($("#"+msg.identifier).length < 1){

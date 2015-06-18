@@ -1,3 +1,5 @@
+var shellTabs = {};
+
 function processCommand(input){
 	var hosts = [];
 	$(".doexecute").each(function(index, element){
@@ -14,7 +16,6 @@ function sendInput(input, hosts){
 }
 
 function appendShellOutput(input, ip, stream_name, stop, command, identifier){
-	
 
 	if(stop == false){
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+escapeHtml(input)+"</p>");
@@ -26,7 +27,6 @@ function appendShellOutput(input, ip, stream_name, stop, command, identifier){
 	}
 }
 
-var shellTabs = {};
 
 function createShellTab(ip){
 	

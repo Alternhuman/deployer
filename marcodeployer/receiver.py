@@ -42,7 +42,15 @@ from marcopolo.bindings.polo import Polo, PoloInternalException, PoloException
 import six
 from six.moves.urllib import parse as urlparse
 
-ip = ""
+
+
+from marcodeployer.bufferprocessor import ProcessReactor
+from marcodeployer.statusmonitor import get_data
+from marcodeployer.utils import getip 
+from marcodeployer import conf
+
+#ip = ""
+ip = getip(conf.INTERFACE)
 opensockets={}
 io_loop = ioloop.IOLoop.instance()
 data_dict = {}
@@ -52,11 +60,6 @@ response_dict = {}
 statusmonitor_open_sockets =  []
 getDataCallback = None
 processes = {}
-
-from marcodeployer.bufferprocessor import ProcessReactor
-from marcodeployer.statusmonitor import get_data
-from marcodeployer.utils import getip 
-from marcodeployer import conf
 
 #TODO def sigterm_handler(signal, frame):
 #     ioloop.IOLoop.instance().stop()

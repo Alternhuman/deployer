@@ -81,7 +81,7 @@ if __name__ == "__main__":
                     ('/usr/lib/marcodeployer/templates', glob.glob("marcodeployer/templates/*.jade"))
                  ]
     
-
+    daemon_files = []
     if "--marcodeployer-disable-daemons" not in deployer_params:
         init_bin = detect_init()
 
