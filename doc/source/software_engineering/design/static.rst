@@ -21,7 +21,7 @@ Paquete bufferprocessor
     :align: center
 
 Paquete statusmonitor
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/design_statusmonitor.*
     :align: center

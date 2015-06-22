@@ -1,7 +1,6 @@
 Receiver handlers
 =================
 
-
 DeployHandler
 -------------
 

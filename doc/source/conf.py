@@ -16,8 +16,6 @@ import sys
 import os
 import shlex
 
-#sys.path.append(os.path.join("../../../deployer/", ))
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../deployer/"))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -301,3 +299,5 @@ intersphinx_mapping = {
                       'marcopolo': ('file:///home/martin/TFG/workspaces/discovery/doc/build/html/', None)
                       }
 #Add 
+locale_dirs = ['build/locale/']
+gettext_compact  =  False

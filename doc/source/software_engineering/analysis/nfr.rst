@@ -2,7 +2,7 @@ Requisitos no funcionales
 -------------------------
 
 
-NFR 1 Autenticación con credenciales ya conocidas por los usuarios
+NFR1 Autenticación con credenciales ya conocidas por los usuarios
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Versión**
@@ -34,7 +34,7 @@ NFR 2 La frecuencia de actualización del monitor de estado
 **Comentarios**: Esta restricción no es rígida, admitiéndose frecuencias de actualización oscilantes entre 0.5 y 2 segundos.
 
 
-NRF 3 Eliminación de "cuellos de botella"
+NRF3 Eliminación de "cuellos de botella"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Versión**
@@ -94,6 +94,9 @@ NRF6 Tornado
 **Estado**: Completo
 **Estabilidad**
 **Comentarios**
+
+NRF7 Encriptación
+~~~~~~~~~~~~~~~~~~
 
 
 s
