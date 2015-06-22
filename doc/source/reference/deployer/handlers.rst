@@ -4,60 +4,60 @@ Deployer handlers
 NotCheckingHostnameHTTPAdapter
 ------------------------------
 
-.. autoclass:: deployer.NotCheckingHostnameHTTPAdapter
+.. autoclass:: marcodeployer.deployer.NotCheckingHostnameHTTPAdapter
 	:members:
 
 BaseHandler
 -----------
 
-.. autoclass:: deployer.BaseHandler
+.. autoclass:: marcodeployer.deployer.BaseHandler
 	:members:
 
 IndexHandler
 ------------
 
-.. autoclass:: deployer.IndexHandler
+.. autoclass:: marcodeployer.deployer.IndexHandler
 	:members:
 
 LoginHandler
 ------------
 
-.. autoclass:: deployer.LoginHandler
+.. autoclass:: marcodeployer.deployer.LoginHandler
 	:members:
 
 LogoutHandler
 -------------
 
-.. autoclass:: deployer.Logout
+.. autoclass:: marcodeployer.deployer.Logout
 	:members:
 
 UploadAndDeployHandler
 ----------------------
 
-.. autoclass:: deployer.UploadAndDeployHandler
+.. autoclass:: marcodeployer.deployer.UploadAndDeployHandler
 	:members:
 
 NodesHandler
 ------------
 
-.. autoclass:: deployer.NodesHandler
+.. autoclass:: marcodeployer.deployer.NodesHandler
 	:members:
 
 Nodes
 -----
 
-.. autoclass:: deployer.Nodes
+.. autoclass:: marcodeployer.deployer.Nodes
 	:members:
 
 ProbeHandler
 ------------
 
-.. autoclass:: deployer.ProbeHandler
+.. autoclass:: marcodeployer.deployer.ProbeHandler
 	:members:
 
 ProbeWSHandler
 --------------
 
-.. autoclass:: deployer.ProbeWSHandler
+.. autoclass:: marcodeployer.deployer.ProbeWSHandler
 	:members:
 

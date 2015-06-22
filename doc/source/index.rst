@@ -16,9 +16,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   Installation <installation>
-   User manual <manual>
-   Reference <reference>
+   installation
+   manual/intro
+   reference/intro
+   software_engineering/intro
 
 Indices and tables
 ==================

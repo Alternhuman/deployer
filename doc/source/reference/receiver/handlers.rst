@@ -5,29 +5,29 @@ Receiver handlers
 DeployHandler
 -------------
 
-.. autoclass:: receiver.DeployHandler
+.. autoclass:: marcodeployer.receiver.DeployHandler
 	:members:
 
 LoggerHandler
 -------------
 
-.. autoclass:: receiver.LoggerHandler
+.. autoclass:: marcodeployer.receiver.LoggerHandler
 	:members:
 
 ProbeWSHandler
 --------------
 
-.. autoclass:: receiver.ProbeWSHandler
+.. autoclass:: marcodeployer.receiver.ProbeWSHandler
 	:members:
 
 ProbeHandler
 ------------
 
-.. autoclass:: receiver.ProbeHandler
+.. autoclass:: marcodeployer.receiver.ProbeHandler
 	:members:
 
 SocketHandler
 -------------
 
-.. autoclass:: receiver.SocketHandler
+.. autoclass:: marcodeployer.receiver.SocketHandler
 	:members:
