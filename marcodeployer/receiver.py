@@ -67,9 +67,6 @@ processes = {}
 #         socket.close()
 #     sys.exit(0)
 
-def sigint_handler(signal, frame):
-    io_loop.add_callback(shutdown)
-
 def shutdown():
     logging.info("Stopping gracefully")
     try:
@@ -78,6 +75,9 @@ def shutdown():
     except Exception as e:
         logging.warning(e)
     io_loop.stop()
+
+def sigint_handler(signal, frame):
+    io_loop.add_callback(shutdown)
 
 signal.signal(signal.SIGINT, sigint_handler)
 

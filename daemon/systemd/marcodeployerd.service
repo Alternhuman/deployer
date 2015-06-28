@@ -1,11 +1,11 @@
 [Unit]
 Description=A deployment utility
-Requires=polo.service
-After=polo.service
+Requires=polod.service
+After=polod.service
 
 [Service]
 
-ExecStart=marcodeployerd
+ExecStart=/usr/bin/marcodeployerd
 
 Type=simple
 User=root

@@ -53,15 +53,14 @@ Objetivo 4: Órdenes
 
 
 
-- **Versión**
-- **Autores**
-- **Fuentes**
-- **Descripción**
-- **Subobjetivos**
-- **Importancia**
-- **Urgencia**
-- **Estado**
-- **Estabilidad**
-
-
-- **Comentarios**
+.. 
+    - **Versión**
+    - **Autores**
+    - **Fuentes**
+    - **Descripción**
+    - **Subobjetivos**
+    - **Importancia**
+    - **Urgencia**
+    - **Estado**
+    - **Estabilidad**
+    - **Comentarios**

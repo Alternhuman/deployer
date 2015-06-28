@@ -26,10 +26,10 @@ Diagrama de actores del sistema
 .. image:: ../img/actors.*
     :align: center
 
-
-- **Versión**
-- **Autores**
-- **Fuentes**
-- **Descripción**
-- **Comentarios**
+.. 
+    - **Versión**
+    - **Autores**
+    - **Fuentes**
+    - **Descripción**
+    - **Comentarios**
 

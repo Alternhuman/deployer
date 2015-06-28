@@ -481,13 +481,8 @@ Vista de paquetes de casos de uso
     - **Estado**: Completo
     - **Estabilidad**: Estable
     - **Comentarios**
-      
 
-
-
-      
-
-
+.. 
     - **Versión**: 
     - **Autores**: 
     - **Fuentes**: 

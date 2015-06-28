@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-The deployer application
+A deployer, remote shell and status monitor built upon MarcoPolo
 """
 
 from setuptools import setup, find_packages
@@ -11,6 +11,7 @@ from distutils.command.install import install
 from codecs import open
 import os, sys, subprocess
 import glob
+import stat
 
 custom_deployer_params = [
                             "--marcodeployer-disable-daemons",
@@ -73,12 +74,12 @@ if __name__ == "__main__":
                 yield os.path.join(dirpath.split('/', 1)[1], f)
 
     data_files = [
-                    ('/usr/lib/marcodeployer/static/css', glob.glob("marcodeployer/static/css/*")),
-                    ('/usr/lib/marcodeployer/static/fonts', glob.glob("marcodeployer/static/fonts/*")),
-                    ('/usr/lib/marcodeployer/static/img',  glob.glob("marcodeployer/static/img/*")),
-                    ('/usr/lib/marcodeployer/static/js',  glob.glob("marcodeployer/static/js/*")),
-                    ('/usr/lib/marcodeployer/certs', [os.path.join("certs", f) for f in os.listdir("certs")]),
-                    ('/usr/lib/marcodeployer/templates', glob.glob("marcodeployer/templates/*.jade"))
+                    ('/usr/lib/marcodeployer/static/css', glob.glob("usr/lib/marcodeployer/static/css/*")),
+                    ('/usr/lib/marcodeployer/static/fonts', glob.glob("usr/lib/marcodeployer/static/fonts/*")),
+                    ('/usr/lib/marcodeployer/static/img',  glob.glob("usr/lib/marcodeployer/static/img/*")),
+                    ('/usr/lib/marcodeployer/static/js',  glob.glob("usr/lib/marcodeployer/static/js/*")),
+                    ('/usr/lib/marcodeployer/certs', glob.glob("usr/lib/marcodeployer/certs/*")),
+                    ('/usr/lib/marcodeployer/templates', glob.glob("usr/lib/marcodeployer/templates/*.jade"))
                  ]
     
     daemon_files = []
@@ -102,9 +103,9 @@ if __name__ == "__main__":
     description = "The deployer for the marcopolo environment"
 
     setup(
-        name="marcodeployer",
+        name="marcopolo-deployer",
         provides=["marcodeployer"],
-        version='0.0.1',
+        version='0.0.4',
         description=description,
         long_description = long_description,
         url="marcopolo.martinarroyo.net/apps/marcodeployer",
@@ -112,15 +113,22 @@ if __name__ == "__main__":
         author_email="martinarroyo@usal.es",
         license="MIT",
         classifiers=[
-            'Development Status :: 3 - Alpha',
-            'Intended Audience :: Developers',
-            'Topic :: Software Development :: Build Tools',
-            'License :: OSI Approved :: MIT License',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3.4',
+        'Development Status :: 3 - Alpha',
+
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+
+        'Topic :: Software Development',
+        'Topic :: System :: Networking',
+        'Topic :: System :: Monitoring',
+        'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
+
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Natural Language :: English',
 
         ],
-        keywords="marcopolo deployer",
+        keywords="marcopolo deployer statusmonitor",
         packages=find_packages(),
         install_requires=[
             'certifi==2015.4.28',
@@ -132,7 +140,9 @@ if __name__ == "__main__":
             'six==1.9.0',
             'tornado==4.1',
             'marcopolo',
-            'marcopolobindings'
+            'marcopolo.bindings',
+        #    'transifex-client',
+        #    'sphinx-intl'
         ],
         zip_safe=False,
         data_files=data_files,
@@ -144,16 +154,20 @@ if __name__ == "__main__":
         }
     )
 
-    if "--marcodeployer-disable-daemons" not in deployer_params:
-         if "--marcodeployer-disable-deployer" not in deployer_params:
-             enable_service("marcodeployerd")
-             if "--marcodeployer-no-start" not in deployer_params:
-                 start_service("marcodeployerd")
+    if "install" in sys.argv:
+        if "--marcodeployer-disable-daemons" not in deployer_params:
+            if "--marcodeployer-disable-deployer" not in deployer_params:
+                enable_service("marcodeployerd")
+                if "--marcodeployer-no-start" not in deployer_params:
+                    start_service("marcodeployerd")
 
-         if "--marcodeployer-enable-receiver" in deployer_params:
-             enable_service("marcoreceiverd")
-             if "--marcodeployer-no-start" not in deployer_params:
-                 start_service("marcoreceiverd")
+            if "--marcodeployer-enable-receiver" in deployer_params:
+                enable_service("marcoreceiverd")
+                if "--marcodeployer-no-start" not in deployer_params:
+                    start_service("marcoreceiverd")
 
-    if not os.path.exists("/var/log/marcodeployer"):
-        os.makedirs('/var/log/marcodeployer')
+        if not os.path.exists("/var/log/marcodeployer"):
+            os.makedirs('/var/log/marcodeployer')
+
+        for f in os.listdir('/usr/lib/marcodeployer/certs'):
+            os.chmod(f, stat.S_IREAD | stat.S_IWRITE)

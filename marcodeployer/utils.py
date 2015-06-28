@@ -16,10 +16,14 @@ def authenticate(name, password):
     the shadows or passwd file (The shadow file is preferred if it exists) 
     """
     try:
-        return pam.pam().authenticate(name, password)
+        success = pam.pam().authenticate(name, password)
+        if success is True:
+            return success
     except Exception as e:
+        print("Exception")
         print(e)
         return False
+        
     if path.exists("/etc/shadow"):
         import spwd
         shadow = spwd.getspnam(name).sp_pwdp # https://docs.python.org/3.4/library/spwd.html#module-spwd
@@ -32,8 +36,9 @@ def authenticate(name, password):
     try:
         salt = salt_pattern.match(shadow).group()
     except AttributeError:
+        print("AttributeError")
         return False
-
+    print("Returning")
     return crypt(password, salt) == shadow
 
 
