@@ -27,8 +27,6 @@ from marcodeployer import utils, conf
 import logging
 
 
-
-
 class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
     """
     A middleware that avoids the verification of the SSL Hostname field.
@@ -392,13 +390,13 @@ def main(args=None):
 
     logging.basicConfig(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
 
-    try:
-        f = open(conf.PIDFILE_DEPLOYER, 'w')
-        f.write(str(pid))
-        f.close()
-    except Exception as e:
-        logging.error(e)
-        exit(1)
+    # try:
+    #     f = open(conf.PIDFILE_DEPLOYER, 'w')
+    #     f.write(str(pid))
+    #     f.close()
+    # except Exception as e:
+    #     logging.error(e)
+    #     exit(1)
     #TODO Replace with SSLContext (this option is maintained for compatibility reasons)
     httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,

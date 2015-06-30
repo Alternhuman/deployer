@@ -424,13 +424,6 @@ def main(args=None):
     #    makedirs('/var/run/marcopolo')
     logging.basicConfig(filename=conf.RECEIVER_LOG_FILE, level=getattr(logging, conf.RECEIVER_LOGLEVEL.upper()))
 
-    try:
-        f = open(conf.PIDFILE_RECEIVER, 'w')
-        f.write(str(pid))
-        f.close()
-    except Exception as e:
-        logging.error(e)
-        exit(1)
 
     httpServer = HTTPServer(app, ssl_options={
         "certfile": conf.RECEIVERCERT,
