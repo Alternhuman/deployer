@@ -79,7 +79,8 @@ if __name__ == "__main__":
                     ('/usr/lib/marcodeployer/static/img',  glob.glob("usr/lib/marcodeployer/static/img/*")),
                     ('/usr/lib/marcodeployer/static/js',  glob.glob("usr/lib/marcodeployer/static/js/*")),
                     ('/usr/lib/marcodeployer/certs', glob.glob("usr/lib/marcodeployer/certs/*")),
-                    ('/usr/lib/marcodeployer/templates', glob.glob("usr/lib/marcodeployer/templates/*.jade"))
+                    ('/usr/lib/marcodeployer/templates', glob.glob("usr/lib/marcodeployer/templates/*.jade")),
+                    ('/etc/marcodeployer', glob.glob('etc/marcodeployer/*'))
                  ]
     
     daemon_files = []
@@ -170,4 +171,4 @@ if __name__ == "__main__":
             os.makedirs('/var/log/marcodeployer')
 
         for f in os.listdir('/usr/lib/marcodeployer/certs'):
-            os.chmod(f, stat.S_IREAD | stat.S_IWRITE)
+            os.chmod(os.path.join('/usr/lib/marcodeployer/certs', f), stat.S_IREAD | stat.S_IWRITE)
