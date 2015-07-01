@@ -4,6 +4,7 @@ Análisis
 .. toctree::
     :maxdepth: 2
 
+    domain
     goals
     static
     actors
