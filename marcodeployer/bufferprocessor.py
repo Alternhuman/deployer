@@ -4,7 +4,7 @@ class LineBuffer(object):
 	"""
 	Processes each line in the desired buffer
 
-	From Juan Luis Boya
+	From Juan Luis Boya: https://github.com/ntrrgc/dotfiles/blob/master/wtfd
 	"""
 	def __init__(self):
 		self.buffer = b''

@@ -69,3 +69,4 @@ doc/build/*
 deployer/uploads/*
 *.vpp~*
 *.vpp\~*
+doc/doxygen.old/

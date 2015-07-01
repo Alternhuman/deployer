@@ -20,8 +20,7 @@ def authenticate(name, password):
         if success is True:
             return success
     except Exception as e:
-        print("Exception")
-        print(e)
+        logging.warning(e)
         return False
         
     if path.exists("/etc/shadow"):
@@ -35,10 +34,9 @@ def authenticate(name, password):
     
     try:
         salt = salt_pattern.match(shadow).group()
-    except AttributeError:
-        print("AttributeError")
+    except AttributeError as a:
+        logging.warning(a)
         return False
-    print("Returning")
     return crypt(password, salt) == shadow
 
 

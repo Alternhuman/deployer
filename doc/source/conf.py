@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinxcontrib.autojs'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -296,7 +297,7 @@ texinfo_documents = [
 intersphinx_mapping = {
                       'python':('https://docs.python.org/', None),
                       'tornado': ('http://www.tornadoweb.org/en/stable/', None),
-                      'marcopolo': ('file:///home/martin/TFG/workspaces/discovery/doc/build/html/', None)
+                      'marcopolo': ('file:///home/martin/TFG/workspaces/discovery/marcopolo-doc/build/html/', None)
                       }
 #Add 
 locale_dirs = ['build/locale/']
