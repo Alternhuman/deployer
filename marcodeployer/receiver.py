@@ -164,11 +164,18 @@ class DeployHandler(RequestHandler):
             #TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             #TODOout, err = process.communicate()
 
+secret = ""
+try:
+    with open(conf.SECRET_FILE, 'r') as secret_file:
+        secret = secret_file.read()
+except Exception as e:
+    logging.error("Could not open secret file")
+    sys.exit(1)
 
 settings = {
     "debug": True,
-    "static_path": os.path.join(os.path.dirname(__file__), "static"),
-    "cookie_secret": "2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
+    "static_path": conf.STATIC_PATH, #os.path.join(os.path.dirname(__file__), "static"),
+    "cookie_secret": secret
 }
 
 class LoggerHandler(WebSocketHandler):

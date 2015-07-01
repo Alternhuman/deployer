@@ -172,3 +172,5 @@ if __name__ == "__main__":
 
         for f in os.listdir('/usr/lib/marcodeployer/certs'):
             os.chmod(os.path.join('/usr/lib/marcodeployer/certs', f), stat.S_IREAD | stat.S_IWRITE)
+
+        os.chmod('/etc/marcodeployer/secret', stat.S_IREAD | stat.S_IWRITE)

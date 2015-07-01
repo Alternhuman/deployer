@@ -39,6 +39,8 @@ RECEIVER_LOG_FILE = "/var/log/marcodeployer/marcoreceiverd.log"
 DEPLOYER_LOGLEVEL = "DEBUG"
 RECEIVER_LOGLEVEL = "DEBUG"
 
+SECRET_FILE = "/etc/marcodeployer/secret"
+
 
 default_values = {
     "CERTS": CERTS,
@@ -63,6 +65,7 @@ default_values = {
     "RECEIVER_LOG_FILE" : RECEIVER_LOG_FILE,
     "DEPLOYER_LOGLEVEL" : DEPLOYER_LOGLEVEL,
     "RECEIVER_LOGLEVEL" : RECEIVER_LOGLEVEL,
+    "SECRET_FILE": SECRET_FILE,
 }
 
 config = configparser.RawConfigParser(default_values, allow_no_value=False)
@@ -106,8 +109,9 @@ try:
         RECEIVER_LOG_FILE = config.get('receiver', 'RECEIVER_LOG_FILE')
         DEPLOYER_LOGLEVEL = config.get('deployer', 'DEPLOYER_LOGLEVEL')
         RECEIVER_LOGLEVEL = config.get('receiver', 'RECEIVER_LOGLEVEL')
+        SECRET_FILE = config.get('receiver', 'SECRET_FILE')
 
 except IOError as i:
-    logging.warning("Warning! The configuration file is not available. Defaults will be used as fallback")
+    logging.warning("Warning! The configuration file could not be read. Defaults will be used as fallback")
 except Exception as e:
-    logging.warning("Unknown exception in polo parser %s" % e)
+    logging.warning("Unknown exception in configuration parser %s" % e)
