@@ -410,16 +410,16 @@ Requisitos funcionales
 - **Estabilidad**: Estable
 - **Comentarios**: Los diferentes sistemas operativos con los que se debe trabajar cuentan con un conjunto diferente de mecanismos para la obtención de datos. El sistema se debe adaptar a cada uno de ellos.
 
+Vista de casos de uso
+---------------------
+
+.. toctree::
+    :maxdepth: 2
+
+    uc
 
 
-Vista de paquetes de casos de uso
----------------------------------
-
-.. image:: ../img/analysis_cu_deployer.*
-    :align: center
-
-
-..
+.. 
     - **Versión**: 
     - **Autores**: 
     - **Fuentes**: 

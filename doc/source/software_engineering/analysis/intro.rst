@@ -9,4 +9,8 @@ Análisis
     actors
     ir
     fr
+    uc
     nfr
+
+    activity
+    state

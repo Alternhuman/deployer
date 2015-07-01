@@ -6,4 +6,7 @@ The status monitor provides a live visualization of several important status inf
 
 The monitor is pretty straightforward, after the page is loaded the nodes in the network are detected and then the statistics are returned to the user every second.
 
-There is a general view where the users can get general information about the overal performance of the system.
+.. image:: ../img/screenshot-statusmonitor.*
+    :align: center
+
+Each node is displayed in an independent panel.

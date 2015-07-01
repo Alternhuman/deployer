@@ -1,5 +1,5 @@
-Deployer handlers
-=================
+The deployer module
+===================
 
 NotCheckingHostnameHTTPAdapter
 ------------------------------
@@ -61,3 +61,7 @@ ProbeWSHandler
 .. autoclass:: marcodeployer.deployer.ProbeWSHandler
 	:members:
 
+main
+----
+
+.. automethod:: marcodeployer.deployer.main

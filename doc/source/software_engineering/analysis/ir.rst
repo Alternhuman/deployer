@@ -36,18 +36,17 @@ IRQ 2: Información de estado
 IRQ 3: 
 
 .. 
-	- ************
-	- **Versión**
-	- **Autores**
-	- **Fuentes**
-	- **Objetivos asociados**
-	- **Requisitos asociados**
-	- **Descripción**
-	- **Datos específicos**
-	- **Tiempo de vida**
-	- **Ocurrencias simultáneas**
-	- **Importancia**
-	- **Urgencia**
-	- **Estado**
-	- **Estabilidad**
-	- **Comentarios**
+    - **Versión**
+    - **Autores**
+    - **Fuentes**
+    - **Objetivos asociados**
+    - **Requisitos asociados**
+    - **Descripción**
+    - **Datos específicos**
+    - **Tiempo de vida**
+    - **Ocurrencias simultáneas**
+    - **Importancia**
+    - **Urgencia**
+    - **Estado**
+    - **Estabilidad**
+    - **Comentarios**

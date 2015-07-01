@@ -1,10 +1,10 @@
 Objetivos del sistema
----------------------
+=====================
 
 El sistema debe cumplir los siguientes objetivos a alto nivel:
 
 Objetivo 1: Despliegue de ejecutables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 - **Descripción**: El *software* deberá realizar operaciones de despliegue sobre un conjunto de nodos especificado por el usuario, con una serie de parámetros que modificarán los efectos de dicha acción. No deberá existir un conjunto limitado de software compatible, sino que la herramienta deberá ser de carácter general, admitiendo en casos particulares ser extendida para dar mejor soporte a un propósito particular, atendiendo a las demandas del público objetivo.
 - **Importancia**: Muy alta
@@ -15,7 +15,7 @@ Objetivo 1: Despliegue de ejecutables
 
 
 Objetivo 2: Monitorización del sistema
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 - **Versión**
 - **Autores**
@@ -29,7 +29,7 @@ Objetivo 2: Monitorización del sistema
 
 
 Objetivo 3: Operaciones de depuración y control
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -42,7 +42,7 @@ Objetivo 3: Operaciones de depuración y control
 - **Comentarios**
 
 Objetivo 4: Órdenes
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 - **Descripción**: Junto a una operación de despliegue o de forma independiente, los usuarios pueden realizar diferentes acciones a través de llamadas al sistema mediante la misma interfaz.
 - **Importancia**: Media

@@ -1,9 +1,9 @@
 Requisitos no funcionales
--------------------------
+=========================
 
 
 NFR1 Autenticación con credenciales ya conocidas por los usuarios
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -19,7 +19,7 @@ NFR1 Autenticación con credenciales ya conocidas por los usuarios
 
 
 NFR 2 La frecuencia de actualización del monitor de estado
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -35,7 +35,7 @@ NFR 2 La frecuencia de actualización del monitor de estado
 
 
 NRF3 Eliminación de "cuellos de botella"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 - **Versión**
 - **Autores**
@@ -50,7 +50,7 @@ NRF3 Eliminación de "cuellos de botella"
 - **Comentarios**:
 
 NRF4 Descubrimiento de los nodos con MarcoPolo
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -65,7 +65,7 @@ NRF4 Descubrimiento de los nodos con MarcoPolo
 - **Comentarios**
 
 NRF5 Servicios dinámicos
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 - **Versión**
 - **Autores**
@@ -81,7 +81,7 @@ NRF5 Servicios dinámicos
 
 
 NRF6 Tornado
-~~~~~~~~~~~~
+------------
 
 - **Versión**
 - **Autores**
@@ -96,22 +96,26 @@ NRF6 Tornado
 - **Comentarios**
 
 NRF7 Encriptación
-~~~~~~~~~~~~~~~~~~
+------------------
+
+
+
 
 
 s
 3 
+
 .. 
-	- **Versión**
-	- **Autores**
-	- **Fuentes**
-	- **Objetivos asociados**
-	- **Requisitos asociados**
-	- **Descripción**
-	- **Importancia**
-	- **Urgencia**
-	- **Estado**
-	- **Estabilidad**
-	- **Comentarios**
+    - **Versión**
+    - **Autores**
+    - **Fuentes**
+    - **Objetivos asociados**
+    - **Requisitos asociados**
+    - **Descripción**
+    - **Importancia**
+    - **Urgencia**
+    - **Estado**
+    - **Estabilidad**
+    - **Comentarios**
 
 
