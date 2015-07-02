@@ -177,10 +177,6 @@ class UploadAndDeployHandler(BaseHandler):
         
         """The deployment process is performed asynchronously 
         using a ThreadPool, which will handle the request asynchronously"""
-        #TODO: remove?
-        #thread_pool = futures.ThreadPoolExecutor(max_workers=len(nodes))
-
-        #For each node a future is received
 
         futures_set = set()
 
@@ -257,7 +253,7 @@ class UploadAndDeployHandler(BaseHandler):
         
             return f
         except Exception as e:
-            print("It happened here")
+            logging.error("Unknown exception in POSTing %s" % e)
 
 class NodesHandler(websocket.WebSocketHandler):
     """

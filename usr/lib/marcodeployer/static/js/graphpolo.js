@@ -321,7 +321,7 @@ function createPanel(number, ip){
       
       $("#hostname-"+number)
       .closest(".panel-heading")
-      .append("<p>The websocket connection could not be created. Check your network connectivity and make sure that you can stablish a connection clicking <a style='color:#fff' href='"+probe+"'>here</a></p>");
+      .append("<p>The websocket connection could not be created. Check your network connectivity and make sure that you can establish a connection clicking <a style='color:#fff' href='"+probe+"'>here</a></p>");
   
     }
     ws.onmessage = function(evt){

@@ -42,8 +42,6 @@ from marcopolo.bindings.polo import Polo, PoloInternalException, PoloException
 import six
 from six.moves.urllib import parse as urlparse
 
-
-
 from marcodeployer.bufferprocessor import ProcessReactor
 from marcodeployer.statusmonitor import get_data
 from marcodeployer.utils import getip 
