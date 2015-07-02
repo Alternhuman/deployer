@@ -48,6 +48,7 @@ function nodo(info, callback){
         cadena += "</div>";
         callback(cadena);
     });
+}
 
 $(document).ready(function() {
     /**function:ready()
