@@ -1,7 +1,7 @@
 Requisitos de información
 -------------------------
 
-IRQ 1: Información sobre los usuarios del sistema
+IRQ-1: Información sobre los usuarios del sistema
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - **Fuentes**
@@ -17,7 +17,7 @@ IRQ 1: Información sobre los usuarios del sistema
 - **Estabilidad**: Completo
 - **Comentarios**: Esta información no es gestionada por el *software*, sino únicamente consultada.
 
-IRQ 2: Información de estado
+IRQ-2: Información de estado
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - **Fuentes**
@@ -26,14 +26,30 @@ IRQ 2: Información de estado
 - **Descripción**: El sistema almacenará diferentes registros de las operaciones realizadas en el mismo, así como una serie de mensajes que reflejen actualizaciones en el estado del sistema.
 - **Datos específicos**: Ficheros *log*.
 - **Tiempo de vida**: Permanente
-- **Ocurrencias simultáneas**: El acceso al fichero es concurrente
+- **Ocurrencias simultáneas**:
 - **Importancia**: Media
 - **Urgencia**: Elevada
 - **Estado**: Completo
 - **Estabilidad**: Completo
 - **Comentarios**
 
-IRQ 3: 
+IRQ-3: Estadísticas del sistema
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Versión**
+- **Autores**
+- **Fuentes**
+- **Objetivos asociados**
+- **Requisitos asociados**: **NRF-2**
+- **Descripción**: La aplicación deberá generar y gestionar el envío de diferentes datos del sistema (CPU, memoria, temperatura...) en directo.
+- **Datos específicos**: CPU, Temperatura, memoria libre, *swap*, listado de procesos con el consumo de memoria y CPU, extensible a otros datos.
+- **Tiempo de vida**: Cada segundo se genera un nuevo conjunto de datos, descartando el anterior.
+- **Ocurrencias simultáneas**: Una única ocurrencia por cada instancia.
+- **Importancia**: Alta
+- **Urgencia**: Alta
+- **Estado**: Completo
+- **Estabilidad**: Estable
+- **Comentarios**
 
 .. 
     - **Versión**

@@ -11,7 +11,7 @@ Objetivo 1: Despliegue de ejecutables
 - **Urgencia**: Elevada
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
+- **Comentarios**: El sistema debe soportar el despliegue de ejecutables y ficheros de configuración de forma indistinta.
 
 
 Objetivo 2: Monitorización del sistema
@@ -25,7 +25,7 @@ Objetivo 2: Monitorización del sistema
 - **Urgencia**: Elevada
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
+- **Comentarios**: La monitorización deberá realizarse de forma asíncrona y evitando "cuellos de botella", debido a la gran cantidad de información transmitida en periódicamente con intervalos entre cada operación envío muy pequeños.
 
 
 Objetivo 3: Operaciones de depuración y control
@@ -39,7 +39,6 @@ Objetivo 3: Operaciones de depuración y control
 - **Urgencia**: Alta
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
 
 Objetivo 4: Órdenes
 -------------------
@@ -49,9 +48,6 @@ Objetivo 4: Órdenes
 - **Urgencia**: Media
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
-
-
 
 .. 
     - **Versión**

@@ -1,9 +1,8 @@
 Requisitos no funcionales
 =========================
 
-
-NFR1 Autenticación con credenciales ya conocidas por los usuarios
-------------------------------------------------------------------
+NFR-1: Autenticación con credenciales ya conocidas por los usuarios
+-------------------------------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -18,7 +17,7 @@ NFR1 Autenticación con credenciales ya conocidas por los usuarios
 - **Comentarios**
 
 
-NFR 2 La frecuencia de actualización del monitor de estado
+NFR-2: Frecuencia de actualización del monitor de estado
 -----------------------------------------------------------
 
 - **Versión**
@@ -34,8 +33,8 @@ NFR 2 La frecuencia de actualización del monitor de estado
 - **Comentarios**: Esta restricción no es rígida, admitiéndose frecuencias de actualización oscilantes entre 0.5 y 2 segundos.
 
 
-NRF3 Eliminación de "cuellos de botella"
------------------------------------------
+NFR-3: Eliminación de "cuellos de botella"
+------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -49,8 +48,8 @@ NRF3 Eliminación de "cuellos de botella"
 - **Estabilidad**
 - **Comentarios**:
 
-NRF4 Descubrimiento de los nodos con MarcoPolo
-----------------------------------------------
+NFR-4: Descubrimiento de los nodos con MarcoPolo
+------------------------------------------------
 
 - **Versión**
 - **Autores**
@@ -64,8 +63,8 @@ NRF4 Descubrimiento de los nodos con MarcoPolo
 - **Estabilidad**
 - **Comentarios**
 
-NRF5 Servicios dinámicos
-------------------------
+NFR-5: Servicios dinámicos
+--------------------------
 
 - **Versión**
 - **Autores**
@@ -80,8 +79,8 @@ NRF5 Servicios dinámicos
 - **Comentarios**
 
 
-NRF6 Tornado
-------------
+NFR-6: Tornado
+--------------
 
 - **Versión**
 - **Autores**
@@ -95,15 +94,24 @@ NRF6 Tornado
 - **Estabilidad**
 - **Comentarios**
 
-NRF7 Encriptación
+NFR-7 Encriptación
 ------------------
 
+- **Versión**
+- **Autores**
+- **Fuentes**
+- **Objetivos asociados**
+- **Requisitos asociados**
+- **Descripción**: Todas las comunicaciones entre los diferentes componentes se realizan de forma cifrada utilizando HTTPS o WSS (*Secure WebSocket*). Ambos roles (cliente y servidor) deberán aportar un certificado que será validado por la entidad al otro lado del canal durante la creación del canal.
+- **Importancia**
+- **Urgencia**
+- **Estado**
+- **Estabilidad**
+- **Comentarios**
 
-
-
-
-s
-3 
+.. 
+    s
+    3 
 
 .. 
     - **Versión**

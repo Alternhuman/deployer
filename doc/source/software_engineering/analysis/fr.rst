@@ -1,20 +1,16 @@
 Requisitos funcionales
-----------------------
+======================
 
-**RF1**: Ordenar despliegue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-1: Ordenar despliegue
+------------------------
 
 - **Versión**: 
 - **Autores**: 
 - **Fuentes**: 
 - **Objetivos asociados**: 1
 - **Requisitos asociados**: RF4
-- **Descripción**: 
-    Diferentes usuarios solicitan al sistema la realización de operaciones de despliegue con una serie de parámetros de configuración.
-
-- **Precondición**: 
-    El usuario deberá estar autenticado en el sistema.
-
+- **Descripción**: Diferentes usuarios solicitan al sistema la realización de operaciones de despliegue con una serie de parámetros de configuración.
+- **Precondición**: El usuario deberá estar autenticado en el sistema.
 - **Secuencia normal**:
 
     1. El usuario solicita realizar una operación de despliegue.
@@ -23,15 +19,13 @@ Requisitos funcionales
     4. El usuario elige un fichero ejecutable e indica los diferentes parámetros de despliegue.
     5. Para cada uno de los ficheros a desplegar realizará esta acción.
     6. Una vez que termine de añadir ficheros, el despliegue comenzará.
-    7. Si se indica un comando en uno o varios de los ficheros, el usuario recibe la salida de estos en la vista dispuesta a tal efecto.  Se ejecuta el caso de uso **RF4**
+    7. Si se indica un comando en uno o varios de los ficheros, el usuario recibe la salida de estos en la vista dispuesta a tal efecto.  Se ejecuta el caso de uso RF-4
     
 - **Poscondición**: El usuario recibe la confirmación de éxito o un mensaje de error en su defecto.
-
 - **Excepciones**:
 
     + Si el usuario no dispone de los permisos de ejecución o despliegue necesarios en el directorio elegido, recibirá un mensaje informativo.
     + En caso de que exista algún tipo de error interno, el usuario recibirá un mensaje informativo. 
-
 - **Rendimiento**:
 
     + El sistema deberá ser capaz de ejecutar operaciones de despliegue de forma concurrente para un volumen de usuarios estimado en 60.
@@ -41,16 +35,14 @@ Requisitos funcionales
     + Se espera que los usuarios utilicen esta funcionalidad en una frecuencia aproximada de 3 despliegues/hora.
 
 - **Importancia**: Muy alta
-
 - **Urgencia**: Alta
-
 - **Estado**: Completo
 - **Estabilidad**: Estable
 - **Comentarios**
 
 
-**RF2**: Monitorización de estado
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-2: Monitorización de estado
+------------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -58,7 +50,6 @@ Requisitos funcionales
 - **Objetivos asociados**: 2
 - **Requisitos asociados**: RF4, NFR2
 - **Descripción**: Los diferentes usuarios podrán consultar en directo diferentes valores de estado como la memoria en uso o los diferentes procesos en ejecución.
-
 - **Precondición**: 
    
     + El usuario deberá estar autenticado en el sistema.
@@ -72,23 +63,18 @@ Requisitos funcionales
 
 - **Poscondición**
 - **Excepciones**:
-    + En caso de que exista algún tipo de error interno (en especial en el establecimiento de las conexiones con los diferentes nodos), el usuario recibirá un mensaje informativo. 
 
+    + En caso de que exista algún tipo de error interno (en especial en el establecimiento de las conexiones con los diferentes nodos), el usuario recibirá un mensaje informativo. 
 - **Rendimiento**:
 - **Frecuencia**:
-
-    + 
-
 - **Importancia**: Muy alta
-
 - **Urgencia**: Alta
-
 - **Estado**: Completo
 - **Estabilidad**: Estable
 - **Comentarios**
   
-**RF3**: Ejecutar de comandos
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-3: Ejecución de comandos
+---------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -96,7 +82,6 @@ Requisitos funcionales
 - **Objetivos asociados**: 1
 - **Requisitos asociados**: RF4
 - **Descripción**: Acompañando a un despliegue o de forma independiente, el *software* permite ejecutar comandos en los diferentes nodos que conforman el sistema.
-
 - **Precondición**:
 
     + El usuario deberá estar autenticado en el sistema.
@@ -112,7 +97,7 @@ Requisitos funcionales
 - **Poscondición**:
 - **Excepciones**:
 
-    + En caso de que exista algún tipo de error interno, el usuario recibirá un mensaje informativo. 
+    + En caso de que exista algún tipo de error interno, el usuario recibirá un mensaje informativo y se registrará el incidente en un fichero de *log*. 
 
 - **Rendimiento**:
 
@@ -130,8 +115,8 @@ Requisitos funcionales
 - **Estabilidad**: Estable
 - **Comentarios**
   
-**RF4**: Autenticación
-~~~~~~~~~~~~~~~~~~~~~~~
+RF-4: Autenticación
+-----------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -139,7 +124,6 @@ Requisitos funcionales
 - **Objetivos asociados**: 1
 - **Requisitos asociados**: NFR1
 - **Descripción**: A través de una interfaz de autenticación los usuarios acceden al sistema.
-
 - **Precondición**:
 
     + El usuario debe poseer unas credenciales en el sistema.
@@ -150,27 +134,22 @@ Requisitos funcionales
     2. El usuario introduce las claves de acceso.
     3. El sistema valida dichas claves utilizando la fuente de datos especificada por el administrador.
     4. Si los datos son válidos, el sistema da acceso al usuario y muestra la interfaz de control. En caso de que los datos no sean válidos el sistema muestra un mensaje de error.
-       
-
+    
 - **Poscondición**: El usuario es autenticado en el sistema.
 - **Excepciones**:
 
     + En caso de que exista algún tipo de error interno (como un fallo en el acceso al sistema de validación de claves), el usuario recibirá un mensaje informativo. 
 
 - **Rendimiento**:
-
 - **Frecuencia**:
-
 - **Importancia**: Muy alta
-
 - **Urgencia**: Alta
-
 - **Estado**: Completo
 - **Estabilidad**: Estable
 - **Comentarios**
   
-**RF5**: Validar una conexión **WebSocket**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-5: Validar una conexión **WebSocket**
+-------------------------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -201,8 +180,8 @@ Requisitos funcionales
 - **Comentarios**
   
 
-**RF6**: Instalación del sistema
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-6: Instalación del sistema
+--------------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -225,8 +204,8 @@ Requisitos funcionales
 - **Estabilidad**: Estable
 - **Comentarios**       
 
-**RF7**: Gestión de errores
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-7: Gestión de errores
+---------------------------
   
 - **Versión**: 
 - **Autores**: 
@@ -253,8 +232,8 @@ Requisitos funcionales
 - **Comentarios**
   
 
-**RF8**: Procesar petición
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-8: Procesar petición
+--------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -268,9 +247,9 @@ Requisitos funcionales
     2. En caso de que la validación sea satisfactoria, el sistema identifica el tipo de acción a realizar.
     3. Se realiza una de las siguientes acciones:
     
-        - En caso de que se solicite un despliegue, comienza el caso de uso **RF9**.
-        - En caso de que se solicite recibir la información sobre el estado del nodo, el cliente es añadido a la lista de interesados y comienza el caso de uso **RF10**.
-        - En caso de que se solicite la ejecución de un comando, comienza el caso de uso **RF11**.
+        - En caso de que se solicite un despliegue, comienza el caso de uso RF-9.
+        - En caso de que se solicite recibir la información sobre el estado del nodo, el cliente es añadido a la lista de interesados y comienza el caso de uso RF-10.
+        - En caso de que se solicite la ejecución de un comando, comienza el caso de uso RF-11.
         
 - **Poscondición**: La acción es realizada
 - **Excepciones**: En caso de que la identidad del solicitante no pueda ser validada, la conexión es rechazada. El resto de errores son gestionados por los puntos de extensión.
@@ -282,8 +261,8 @@ Requisitos funcionales
 - **Estabilidad**: Estable
 - **Comentarios**
 
-**RF9**: Realizar despliegue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-9: Realizar despliegue
+----------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -302,7 +281,7 @@ Requisitos funcionales
             +  Si existe el fichero y la petición indica que no sea sobreescrito, la operación termina.
             
         4. Los archivos son copiados.
-        5. En caso de que se solicite la ejecución de un comando, comienza el caso de uso **RF11**.
+        5. En caso de que se solicite la ejecución de un comando, comienza el caso de uso RF-11.
 
 - **Poscondición**: El despliegue se ha realizado correctamente.
 - **Excepciones**: En caso de que el usuario no disponga de los suficientes permisos de ejecución, se emitirá un mensaje de error a través de la interfaz de usuario.
@@ -314,8 +293,8 @@ Requisitos funcionales
 - **Estabilidad**:
 - **Comentarios**
 
-**RF10**: Enviar estado
-~~~~~~~~~~~~~~~~~~~~~~~
+RF-10: Enviar estado
+-----------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -326,7 +305,7 @@ Requisitos funcionales
 - **Precondición**:
 - **Secuencia normal**:
     1. De forma continua (en intervalos de un segundo), se verifica que existan conexiones interesadas en la información del estado del nodo.
-    2. En caso de que exista al menos una, se procede a la recolección de dichos datos. Comienza el caso de us **RF13** En caso contrario la ejecución de esta iteración termina y se espera al siguiente segundo.
+    2. En caso de que exista al menos una, se procede a la recolección de dichos datos. Comienza el caso de us RF-13 En caso contrario la ejecución de esta iteración termina y se espera al siguiente segundo.
     3. Los datos son enviados a todos los interesados recorriendo la colección de conexiones.
 - **Poscondición**: Los datos son enviados a los diferentes clientes interesados, que procesan la información y la muestran.
 - **Excepciones**:
@@ -339,8 +318,8 @@ Requisitos funcionales
 - **Comentarios**
 
 
-**RF11**: Ejecutar comando
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-11: Ejecutar comando
+--------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -364,8 +343,8 @@ Requisitos funcionales
 - **Comentarios**
 
 
-**RF12**: Procesar mensaje
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+RF-12: Procesar mensaje
+--------------------------
 
 - **Versión**: 
 - **Autores**: 
@@ -387,8 +366,8 @@ Requisitos funcionales
 - **Estabilidad**: Estable
 - **Comentarios**
   
-**RF13** Recoger estado
-~~~~~~~~~~~~~~~~~~~~~~~
+RF-13 Recoger estado
+-----------------------
 
 - **Versión**: 
 - **Autores**: 

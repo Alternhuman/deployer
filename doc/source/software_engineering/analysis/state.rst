@@ -1,8 +1,8 @@
 Vista de estados
 ================
 
-Estados en un despliegue
-------------------------
+Estados durante una fase de despliegue
+--------------------------------------
 
 .. image:: ../img/deployment_sequence.*
 	:align: center
