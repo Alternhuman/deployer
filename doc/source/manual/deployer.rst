@@ -17,7 +17,7 @@ After dragging a file, a configuration menu is displayed, where the user can add
 
 - If the service has to be deployed on a local instance of `Apache Tomcat <http://tomcat.apache.org/>`_ the option `Tomcat` handles the deployment of the .war file (no activation whatsoever is done, but Tomcat can be configured (and sometimes it is set by default) to process new containers automatically upon copying to the services folder).
 
-- If the service has to be deployed on MarcoPolo (and you does not want to use the :class:`Polo binding<bindings.polo.polo.Polo>`), the parameter `Deploy on Polo?` can be set to True and the identifier of the service must be provided.
+- If the service has to be deployed on MarcoPolo (and you do not want to use the :class:`Polo binding <marcopolo.bindings.polo.Polo>`), the parameter `Deploy on Polo?` can be set to True and the identifier of the service must be provided.
 
 - If the service must not overwrite previous deployments, uncheck the `Overwrite file if it exists` box.
 

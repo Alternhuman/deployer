@@ -1,5 +1,0 @@
-Upload .mar / set of binaries, scripts, etc
-Linked to statusmonitor
-MarcoPolo-based
-Created with Tornado (ofc)
-Drag-drop, etc

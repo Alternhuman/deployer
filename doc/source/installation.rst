@@ -8,13 +8,13 @@ The installation of the software is rather easy when using a package manager. On
     pip install marcopolo-deployer
 
 
-It can also be installed through the `setup.py` script that is included on the tarball with the following command:
+It can also be installed through the ``setup.py`` script that is included on the tarball with the following command:
 
 ::
     
     python setup.py install
 
-The deployer role is activated by default. The receiver, however, is not. To activate it the following commands have to be issued.
+The *deployer* role is activated by default. The *receiver*, however, is not. To activate it the following commands have to be issued.
 
 **systemd**:
 
@@ -29,7 +29,7 @@ The deployer role is activated by default. The receiver, however, is not. To act
     /etc/init.d/marcoreceiverd start
 
 
-The package requires the following dependencies to be set up:
+The package requires the following dependencies to work. They will be downloaded during the installation:
 
 ::
 
@@ -53,3 +53,10 @@ The package creates the following files:
 - The modules on the Python modules folder.
 - During execution runfiles are stored in ``/var/run`` and logs are stored in ``/var/log``.
 - The configuration files are in  ``/etc/marcodeployer/deployer.cfg``. :doc:`Here <configuration>` is an example of the configuration file.
+- The JavaScript, fonts, images and CSS code are located in ``/usr/lib/marcodeployer/static``.
+- The Jade templates used by the utility are located in ``/usr/lib/marcodeployer/templates``.
+
+Certificates
+------------
+
+The required certificates are located in ``/usr/lib/marcodeployer/certs``. **The included certificates are not suited for production use**. Replace them with your own set of certificates for any purpose other than trying the application, or the security of your entire system might be compromised.

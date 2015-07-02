@@ -17,6 +17,7 @@ Contents
    	installation
    	configuration
    	manual/intro
+   	technical/intro
    	reference/intro
    	software_engineering/intro
 
