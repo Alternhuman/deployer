@@ -1,8 +1,8 @@
 Requisitos de información
--------------------------
+=========================
 
 IRQ-1: Información sobre los usuarios del sistema
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 - **Fuentes**
 - **Objetivos asociados**
@@ -18,7 +18,7 @@ IRQ-1: Información sobre los usuarios del sistema
 - **Comentarios**: Esta información no es gestionada por el *software*, sino únicamente consultada.
 
 IRQ-2: Información de estado
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 - **Fuentes**
 - **Objetivos asociados**: 
@@ -34,7 +34,7 @@ IRQ-2: Información de estado
 - **Comentarios**
 
 IRQ-3: Estadísticas del sistema
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 - **Versión**
 - **Autores**

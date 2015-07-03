@@ -16,9 +16,8 @@ NFR-1: Autenticación con credenciales ya conocidas por los usuarios
 - **Estabilidad**: Alta
 - **Comentarios**
 
-
-NFR-2: Frecuencia de actualización del monitor de estado
------------------------------------------------------------
+NFR-2: Frecuencia de actualización del monitor de estado 
+--------------------------------------------------------
 
 - **Versión**
 - **Autores**

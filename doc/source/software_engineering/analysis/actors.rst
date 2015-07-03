@@ -1,10 +1,10 @@
 Actores
--------
+=======
 
 En el sistema se identifican los siguientes actores.
 
 Actor 1: Estudiante
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 - **Versión**
 - **Autores**
@@ -13,7 +13,7 @@ Actor 1: Estudiante
 - **Comentarios**
 
 Actor 2: Profesor
-~~~~~~~~~~~~~~~~~
+-----------------
 
 - **Versión**
 - **Autores**
@@ -22,7 +22,7 @@ Actor 2: Profesor
 - **Comentarios**
 
 Actor 3: Administrador
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 - **Versión**
 - **Autores**
@@ -31,7 +31,7 @@ Actor 3: Administrador
 - **Comentarios**
  
 Actor 4: Sistema
-~~~~~~~~~~~~~~~~
+----------------
 
 - **Versión**
 - **Autores**
@@ -41,7 +41,7 @@ Actor 4: Sistema
 
 
 Diagrama de actores del sistema
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 .. image:: ../img/actors.*
     :align: center

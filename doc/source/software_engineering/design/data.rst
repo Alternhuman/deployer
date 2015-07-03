@@ -19,3 +19,4 @@ Se consultan varias fuentes de datos en la aplicación:
 - Ficheros ``/etc/passwd`` y ``/etc/shadow`` como segunda fuente de datos, en caso de que no se pueda acceder al módulo PAM o no se encuentre en dicha fuente de datos al usuario.
 - Ficheros de configuración ``/etc/marcodeployer/deployer.cfg`` y  ``/etc/marcodeployer/secret``, que permiten modificar el comportamiento de la aplicación.
 - Ficheros del sistema situados en las particiones virtuales ``/proc`` y ``/sys``, necesarios para la recolección de datos.
+- Ficheros de *log*, que permiten analizar *a posteriori* el comportamiento del programa, en particular ante algún tipo de situación irregular.
