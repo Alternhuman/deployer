@@ -5,7 +5,7 @@ After=polod.service
 
 [Service]
 
-ExecStart=/usr/bin/marcoreceiverd
+ExecStart=/usr/bin/marcoreceiverd &> /dev/null
 
 Type=simple
 User=root

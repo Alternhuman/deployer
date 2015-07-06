@@ -5,7 +5,7 @@ After=polod.service
 
 [Service]
 
-ExecStart=/usr/bin/marcodeployerd
+ExecStart=/usr/bin/marcodeployerd &> /dev/null
 
 Type=simple
 User=root
