@@ -59,14 +59,14 @@ statusmonitor_open_sockets =  []
 getDataCallback = None
 processes = {}
 
-#TODO def sigterm_handler(signal, frame):
-#     ioloop.IOLoop.instance().stop()
-#     for socket in statusmonitor_open_sockets:
-#         socket.close()
-#     sys.exit(0)
-
-def shutdown():
+def shutdown(signal, frame):
+    """
+    Stops the application gracefully, closing all socket connections
+    and unpublishing the MarcoPolo services.
+    """
     logging.info("Stopping gracefully")
+    for socket in statusmonitor_open_sockets:
+        socket.close()
     try:
         Polo().unpublish_service(conf.RECEIVER_SERVICE_NAME, delete_file=True)
         Polo().unpublish_service(conf.STATUS_MONITOR_SERVICE_NAME, delete_file=True)
@@ -78,6 +78,7 @@ def sigint_handler(signal, frame):
     io_loop.add_callback(shutdown)
 
 signal.signal(signal.SIGINT, sigint_handler)
+signal.signal(signal.SIGTERM, sigint_handler)
 
 class DeployHandler(RequestHandler):
     @tornado.web.asynchronous
@@ -128,7 +129,7 @@ class DeployHandler(RequestHandler):
         overwrite = False if overwrite.lower() == 'false' else True;
 
 
-        thread_pool = futures.ThreadPoolExecutor(max_workers=4) #TODO
+        thread_pool = futures.ThreadPoolExecutor(max_workers=1) #TODO
         thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
         
         self.finish('OK')
@@ -159,8 +160,6 @@ class DeployHandler(RequestHandler):
             if processes.get(user.pw_name, None) is None:
                 processes[user.pw_name] = set()
             processes[user.pw_name].add(p)
-            #TODOprocess = Popen(split(command), preexec_fn=demote(user.pw_uid, user.pw_gid), cwd=directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            #TODOout, err = process.communicate()
 
 secret = ""
 try:
@@ -191,10 +190,8 @@ class LoggerHandler(WebSocketHandler):
         return True
     
     def open(self):
-        #TODO: remove
-        #global ip
-        #ip = getip(conf.INTERFACE)
-        pass
+        logging.debug("A new connection was open")
+
     def on_message(self, message):
         """
         A message is sent by the client after creating the connection. The method verifies the user
@@ -206,13 +203,12 @@ class LoggerHandler(WebSocketHandler):
         If the user_id is other than None the verification has succeded, and the connection is appended to the 
         rest of the websockets related to the user.
         """
-        if not user_id is None:
+        if user_id is not None:
             if opensockets.get(user_id) is None:
-                opensockets[user_id] = []#TODO: change to set
+                opensockets[user_id] = []
             opensockets[user_id].append(self)
         else:
-            pass
-        #TODO: Return error code
+            logging.debug("The user could not be found")
 
     def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout", *args, **kwargs):
         """
@@ -225,7 +221,7 @@ class LoggerHandler(WebSocketHandler):
         :param: str stream_name The name of the stream
         """
         #TODO Could the client side of the ws guess the address
-        #TODO: Remove stop
+        
         msg = {}
         msg["user"] = user
         msg["command"] = command
@@ -241,12 +237,14 @@ class LoggerHandler(WebSocketHandler):
         """
         Removes the connection from the opensockets dictionary
         """
-        success = False
+        #success = False
         for ws in opensockets:
             if self in opensockets[ws]:
                 opensockets[ws].remove(self)
-                success = True
-                break #TODO:  Remove success
+                #success = True TODO
+                break
+        else:
+            logging.debug("The websocket could not be found")
 
 class ShellHandler(LoggerHandler):
     
@@ -257,13 +255,13 @@ class ShellHandler(LoggerHandler):
             message_dict = json.loads(message_json)
         except ValueError as v:
             return
-        #print(message_dict)
+        
         if message_dict.get("register", None) is not None:
             user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict["register"]).decode('utf-8')
             
             if not user_id is None:
                 if opensockets.get(user_id) is None:
-                    opensockets[user_id] = []#TODO: change to set
+                    opensockets[user_id] = []
                 opensockets[user_id].append(self)
             else:
                 pass
@@ -271,7 +269,6 @@ class ShellHandler(LoggerHandler):
         elif message_dict.get("command", None) is not None:
             user_id = decode_signed_value(settings["cookie_secret"], 'user', message_dict.get("user_id", ""))
             
-
             if user_id is not None:
                 user_id = user_id.decode('utf-8')
                 user_pwd = pwd.getpwnam(user_id)
@@ -311,7 +308,7 @@ class ShellHandler(LoggerHandler):
                             if process is not None:
                                 logging.debug("Killing")
                                 process.stop()
-                                processes[user_id].remove(process) #TODO: Callback?
+                                processes[user_id].remove(process)
                     except ValueError as v:
                         logging.warning(v)
                     except KeyError as k:

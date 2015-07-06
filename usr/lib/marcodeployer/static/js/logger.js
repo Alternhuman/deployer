@@ -124,11 +124,10 @@ function createOutput(host, identifier, command){
 
 }
 
-
-//TODO: http://stackoverflow.com/a/12034334/2628463
 function escapeHtml(string) {
     /**function:escapeHTML(string)
-        Escapes potentially malicious HTML strings
+        Escapes potentially malicious HTML strings, based on
+        the mustache.js escaping function. See http://stackoverflow.com/a/12034334/2628463
     */
     var entityMap = {
     "&": "&amp;",
@@ -156,14 +155,12 @@ function addOutput(host, identifier, message, stream, stop){
     if (stop == true)
         //If the stop flag is true, no more input is appended and the style of the panel is modified
         $("#"+$tab.selector).find("#"+identifier).find(".panel").removeClass("panel-primary").addClass("panel-default");
-    else
+    else{
         $("#"+$tab.selector).find("#"+identifier).find(".panel-body").append("<p class='"+stream+"'>"+escapeHtml(message)+"</p>");
+    }
     
 }
 
-//function stopOutput(host, identifier){
-//    console.log(opensockets[host]); //TODO
-//}
 
 function parseTabs(selector) {
     /**function:parseTabs(selector)

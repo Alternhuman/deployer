@@ -26,6 +26,16 @@ function sendInput(input, hosts){
 	}
 }
 
+function scrollToBottom(placeholder){
+	/**function:scrollToBottom(placeholder)
+		Automatically scrolls the placeholder to the bottom
+
+		:param object placeholder: The jQuery object with the tab
+	*/
+	var panel_body = placeholder.find(".panel-body");
+	panel_body.scrollTop(panel_body.prop('scrollHeight'));
+}
+
 function appendShellOutput(input, ip, stream_name, stop, command, identifier){
 	/**function:appendShellOutput(input, ip, stream_name, stop, command, identifier)
 		Appends a new output or ends the command execution
@@ -37,14 +47,19 @@ function appendShellOutput(input, ip, stream_name, stop, command, identifier){
 		:param str command: The name of the command
 		:param str identifier: An unique identifier for the command
 	*/
+	var panel_body = shellTabs[ip].find(".panel-body");
+	var doScroll = ((panel_body.scrollTop()+200) == panel_body.prop('scrollHeight'));
+
 	if(stop == false){
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+escapeHtml(input)+"</p>");
 		//if(!shellTabs[ip].find(".panel-body").hasClass(identifier)){
 		shellTabs[ip].find(".panel-heading").addClass(identifier);
+		
 	}else{
 		shellTabs[ip].find(".panel-body").append("<p class='"+stream_name+"'>"+"End of "+stream_name+" for "+command+"</p>");
 		shellTabs[ip].find(".panel-heading").removeClass(identifier)
 	}
+	if(doScroll) scrollToBottom(shellTabs[ip]);
 }
 
 

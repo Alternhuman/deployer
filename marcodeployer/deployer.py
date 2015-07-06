@@ -296,7 +296,6 @@ class Nodes(RequestHandler):
     """
     Performs a synchronous Marco request for the deployer service
     """
-    #TODO: Make async
     def get(self):
         """
         Returns a JSON string with the nodes offering the deployer service
@@ -315,8 +314,8 @@ class ProbeHandler(RequestHandler):
     since WebSockets cannot request user confirmation by themselves.
     """
     def get(self):
-        self.write("You should be able to open a WebSocket connection right now")
-        #TODO: Test the ws in the page
+        self.write("You should be able to open a WebSocket connection now")
+        
 
 class ProbeWSHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -328,8 +327,6 @@ class ProbeWSHandler(websocket.WebSocketHandler):
 
         :returns: bool True
         """
-
-        #:ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
         return True
 
     def open(self):
@@ -345,6 +342,7 @@ routes = [
     (r"/login/?", LoginHandler),
     (r"/logout/?", Logout),
     (r'/upload/?', UploadAndDeployHandler),
+    
     #probes
     (r'/probe/?', ProbeHandler),
     (r'/ws/probe/?', ProbeWSHandler)
@@ -381,18 +379,9 @@ def main(args=None):
     
     pid = os.getpid()
 
-    #if not os.path.exists('/var/run/marcopolo'):
-    #    makedirs('/var/run/marcopolo')
-
     logging.basicConfig(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
 
-    # try:
-    #     f = open(conf.PIDFILE_DEPLOYER, 'w')
-    #     f.write(str(pid))
-    #     f.close()
-    # except Exception as e:
-    #     logging.error(e)
-    #     exit(1)
+    
     #TODO Replace with SSLContext (this option is maintained for compatibility reasons)
     httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
@@ -414,7 +403,6 @@ def main(args=None):
 
     logging.info("Serving on port %d" % conf.DEPLOYER_PORT)
     io_loop.start()
-    #TODO consider multicore server
 
 if __name__ == "__main__":
     main(sys.argv[1:])
