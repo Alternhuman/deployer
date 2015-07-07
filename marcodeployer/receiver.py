@@ -84,7 +84,7 @@ class DeployHandler(RequestHandler):
     @tornado.web.asynchronous
     def post(self):
         """
-        POST handler received from deployer.py. 
+        POST handler received from ``deployer.py``. 
         It handles the deployment of the file and the execution of the desired command.
         """
 
@@ -184,18 +184,24 @@ class LoggerHandler(WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :ref:`Tornado documentation: <tornado:tornado.websocket.WebSocketHandler.check_origin>`_
+        
         :returns: bool True
         """
         return True
     
     def open(self):
+        """
+        Notifies the opening of a new Logger connection
+        """
         logging.debug("A new connection was open")
 
     def on_message(self, message):
         """
         A message is sent by the client after creating the connection. The method verifies the user
         secret cookie and appends the connection to the opensockets dictionary.
+
+        :param str message: The received message
         """
         user_id = decode_signed_value(settings["cookie_secret"], 'user', json.loads(message).get("register", "")).decode('utf-8')
         
@@ -213,14 +219,13 @@ class LoggerHandler(WebSocketHandler):
     def on_line(self, user, command, message, ip, identifier, stop=False, stream_name="stdout", *args, **kwargs):
         """
         The io_loop calls the function when a new message appears.
-        :param: str user The name of the user
-        :param: str command The command in execution
-        :param: str message The message to deliver
-        :param: str ip The ip of the server, so the client knows where the message comes from
-        :param: bool stop Determines if the connection must be closed or not *deprecated*
-        :param: str stream_name The name of the stream
+        :param str user: The name of the user
+        :param str command: The command in execution
+        :param str message: The message to deliver
+        :param str ip: The ip of the server, so the client knows where the message comes from
+        :param boolean stop: Determines if the connection must be closed or not *deprecated*
+        :param str stream_name: The name of the stream
         """
-        #TODO Could the client side of the ws guess the address
         
         msg = {}
         msg["user"] = user
@@ -237,11 +242,11 @@ class LoggerHandler(WebSocketHandler):
         """
         Removes the connection from the opensockets dictionary
         """
-        #success = False
+        
         for ws in opensockets:
             if self in opensockets[ws]:
                 opensockets[ws].remove(self)
-                #success = True TODO
+                
                 break
         else:
             logging.debug("The websocket could not be found")
@@ -321,7 +326,8 @@ class ProbeWSHandler(WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :ref:`Tornado documentation: <tornado:tornado.websocket.WebSocketHandler.check_origin>`_
+        
         :returns: bool True
         """
         return True
@@ -340,6 +346,11 @@ class ProbeHandler(RequestHandler):
 
 
 def start_callback():
+    """
+    Starts the collection callback
+
+    See :ref:`<Tornado documentation <tornado:tornado.ioloop.PeriodicCallback>`_
+    """
     global getDataCallback
     if getDataCallback is None:
         getDataCallback = PeriodicCallback(process_data, conf.REFRESH_FREQ)  
@@ -348,6 +359,9 @@ def start_callback():
         getDataCallback.start()
 
 def stop_callback():
+    """
+    If the number of open connections is zero, stops the collection callback of data.
+    """
     global getDataCallback
     if getDataCallback is not None:
         if len(statusmonitor_open_sockets) == 0:
@@ -355,7 +369,7 @@ def stop_callback():
 
 def process_data():
     """
-    
+    Processes the statusmonitor data
     """
     global data_dict, data_json
     if len(statusmonitor_open_sockets) > 0:
@@ -370,7 +384,7 @@ class SocketHandler(WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation: <tornado:WebSocketHandler.check_origin>`
+        :ref:`Tornado documentation <tornado:WebSocketHandler.check_origin>`_
         :returns: bool True
         """
         return True
@@ -419,6 +433,9 @@ wsapp = Application(routes_ws, **settings);
 
 
 def main(args=None):
+    """
+    Creates the servers, initializes the logging facility, publishes the ``MarcoPolo`` services and starts the ``io_loop``.
+    """
     ip = getip(conf.INTERFACE)
     pid = os.getpid()
 

@@ -33,13 +33,13 @@ class NotCheckingHostnameHTTPAdapter(HTTPAdapter):
     Since the name of the client cannot be verified,
     it is simply not checked
     
-    From Juan Luis Boya
+    Generously provided by Juan Luis Boya
     """
     def cert_verify(self, conn, *args, **kwargs):
         """
         Avoids the verification of the SSL Hostname field
 
-        :param: conn The connection object
+        :param Connection conn: The connection object
         """
         super(NotCheckingHostnameHTTPAdapter, self).cert_verify(conn, *args, **kwargs)
         conn.assert_hostname = False
@@ -213,15 +213,15 @@ class UploadAndDeployHandler(BaseHandler):
         """
         Performs the deployment asynchronously.
 
-        :param: :class:`str` The IP address of the node
-        :param: :class:`BaseHandler` The related POST request which invoked this method *Deprecated*
-        :param: str filename The name of the file to upload
-        :param: str command The command to execute after deployment
-        :param: str user The name of the user who performs the request
-        :param: str folder The deployment folder
-        :param: str idpolo The id of the polo service to publish
-        :param: str tomcat Specifies whether the file should be deployed as a tomcat service
-        :param: str overwrite Specifies if the file can overwrite existing files
+        :param str node: The IP address of the node
+        :param :class:`BaseHandler` request: The related POST request which invoked this method *Deprecated*
+        :param str filename: The name of the file to upload
+        :param str command: The command to execute after deployment
+        :param str user: The name of the user who performs the request
+        :param str folder: The deployment folder
+        :param str idpolo: The id of the polo service to publish
+        :param str tomcat: Specifies whether the file should be deployed as a tomcat service
+        :param str overwrite: Specifies if the file can overwrite existing files
 
         :returns: :class:`concurrent.future` A future that encapsulates the asynchronous execution 
         """
@@ -229,7 +229,7 @@ class UploadAndDeployHandler(BaseHandler):
             """
             Guesses the MIME type of the file so it can be sent with the POST request
 
-            :param: str filename The name of the file to process
+            :param str filename: The name of the file to process
             """
             return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
@@ -348,6 +348,23 @@ routes = [
     (r'/ws/probe/?', ProbeWSHandler)
 ]
 
+class RedirectHandler(RequestHandler):
+    """
+    Redirects all request to the secure port
+    """
+    def get(self):
+        """
+        Redirects all requests to the secure port
+        """
+        self.redirect("https://%s:%s%s" 
+            % ((self.request.host).replace(":"+str(conf.NON_SECURE_DEPLOYER_PORT), ""), 
+                conf.DEPLOYER_PORT, self.request.uri), permanent=True
+            )
+
+nonsecure_routes = [
+    (r'/.*', RedirectHandler)    
+]
+
 settings = {
     "debug": True,
     "static_path": conf.STATIC_PATH,
@@ -356,15 +373,16 @@ settings = {
 }
 
 app = Application(routes, **settings)
+nonsecure_app = Application(nonsecure_routes)
 io_loop = ioloop.IOLoop.instance()
 
 
 def shutdown():
-    print("Stopping gracefully")
+    logging.info("Stopping gracefully")
     try:
         Polo().unpublish_service(conf.DEPLOYER_SERVICE_NAME, delete_file=True)
     except Exception as e:
-        print(e)
+        logging.warning(e)
     io_loop.stop()
 
 def sigint_handler(signal, frame):
@@ -373,15 +391,12 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 
-    
-    
 def main(args=None):
     
     pid = os.getpid()
 
     logging.basicConfig(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
 
-    
     #TODO Replace with SSLContext (this option is maintained for compatibility reasons)
     httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
@@ -390,6 +405,9 @@ def main(args=None):
 
     httpServer.listen(conf.DEPLOYER_PORT)
 
+    nonsecure_app.listen(conf.NON_SECURE_DEPLOYER_PORT)
+    
+    print(conf.NON_SECURE_DEPLOYER_PORT)
     while True:
         try:
             Polo().publish_service(conf.DEPLOYER_SERVICE_NAME, root=True)

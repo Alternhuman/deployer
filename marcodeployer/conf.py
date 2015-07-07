@@ -21,6 +21,7 @@ TOMCAT_PATH = '/var/lib/tomcat7/webapps/'
 DEPLOYER_PORT = 1342
 RECEIVER_PORT = 1339
 RECEIVER_WEBSOCKET_PORT = 1370
+NON_SECURE_DEPLOYER_PORT = 1442
 
 INTERFACE = 'eth0'
 
@@ -66,6 +67,7 @@ default_values = {
     "DEPLOYER_LOGLEVEL" : DEPLOYER_LOGLEVEL,
     "RECEIVER_LOGLEVEL" : RECEIVER_LOGLEVEL,
     "SECRET_FILE": SECRET_FILE,
+    "NON_SECURE_DEPLOYER_PORT" : NON_SECURE_DEPLOYER_PORT,
 }
 
 config = configparser.RawConfigParser(default_values, allow_no_value=False)
@@ -110,6 +112,7 @@ try:
         DEPLOYER_LOGLEVEL = config.get('deployer', 'DEPLOYER_LOGLEVEL')
         RECEIVER_LOGLEVEL = config.get('receiver', 'RECEIVER_LOGLEVEL')
         SECRET_FILE = config.get('receiver', 'SECRET_FILE')
+        NON_SECURE_DEPLOYER_PORT = config.get('deployer', 'NON_SECURE_DEPLOYER_PORT')
 
 except IOError as i:
     logging.warning("Warning! The configuration file could not be read. Defaults will be used as fallback")
