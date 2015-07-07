@@ -4,9 +4,9 @@ Requisitos funcionales
 RF-1: Ordenar despliegue
 ------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 2
+- **Autores**: Diego Martín
+- **Fuentes**: Análisis preliminar del sistema
 - **Objetivos asociados**: 1
 - **Requisitos asociados**: RF4
 - **Descripción**: Diferentes usuarios solicitan al sistema la realización de operaciones de despliegue con una serie de parámetros de configuración.
@@ -38,14 +38,13 @@ RF-1: Ordenar despliegue
 - **Urgencia**: Alta
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
 
 
 RF-2: Monitorización de estado
 ------------------------------
 
-- **Versión**: 
-- **Autores**: 
+- **Versión**: 2
+- **Autores**: Diego Martín, Rodrigo Santamaría
 - **Fuentes**: 
 - **Objetivos asociados**: 2
 - **Requisitos asociados**: RF4, NFR2
@@ -61,24 +60,23 @@ RF-2: Monitorización de estado
     2. La lógica que dirige la interfaz establece conexiones con los nodos previamente detectados.
     3. La interfaz es actualizada cada vez que los nodos emiten información de estado.
 
-- **Poscondición**
+- **Poscondición**: Se obtiene la información sobre el estado de los diferentes nodos.
 - **Excepciones**:
 
     + En caso de que exista algún tipo de error interno (en especial en el establecimiento de las conexiones con los diferentes nodos), el usuario recibirá un mensaje informativo. 
-- **Rendimiento**:
-- **Frecuencia**:
+- **Rendimiento**: Alto
+- **Frecuencia**: Alta
 - **Importancia**: Muy alta
 - **Urgencia**: Alta
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
   
 RF-3: Ejecución de comandos
 ---------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Entrevistas
 - **Objetivos asociados**: 1
 - **Requisitos asociados**: RF4
 - **Descripción**: Acompañando a un despliegue o de forma independiente, el *software* permite ejecutar comandos en los diferentes nodos que conforman el sistema.
@@ -94,7 +92,7 @@ RF-3: Ejecución de comandos
     3. El comando es ejecutado, los diferentes nodos envían la información al controlador de la interfaz, que muestra el mensaje.
     4. El usuario puede en cualquier momento detener la ejecución del comando.
 
-- **Poscondición**:
+- **Poscondición**: El comando es ejecutado y el usuario obtiene la salida del mismo
 - **Excepciones**:
 
     + En caso de que exista algún tipo de error interno, el usuario recibirá un mensaje informativo y se registrará el incidente en un fichero de *log*. 
@@ -103,9 +101,7 @@ RF-3: Ejecución de comandos
 
     + Paso 3: Generalmente la salida que un programa emite es muy elevada.
 
-- **Frecuencia**:
-
-    + 
+- **Frecuencia**: Alta
 
 - **Importancia**: Muy alta
 
@@ -113,14 +109,13 @@ RF-3: Ejecución de comandos
 
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
   
 RF-4: Autenticación
 -----------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Diseño preliminar del sistema
 - **Objetivos asociados**: 1
 - **Requisitos asociados**: NFR1
 - **Descripción**: A través de una interfaz de autenticación los usuarios acceden al sistema.
@@ -140,20 +135,19 @@ RF-4: Autenticación
 
     + En caso de que exista algún tipo de error interno (como un fallo en el acceso al sistema de validación de claves), el usuario recibirá un mensaje informativo. 
 
-- **Rendimiento**:
-- **Frecuencia**:
+- **Rendimiento**: Medio
+- **Frecuencia**: Media
 - **Importancia**: Muy alta
 - **Urgencia**: Alta
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
   
 RF-5: Validar una conexión **WebSocket**
 -------------------------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Fases de diseño del sistema
 - **Objetivos asociados**:
 - **Requisitos asociados**: NRF7
 - **Descripción**: Las conexiones **WebSocket** cifradas utilizando HTTPS que se realizan utilizando certificados no confiables o sin un campo **CN** válido emiten un error no interactivo. El sistema recoge dicho error y muestra un mensaje en la interfaz de usuario, solicitando la validación del certificado de la misma forma que en una conexión HTTPS tradicional.
@@ -171,21 +165,20 @@ RF-5: Validar una conexión **WebSocket**
     
 - **Poscondición**: El usuario puede utilizar el canal **WebSocket**
 - **Excepciones**: Errores en la conexión entre la interfaz y el servidor, resueltos por el navegador.
-- **Rendimiento**:
-- **Frecuencia**:
+- **Rendimiento**: Alto
+- **Frecuencia**: Una vez por cada sesión. Se espera alta
 - **Importancia**: Media
 - **Urgencia**: Baja
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
   
 
 RF-6: Instalación del sistema
 --------------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Entrevistas, fases de desarrollo
 - **Objetivos asociados**:
 - **Requisitos asociados**:
 - **Descripción**: El administrador contará con un conjunto de herramientas incluidas en el paquete **software** para realizar la instalación del mismo.
@@ -201,16 +194,14 @@ RF-6: Instalación del sistema
 - **Importancia**: Baja
 - **Urgencia**: Baja
 - **Estado**: Completo
-- **Estabilidad**: Estable
-- **Comentarios**       
+- **Estabilidad**: Estable 
 
 RF-7: Gestión de errores
 ---------------------------
   
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
-- **Objetivos asociados**:
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Fases de desarrollo, análisis del sistema
 - **Requisitos asociados**: RF5
 - **Descripción**: En caso de que un error ocurra, el sistema debe recuperarse del mismo de forma transparente, o en caso de que no sea posible, informar al usuario de dicha situación sugiriendo opciones para la recuperación del mismo.
 - **Precondición**: Ha ocurrido un error (excepción, validación insatisfactoria de parámetros introducidos por el usuario...) fruto de una interacción con el sistema. Generalmente el código que ejecuta dicha acción cuenta con una serie de puntos de entrada para gestionar este tipo de comportamiento erróneo.
@@ -223,22 +214,22 @@ RF-7: Gestión de errores
     
 - **Poscondición**: La sesión es funcional de nuevo. El usuario puede en este momento repetir la operación que deseaba en primera instancia.
 - **Excepciones**:
-- **Rendimiento**:
-- **Frecuencia**:
-- **Importancia**:
+
+    + Si el error no es determinable, se ejecuta el caso de uso considerándolo un error "desconocido".
+- **Rendimiento**: Bajo
+- **Frecuencia**: Bajo
+- **Importancia**: Media
 - **Urgencia**: Media
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
   
-
 RF-8: Procesar petición
 --------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
-- **Objetivos asociados**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Fases de desarrollo, análisis del sistema
+- **Objetivos asociados**: OBJ-1, OBJ-2, OBJ-4
 - **Requisitos asociados**: 
 - **Descripción**: El rol **deployer** y el controlador de la interfaz de usuario solicitan a los diferentes nodos que desempeñan el rol de **receiver** la realización de diferentes acciones. Estos deben identificar la acción a llevar a cabo y validar los diferentes parámetros provistos, así como verificar que el solicitante es de confianza.
 - **Precondición**:
@@ -253,21 +244,20 @@ RF-8: Procesar petición
         
 - **Poscondición**: La acción es realizada
 - **Excepciones**: En caso de que la identidad del solicitante no pueda ser validada, la conexión es rechazada. El resto de errores son gestionados por los puntos de extensión.
-- **Rendimiento**:
-- **Frecuencia**:
+- **Rendimiento**: Alto
+- **Frecuencia**: Alta
 - **Importancia**: Alta
 - **Urgencia**: Alta
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
 
 RF-9: Realizar despliegue
 ----------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
-- **Objetivos asociados**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Análisis preliminar
+- **Objetivos asociados**: OBJ-1
 - **Requisitos asociados**: 
 - **Descripción**: Ante la petición de un usuario, se realiza un despliegue.
 - **Precondición**:
@@ -285,20 +275,19 @@ RF-9: Realizar despliegue
 
 - **Poscondición**: El despliegue se ha realizado correctamente.
 - **Excepciones**: En caso de que el usuario no disponga de los suficientes permisos de ejecución, se emitirá un mensaje de error a través de la interfaz de usuario.
-- **Rendimiento**:
-- **Frecuencia**:
-- **Importancia**:
-- **Urgencia**:
-- **Estado**:
-- **Estabilidad**:
-- **Comentarios**
+- **Rendimiento**: Alto
+- **Frecuencia**: Alta
+- **Importancia**: Alta
+- **Urgencia**: Alta
+- **Estado**: Completo
+- **Estabilidad**: Estable
 
 RF-10: Enviar estado
------------------------
+--------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Análisis preliminar
 - **Objetivos asociados**:
 - **Requisitos asociados**:
 - **Descripción**: Periódicamente la información sobre el estado del nodo es emitida a los solicitantes.
@@ -309,6 +298,8 @@ RF-10: Enviar estado
     3. Los datos son enviados a todos los interesados recorriendo la colección de conexiones.
 - **Poscondición**: Los datos son enviados a los diferentes clientes interesados, que procesan la información y la muestran.
 - **Excepciones**:
+
+    + En el caso de que se dé un fallo en la conexión de red, se registrará el error y comenzará el caso de uso **RF-7**
 - **Rendimiento**:
 - **Frecuencia**:
 - **Importancia**:
@@ -321,9 +312,9 @@ RF-10: Enviar estado
 RF-11: Ejecutar comando
 --------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Entrevistas
 - **Objetivos asociados**:
 - **Requisitos asociados**:
 - **Descripción**: El sistema ejecuta un comando y vincula sus canales de salida a un sistema de notificaciones que es capaz de detectar nuevos mensajes y difundirlos.
@@ -334,21 +325,20 @@ RF-11: Ejecutar comando
         3. Cada vez que se emita un mensaje, el sistema recibe una notificación y difunde el mensaje. En caso de que el mensaje sea de finalización, un indicador de dicha situación es retransmitido. 
 - **Poscondición**: Los usuarios reciben la información de la ejecución a través de la interfaz.
 - **Excepciones**: En caso de que el usuario no disponga de los suficientes permisos de ejecución, el usuario es notificado a través del mismo canal.
-- **Rendimiento**:
-- **Frecuencia**:
-- **Importancia**:
-- **Urgencia**:
-- **Estado**:
-- **Estabilidad**:
-- **Comentarios**
+- **Rendimiento**: Alto
+- **Frecuencia**: Alta
+- **Importancia**: Alta
+- **Urgencia**: Alta
+- **Estado**: Completo
+- **Estabilidad**: Estable
 
 
 RF-12: Procesar mensaje
 --------------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Entrevistas
 - **Objetivos asociados**:
 - **Requisitos asociados**: 
 - **Descripción**: Tras la ejecución de un comando el sistema procesa la salida por los canales estándar y de error y emite un mensaje que contiene el valor de dicha salida, que es devuelto al usuario.
@@ -358,20 +348,19 @@ RF-12: Procesar mensaje
         2. El sistema determina de qué *buffer* procede el mensaje, recoge la cadena de caracteres y solicita la difusión del mismo indicándoselo a la entidad a cargo. En caso de que el mensaje sea de fin de ejecución, el mensaje recoge esta situación.
 - **Poscondición**: El servidor es notificado del mensaje.
 - **Excepciones**: Fallo en la comunicación entre procesos.
-- **Rendimiento**:
-- **Frecuencia**:
+- **Rendimiento**: Alto
+- **Frecuencia**: Alto
 - **Importancia**: Alta
 - **Urgencia**: Media
 - **Estado**: Completo
 - **Estabilidad**: Estable
-- **Comentarios**
   
 RF-13 Recoger estado
 -----------------------
 
-- **Versión**: 
-- **Autores**: 
-- **Fuentes**: 
+- **Versión**: 1
+- **Autores**: Diego Martín
+- **Fuentes**: Análisis preliminar del sistema
 - **Objetivos asociados**:
 - **Requisitos asociados**:
 - **Descripción**: A través de llamadas al sistema, consulta de ficheros o cualquier otro mecanismo, los datos sobre el estado del sistema son incluidos en una colección que se retorna al solicitante.

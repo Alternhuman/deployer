@@ -1,6 +1,8 @@
 Configuration
 =============
 
+The software is modified through a file located in ``/etc/marcodeployer/deployer.cfg``. Only one file provides configuration for the both roles.
+
 This is an example of a configuration file:
 
 .. literalinclude:: ../../etc/marcodeployer/deployer.cfg

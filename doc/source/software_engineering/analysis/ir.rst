@@ -4,7 +4,9 @@ Requisitos de información
 IRQ-1: Información sobre los usuarios del sistema
 -------------------------------------------------
 
-- **Fuentes**
+- **Versión**: 1.5
+- **Autores**: Diego Martín
+- **Fuentes**: Fases de desarrollo del sistema
 - **Objetivos asociados**
 - **Requisitos asociados**
 - **Descripción**: El sistema deberá consultar la información de los usuarios relativa a los permisos de acceso y ejecución sobre diferentes ficheros del sistema. Esta información se utilizará en el acceso al sistema y durante diferentes fases de las operaciones de despliegue y ejecución.
@@ -20,7 +22,9 @@ IRQ-1: Información sobre los usuarios del sistema
 IRQ-2: Información de estado
 ----------------------------
 
-- **Fuentes**
+- **Versión**: 1.5
+- **Autores**: Diego Martín
+- **Fuentes**: Diseño preliminar del sistema
 - **Objetivos asociados**: 
 - **Requisitos asociados**: 
 - **Descripción**: El sistema almacenará diferentes registros de las operaciones realizadas en el mismo, así como una serie de mensajes que reflejen actualizaciones en el estado del sistema.
@@ -36,9 +40,9 @@ IRQ-2: Información de estado
 IRQ-3: Estadísticas del sistema
 -------------------------------
 
-- **Versión**
-- **Autores**
-- **Fuentes**
+- **Versión**: 2
+- **Autores**: Diego Martín, Rodrigo Santamaría
+- **Fuentes**: Análisis inicial, entrevistas y reuniones del equipo.
 - **Objetivos asociados**
 - **Requisitos asociados**: **NRF-2**
 - **Descripción**: La aplicación deberá generar y gestionar el envío de diferentes datos del sistema (CPU, memoria, temperatura...) en directo.

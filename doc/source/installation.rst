@@ -24,7 +24,9 @@ The *deployer* role is activated by default. The *receiver*, however, is not. To
     systemctl start marcoreceiverd
     
 **init.d**
-    
+
+::
+
     update-rc.d marcoreceiverd defaults
     /etc/init.d/marcoreceiverd start
 
@@ -44,7 +46,7 @@ The package requires the following dependencies to work. They will be downloaded
     marcopolo>=0.1
     marcopolo.bindings>=0.0.1
 
-The package runs successfuly on both Python 2.7 and 3.4. Compatibility with older versions is not guaranteed.
+The package runs has been tested successfuly on both Python 2.7 and 3.4. Compatibility with older versions is not guaranteed.
 
 The package creates the following files:
 

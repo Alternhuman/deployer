@@ -6,7 +6,7 @@ Objetos de datos
 
 El sistema utiliza un gran abanico de estructuras de datos, entre las que destacan las siguientes:
 
-- Objetos :class:`Node <marcopolo.marco_conf.utils.Node` para la identificación de los diferentes nodos.
+- Objetos :class:`Node <marcopolo.marco_conf.utils.Node>` para la identificación de los diferentes nodos.
 - Objetos JSON para la comunicación entre la interfaz web y los diferentes servidores, así como entre un servidor deployer y las diferentes instancias de receiver.
 - Objetos diccionario (:class:`dict`) con todos los datos sobre el sistema.
  

@@ -6,7 +6,7 @@
 Welcome to marcodeployer's documentation!
 =========================================
 
-MarcoDeployer is a set of tools which ease the deployment of software and files in different nodes of the same network. MarcoDeployer uses the MarcoPolo protocol to detect the nodes in the network (so it does not require any configuration) and WebSockets to stream results live with no bottlenecks.
+MarcoDeployer is a set of tools that ease the deployment of software and files in different nodes of the same network. MarcoDeployer uses the MarcoPolo protocol to detect the nodes in the network (so it does not require any configuration) and WebSocket connection direct to the different deployment nodes to stream live results with no bottlenecks. It also includes the **Status Monitor** and **Shell** tools to create a fully-featured deployment, debugging and profiling tool.
 
 Contents
 --------

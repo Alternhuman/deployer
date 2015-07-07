@@ -4,7 +4,7 @@ Technical details
 Security concerns
 -----------------
 
-All communications (except the Marco discovery) go through a secure HTTPS (or WSS) channel. In order to reduce the number of times that the user must input his access credentials, client certificate validation is used in the channel between the backend and the receiver.
+All communications (except the Marco discovery and the initial HTTP entry point) go through a secure HTTPS (or WSS) channel. In order to reduce the number of times that the user must input his access credentials, client certificate validation is used in the channel between the backend and the receiver.
 
 The production certificates may be self-signed. If so, the WebSocket connection must be manually validated during the first connection. A message like this will be displayed:
 
