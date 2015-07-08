@@ -16,6 +16,7 @@ import sys
 import os
 import shlex
 
+sys.path.insert(0, "..")
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -295,7 +296,7 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
                       'python':('https://docs.python.org/', None),
-                      'tornado': ('http://www.tornadoweb.org/en/stable/', None),
+                      u'tornado': (u'https://www.tornadoweb.org/en/stable/', None),
                       'marcopolo': ('file:///home/martin/TFG/workspaces/discovery/marcopolo-doc/build/html/', None)
                       }
 #Add 

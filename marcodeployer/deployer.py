@@ -172,7 +172,7 @@ class UploadAndDeployHandler(BaseHandler):
         output_file.close()
         
         # The nodes where to deploy are returned as a comma-separated string
-        nodes = self.get_argument('nodes', '').split(',')[:-1] #TODO: no final comma
+        nodes = self.get_argument('nodes', '').split(',')[:-1]
         from concurrent import futures
         
         """The deployment process is performed asynchronously 
@@ -211,16 +211,26 @@ class UploadAndDeployHandler(BaseHandler):
     
     def deploy(self, node, request, filename, command, user, folder="", idpolo="", tomcat="", overwrite='false'):
         """
+        
         Performs the deployment asynchronously.
 
+        
         :param str node: The IP address of the node
+        
         :param :class:`BaseHandler` request: The related POST request which invoked this method *Deprecated*
+        
         :param str filename: The name of the file to upload
+        
         :param str command: The command to execute after deployment
+        
         :param str user: The name of the user who performs the request
+        
         :param str folder: The deployment folder
+        
         :param str idpolo: The id of the polo service to publish
+        
         :param str tomcat: Specifies whether the file should be deployed as a tomcat service
+        
         :param str overwrite: Specifies if the file can overwrite existing files
 
         :returns: :class:`concurrent.future` A future that encapsulates the asynchronous execution 
@@ -278,7 +288,7 @@ class NodesHandler(websocket.WebSocketHandler):
         open_ws.add(self)
         m = Marco()
         try:
-            nodes = m.request_for("deployer")
+            nodes = m.request_for(conf.RECEIVER_SERVICE_NAME)
             self.write_message(json.dumps({"Nodes":[n.address for n in nodes]}))
         except MarcoTimeOutException:
             self.write_message(json.dumps({"Error": "Error in marco detection"}))
@@ -302,7 +312,7 @@ class Nodes(RequestHandler):
         """
         m = Marco()
         try:
-            nodes = m.request_for("deployer")
+            nodes = m.request_for(conf.RECEIVER_SERVICE_NAME)
             self.write(json.dumps({'nodes':[n.address for n in nodes]}))
         except MarcoTimeOutException:
             self.write_message(json.dumps({"Error": "Error in marco detection"}))
@@ -397,7 +407,7 @@ def main(args=None):
 
     logging.basicConfig(filename=conf.DEPLOYER_LOG_FILE, level=getattr(logging, conf.DEPLOYER_LOGLEVEL.upper()))
 
-    #TODO Replace with SSLContext (this option is maintained for compatibility reasons)
+    #Replace with SSLContext (this option is maintained for compatibility reasons)
     httpServer = HTTPServer(app, ssl_options={ 
         "certfile": conf.APPCERT,
         "keyfile": conf.APPKEY,
@@ -407,7 +417,6 @@ def main(args=None):
 
     nonsecure_app.listen(conf.NON_SECURE_DEPLOYER_PORT)
     
-    print(conf.NON_SECURE_DEPLOYER_PORT)
     while True:
         try:
             Polo().publish_service(conf.DEPLOYER_SERVICE_NAME, root=True)

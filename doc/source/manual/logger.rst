@@ -20,5 +20,5 @@ The shell tab
 
 The Shell view allows the execution of commands without performing any deployment. The shell is relative to the home of the user and all commands are executed with his UID and GID. The working principle is identical to the Logger tab.
 
-.. image:: ../img/logger-shell.*
+.. image:: ../img/loggermain.*
     :align: center 

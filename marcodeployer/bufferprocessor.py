@@ -24,10 +24,10 @@ class ProcessReactor(object):
 	def __init__(self, user, directory, ioloop, ip, opensockets, *args, **kwargs):
 		"""
 		Starts the command and sets the redirection of the desired buffers
-		:param: :class:pwd user The pwd structure with the information of the user which issued the command
-		:param: str directory The directory to use as cwd
-		:param: :class:list args A list of supplementary arguments
-		:param: :class:dict kwargs A dictionary of keyword arguments
+		:param pwd: user The pwd structure with the information of the user which issued the command
+		:param str directory: The directory to use as cwd
+		:param list: args A list of supplementary arguments
+		:param dict: kwargs A dictionary of keyword arguments
 
 		The function redirects STDOUT and STDERR to a pipe, and then executes the command using Popen.
 		The output pipe descriptor is made non-blocking and included in the instance of the IOLoop. 
@@ -87,11 +87,9 @@ class ProcessReactor(object):
 	
 	def kill(self):
 		if self.process.returncode is None:
-			print("Sending kill signal")
 			self.process.kill()
 
 	def stop(self):
-		print(self.process.pid)
 		if self.process.returncode is None:
 			print("Sending terminate signal")
 			self.process.terminate()
@@ -100,8 +98,8 @@ class ProcessReactor(object):
 	def can_read(self, fd, events):
 		"""
 		Processes the stdout event
-		:param: int fd The file descriptor of the stdout buffer
-		:param: int events The event flags (bitwise OR of the constants IOLoop.READ, IOLoop.WRITE, and IOLoop.ERROR)
+		:param int fd: The file descriptor of the stdout buffer
+		:param int events: The event flags (bitwise OR of the constants IOLoop.READ, IOLoop.WRITE, and IOLoop.ERROR)
 		"""
 		data = self.process.stdout.read(1024)
 		
@@ -119,8 +117,8 @@ class ProcessReactor(object):
 	def can_read_stderr(self, fd, events):
 		"""
 		Processes the stderr event
-		:param: int fd The file descriptor of the stderr buffer
-		:param: int events The event flags (bitwise OR of the constants IOLoop.READ, IOLoop.WRITE, and IOLoop.ERROR)
+		:param int fd: The file descriptor of the stderr buffer
+		:param int events: The event flags (bitwise OR of the constants IOLoop.READ, IOLoop.WRITE, and IOLoop.ERROR)
 		"""
 		data = self.process.stderr.read(1024)
 
@@ -135,8 +133,8 @@ class ProcessReactor(object):
 	def on_data(self, data, stream_name):
 		"""
 		Decodes the data and passes it to on_line
-		:param: byte[] data an array of bytes with the message
-		:param: str stream_name The name of the stream
+		:param bytes data: an array of bytes with the message
+		:param str stream_name: The name of the stream
 		"""
 		for line in self.line_buffer.read_lines(data):
 			self.on_line(line.decode('utf-8'), stream_name)
@@ -144,8 +142,8 @@ class ProcessReactor(object):
 	def on_line(self, line, stream_name):
 		"""
 		Sends the line to the open websocket
-		:param: str line The message line
-		:param: str stream_name The name of the stream
+		:param str line: The message line
+		:param str stream_name: The name of the stream
 		"""
 		for ws in self.opensockets[self.user.pw_name]:
 			ws.on_line(self.user.pw_name, self.command, line, self.ip, self.identifier, False, stream_name, shell=self.shell)

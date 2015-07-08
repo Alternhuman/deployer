@@ -129,7 +129,7 @@ class DeployHandler(RequestHandler):
         overwrite = False if overwrite.lower() == 'false' else True;
 
 
-        thread_pool = futures.ThreadPoolExecutor(max_workers=1) #TODO
+        thread_pool = futures.ThreadPoolExecutor(max_workers=1)
         thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
         
         self.finish('OK')
@@ -167,7 +167,7 @@ try:
         secret = secret_file.read()
 except Exception as e:
     logging.error("Could not open secret file")
-    sys.exit(1)
+    #sys.exit(1)
 
 settings = {
     "debug": True,
@@ -184,8 +184,6 @@ class LoggerHandler(WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation: <tornado:tornado.websocket.WebSocketHandler.check_origin>`_
-        
         :returns: bool True
         """
         return True
@@ -326,8 +324,6 @@ class ProbeWSHandler(WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation: <tornado:tornado.websocket.WebSocketHandler.check_origin>`_
-        
         :returns: bool True
         """
         return True
@@ -349,7 +345,6 @@ def start_callback():
     """
     Starts the collection callback
 
-    See :ref:`<Tornado documentation <tornado:tornado.ioloop.PeriodicCallback>`_
     """
     global getDataCallback
     if getDataCallback is None:
@@ -384,7 +379,6 @@ class SocketHandler(WebSocketHandler):
         Overrides the parent method to return True for any request, since we are
         working without names
 
-        :ref:`Tornado documentation <tornado:WebSocketHandler.check_origin>`_
         :returns: bool True
         """
         return True

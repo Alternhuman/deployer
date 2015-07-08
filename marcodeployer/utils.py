@@ -8,7 +8,9 @@ from re import compile as compile_regex
 import pam
 import netifaces as ni
 from netifaces import AF_INET
-
+import six
+import spwd
+import pwd
 #http://code.activestate.com/recipes/578489-system-authentication-against-etcshadow-or-etcpass/
 def authenticate(name, password):
     """
@@ -24,10 +26,15 @@ def authenticate(name, password):
         return False
         
     if path.exists("/etc/shadow"):
-        import spwd
-        shadow = spwd.getspnam(name).sp_pwdp # https://docs.python.org/3.4/library/spwd.html#module-spwd
+        
+        try:
+            if six.PY3:
+                shadow = spwd.getspnam(name).sp_pwdp # https://docs.python.org/3.4/library/spwd.html#module-spwd
+            else:
+                shadow = spwd.getspnam(name).sp_pwd
+        except KeyError as e:
+            return False
     else:
-        import pwd
         shadow = pwd.getpwnam(name).pw_passwd
     
     salt_pattern = compile_regex(r"\$.*\$.*\$")

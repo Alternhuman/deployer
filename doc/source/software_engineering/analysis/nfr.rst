@@ -102,6 +102,12 @@ NFR-7 Encriptación
 - **Estado**: Completo
 - **Estabilidad**: Estable
 
+
+Las salidas estándar y de error (``stdout``, ``stderr``) deben ser observables y diferenciables en el momento que se genera la información.
+La información sobre cada nodo y ejecución debe ser diferenciable.
+No deben existir cuellos de botella, las conexiones se deben realizar entre los nodos que realizan la ejecución y el cliente.
+Únicamente el usuario que ha realizado la ejecución está autorizado a visualizar la información de salida.
+
 .. 
     - **Versión**
     - **Autores**
