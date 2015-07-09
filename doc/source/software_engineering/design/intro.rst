@@ -10,4 +10,5 @@ Fase de diseño
     gui
     static
     procedimental
+    patterns
     tests

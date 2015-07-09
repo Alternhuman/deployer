@@ -28,7 +28,7 @@ $(document).ready(function(){
         });
 
         createShell(data.nodes[ip]);
-        opensockets[data.nodes[ip]] = createSocket(data.nodes[ip]); //TODO: consider the array
+        opensockets[data.nodes[ip]] = createSocket(data.nodes[ip]);
       }
     },
     error: function(x, status, error){

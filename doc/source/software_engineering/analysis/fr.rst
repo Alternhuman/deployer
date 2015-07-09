@@ -45,7 +45,7 @@ RF-2: Monitorización de estado
 
 - **Versión**: 2
 - **Autores**: Diego Martín, Rodrigo Santamaría
-- **Fuentes**: 
+- **Fuentes**: Análisis preliminar del sistema
 - **Objetivos asociados**: 2
 - **Requisitos asociados**: RF4, NFR2
 - **Descripción**: Los diferentes usuarios podrán consultar en directo diferentes valores de estado como la memoria en uso o los diferentes procesos en ejecución.
@@ -78,7 +78,7 @@ RF-3: Ejecución de comandos
 - **Autores**: Diego Martín
 - **Fuentes**: Entrevistas
 - **Objetivos asociados**: 1
-- **Requisitos asociados**: RF4
+- **Requisitos asociados**: RF4, NFR-9
 - **Descripción**: Acompañando a un despliegue o de forma independiente, el *software* permite ejecutar comandos en los diferentes nodos que conforman el sistema.
 - **Precondición**:
 
@@ -148,7 +148,7 @@ RF-5: Validar una conexión **WebSocket**
 - **Versión**: 1
 - **Autores**: Diego Martín
 - **Fuentes**: Fases de diseño del sistema
-- **Objetivos asociados**:
+- **Objetivos asociados**: OBJ-2, OBJ-3, OBJ-4
 - **Requisitos asociados**: NRF7
 - **Descripción**: Las conexiones **WebSocket** cifradas utilizando HTTPS que se realizan utilizando certificados no confiables o sin un campo **CN** válido emiten un error no interactivo. El sistema recoge dicho error y muestra un mensaje en la interfaz de usuario, solicitando la validación del certificado de la misma forma que en una conexión HTTPS tradicional.
 - **Precondición**: 
@@ -179,8 +179,6 @@ RF-6: Instalación del sistema
 - **Versión**: 1
 - **Autores**: Diego Martín
 - **Fuentes**: Entrevistas, fases de desarrollo
-- **Objetivos asociados**:
-- **Requisitos asociados**:
 - **Descripción**: El administrador contará con un conjunto de herramientas incluidas en el paquete **software** para realizar la instalación del mismo.
 - **Precondición**: El Administrador debe contar con los permisos de instalación suficientes y contar con una copia del **software** o acceso a un repositorio de paquetes.
 - **Secuencia normal**:
@@ -230,7 +228,6 @@ RF-8: Procesar petición
 - **Autores**: Diego Martín
 - **Fuentes**: Fases de desarrollo, análisis del sistema
 - **Objetivos asociados**: OBJ-1, OBJ-2, OBJ-4
-- **Requisitos asociados**: 
 - **Descripción**: El rol **deployer** y el controlador de la interfaz de usuario solicitan a los diferentes nodos que desempeñan el rol de **receiver** la realización de diferentes acciones. Estos deben identificar la acción a llevar a cabo y validar los diferentes parámetros provistos, así como verificar que el solicitante es de confianza.
 - **Precondición**:
 - **Secuencia normal**:
@@ -258,7 +255,6 @@ RF-9: Realizar despliegue
 - **Autores**: Diego Martín
 - **Fuentes**: Análisis preliminar
 - **Objetivos asociados**: OBJ-1
-- **Requisitos asociados**: 
 - **Descripción**: Ante la petición de un usuario, se realiza un despliegue.
 - **Precondición**:
 - **Secuencia normal**:
@@ -288,8 +284,8 @@ RF-10: Enviar estado
 - **Versión**: 1
 - **Autores**: Diego Martín
 - **Fuentes**: Análisis preliminar
-- **Objetivos asociados**:
-- **Requisitos asociados**:
+- **Objetivos asociados**: OBJ-2
+- **Requisitos asociados**: NFR-3
 - **Descripción**: Periódicamente la información sobre el estado del nodo es emitida a los solicitantes.
 - **Precondición**:
 - **Secuencia normal**:
@@ -300,13 +296,12 @@ RF-10: Enviar estado
 - **Excepciones**:
 
     + En el caso de que se dé un fallo en la conexión de red, se registrará el error y comenzará el caso de uso **RF-7**
-- **Rendimiento**:
-- **Frecuencia**:
-- **Importancia**:
-- **Urgencia**:
-- **Estado**:
-- **Estabilidad**:
-- **Comentarios**
+- **Rendimiento**: Alto
+- **Frecuencia**: Alta
+- **Importancia**: Alta
+- **Urgencia**: Alta
+- **Estado**: Completo
+- **Estabilidad**: Estable
 
 
 RF-11: Ejecutar comando
@@ -315,8 +310,8 @@ RF-11: Ejecutar comando
 - **Versión**: 1
 - **Autores**: Diego Martín
 - **Fuentes**: Entrevistas
-- **Objetivos asociados**:
-- **Requisitos asociados**:
+- **Objetivos asociados**: OBJ-3, OBJ4
+- **Requisitos asociados**: NFR-3
 - **Descripción**: El sistema ejecuta un comando y vincula sus canales de salida a un sistema de notificaciones que es capaz de detectar nuevos mensajes y difundirlos.
 - **Precondición**:
 - **Secuencia normal**:
@@ -339,8 +334,8 @@ RF-12: Procesar mensaje
 - **Versión**: 1
 - **Autores**: Diego Martín
 - **Fuentes**: Entrevistas
-- **Objetivos asociados**:
-- **Requisitos asociados**: 
+- **Objetivos asociados**: OBJ-3, OBJ4
+- **Requisitos asociados**: NFR-3 
 - **Descripción**: Tras la ejecución de un comando el sistema procesa la salida por los canales estándar y de error y emite un mensaje que contiene el valor de dicha salida, que es devuelto al usuario.
 - **Precondición**: Tiene que haberse ejecutado un comando
 - **Secuencia normal**:
@@ -361,8 +356,8 @@ RF-13 Recoger estado
 - **Versión**: 1
 - **Autores**: Diego Martín
 - **Fuentes**: Análisis preliminar del sistema
-- **Objetivos asociados**:
-- **Requisitos asociados**:
+- **Objetivos asociados**: OBJ-2
+- **Requisitos asociados**: NFR-2
 - **Descripción**: A través de llamadas al sistema, consulta de ficheros o cualquier otro mecanismo, los datos sobre el estado del sistema son incluidos en una colección que se retorna al solicitante.
 - **Precondición**:
 - **Secuencia normal**:

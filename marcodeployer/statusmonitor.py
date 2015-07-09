@@ -47,8 +47,8 @@ def get_data():
 
     response_dict["temperature"] = float(subprocess.Popen("cat /sys/class/thermal/thermal_zone0/temp", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')) / 1000.0
     response_dict["top"] = subprocess.Popen("top -d 0.5 -b -n2 | grep 'Cpu(s)'|tail -n 1 | awk '{print $2 + $4}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
-    #TODO: response_dict["top"] = subprocess.Popen("top -d 0.5 -b -n2 | tail -n 10 | awk '{print $12}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
-    #TODO: response_dict["uptime"] = subprocess.Popen("uptime | tail -n 1 | awk '{print $1}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+    # response_dict["top"] = subprocess.Popen("top -d 0.5 -b -n2 | tail -n 10 | awk '{print $12}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+    # response_dict["uptime"] = subprocess.Popen("uptime | tail -n 1 | awk '{print $1}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
     response_dict["uptime"] = subprocess.Popen("uptime | tail -n 1 | awk '{print $3 $4 $5}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
     response_dict["top_list"] = subprocess.Popen("ps aux --width 30 --sort -rss --no-headers | head  | awk 'BEGIN { OFS = \"-\" } ; {print $3,$4,$11}'", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
 
