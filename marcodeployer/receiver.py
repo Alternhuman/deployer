@@ -59,7 +59,7 @@ statusmonitor_open_sockets =  []
 getDataCallback = None
 processes = {}
 
-def shutdown(signal, frame):
+def shutdown():
     """
     Stops the application gracefully, closing all socket connections
     and unpublishing the MarcoPolo services.
