@@ -24,7 +24,6 @@ from tornado.ioloop import PeriodicCallback
 import signal
 from os import path, makedirs
 
-import subprocess
 import fcntl
 import sys
 import json
@@ -47,6 +46,7 @@ from marcodeployer.statusmonitor import get_data
 from marcodeployer.utils import getip 
 from marcodeployer import conf
 
+from marcodeployer import create_home
 #ip = ""
 ip = getip(conf.INTERFACE)
 opensockets={}
@@ -94,16 +94,18 @@ class DeployHandler(RequestHandler):
         idpolo = self.get_argument('idpolo', '')
         tomcat = self.get_argument('tomcat', '')
         
-        if not tomcat:
-            folder = self.get_argument('folder', '')
-        else:
-            folder = conf.TOMCAT_PATH
+        
 
         fname = file1['filename']
         
         user = self.get_argument('user', '')
         
         user_pwd = pwd.getpwnam(user)
+        
+        if not tomcat:
+            folder = self.get_argument('folder', '')
+        else:
+            folder = os.path.join(user_pwd.pw_dir, conf.TOMCAT_PATH)
         
         #Handling of relative paths
         folder = folder.replace('~', user_pwd.pw_dir, 1)
@@ -114,7 +116,11 @@ class DeployHandler(RequestHandler):
         if folder == '':
             folder = user_pwd.pw_dir
 
+        if not os.path.isdir(user_pwd.pw_dir):
+            create_home.create_homedir(user_pwd.pw_dir, user_pwd.pw_uid, user_pwd.pw_gid)
+
         if not os.path.isdir(folder):
+            self.finish('Error')
             return
 
         if not os.path.exists(folder):
@@ -133,6 +139,12 @@ class DeployHandler(RequestHandler):
         thread_pool.submit(self.execute, command=command, file_desc=file1, filename=final_directory, directory=folder, user=user_pwd, tomcat=tomcat, overwrite=overwrite)
         
         self.finish('OK')
+        if tomcat:
+            self.enable_tomcat(folder)
+
+    def enable_tomcat(self, folder):
+        bashcommand = "sh " + os.path.join(folder, "../bin/startup.sh")
+        command_output = subprocess.call(bashcommand.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     @tornado.web.asynchronous
     def execute(self, command, file_desc, filename, directory, user, tomcat=False, overwrite="false"):
@@ -150,10 +162,13 @@ class DeployHandler(RequestHandler):
             return
 
         output_file.write(file_desc['body'])
-        if not tomcat:
-            os.chown(filename, user.pw_uid, user.pw_gid)
-        else:
-            os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
+        #if not tomcat:
+        os.chown(filename, user.pw_uid, user.pw_gid)
+        
+        
+
+        #else:
+        #    os.chown(filename, pwd.getpwnam('tomcat7').pw_uid, pwd.getpwnam('tomcat7').pw_gid)
         output_file.close()
         if len(command) > 0:
             p = ProcessReactor(user, directory, io_loop, ip, opensockets, split(command), shell=False)

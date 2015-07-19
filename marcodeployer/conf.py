@@ -16,7 +16,7 @@ RECEIVERKEY = "receiver.key"
 TMPDIR = join(tempfile.gettempdir(), "tmp_deployer")
 
 STATIC_PATH = "/usr/lib/marcodeployer/static"
-TOMCAT_PATH = '/var/lib/tomcat7/webapps/'
+TOMCAT_PATH = 'apache-tomcat-7.0.62/webapps/'
 
 DEPLOYER_PORT = 1342
 RECEIVER_PORT = 1339
@@ -42,6 +42,8 @@ RECEIVER_LOGLEVEL = "DEBUG"
 
 SECRET_FILE = "/etc/marcodeployer/secret"
 
+MAIN_PORT_INCREMENT = 10000
+STOP_PORT_INCREMENT = 20000
 
 default_values = {
     "CERTS": CERTS,
