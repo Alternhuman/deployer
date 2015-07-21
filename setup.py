@@ -106,7 +106,7 @@ if __name__ == "__main__":
     setup(
         name="marcopolo-deployer",
         provides=["marcodeployer"],
-        version='0.1.6',
+        version='0.1.7',
         description=description,
         long_description = long_description,
         url="marcopolo.martinarroyo.net/apps/marcodeployer",
