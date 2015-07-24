@@ -48,7 +48,12 @@ from marcodeployer import conf
 
 from marcodeployer import create_home
 #ip = ""
-ip = getip(conf.INTERFACE)
+ip = None
+while ip == None:
+    ip = getip(conf.INTERFACE)
+    time.sleep(1)
+
+
 opensockets={}
 io_loop = ioloop.IOLoop.instance()
 data_dict = {}

@@ -51,4 +51,7 @@ def getip(interface, protocol=None, host=None):
     """
     Returns the IP associated with the configured interface
     """
-    return ni.ifaddresses(interface).get(AF_INET)[0].get('addr')
+    try:
+        return ni.ifaddresses(interface).get(AF_INET)[0].get('addr')
+    except Exception as e:
+        return None

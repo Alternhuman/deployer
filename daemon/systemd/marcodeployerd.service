@@ -2,6 +2,9 @@
 Description=A deployment utility
 Requires=polod.service
 After=polod.service
+Requires=network.target network-online.target
+After=network.target network-online.target 
+After=sys-subsystem-net-devices-net0.device
 
 [Service]
 
