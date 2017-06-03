@@ -4,6 +4,8 @@ import signal
 import sys
 import json
 
+import argparse
+
 from tornado.web import Application
 from tornado.httpserver import HTTPServer
 from tornado import web, websocket, ioloop
@@ -71,19 +73,27 @@ def sigint_handler(signal, frame):
 
 routes = [
     (r'/', handlers.IndexHandler),
-    (r'/static/(.*)', web.StaticFileHandler, {'path': conf.STATIC_PATH}),
     (r'/ws/monitor/?', WebSocketIndexHandler),
 ]
+
+if conf.DEBUG:
+    routes += [
+        (r'/static/(.*)', web.StaticFileHandler, {'path': conf.STATIC_PATH}),
+    ]
 
 signal.signal(signal.SIGINT, sigint_handler)
 
 def main(args=None):
-    pid = os.getpid()
+
+    parser = argparse.ArgumentParser(description='Monitoring utility')
+    parser.add_argument('-p', '--port', type=int, help="Port where the application will listen to", default=conf.PORT)
+
+    args = parser.parse_args()
 
     app = Application(routes, **conf.app_settings)
     http_server = HTTPServer(app)
 
-    http_server.listen(conf.PORT)
+    http_server.listen(args.port)
     start_callback()
     #logging.info("Serving on port %d" % conf.PORT)
     io_loop.start()

@@ -13,6 +13,7 @@ PORT = 9999
 DEBUG = False
 COOKIE_SECRET = "2a70b29a80c23f097a074626e584c8f60a87cf33f518f0eda60db0211c82"
 REFRESH_FREQUENCY = 1000
+XHEADERS = False
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
@@ -22,6 +23,7 @@ default_values = {
     "STATIC_PATH": STATIC_PATH,
     "COOKIE_SECRET": COOKIE_SECRET,
     "REFRESH_FREQUENCY": REFRESH_FREQUENCY,
+    "XHEADERS": XHEADERS
 }
 
 for fn in map(lambda x: os.path.join(x, CONF_FILE_NAME), CONF_FILE_SEARCHPATHS): 
@@ -32,6 +34,7 @@ for fn in map(lambda x: os.path.join(x, CONF_FILE_NAME), CONF_FILE_SEARCHPATHS):
             with open(fn, 'r') as f:
                 config.readfp(f)
                 PORT = config.getint('http', 'port')
+                XHEADERS = config.getboolean('http', 'xheaders')
                 DEBUG = config.getboolean('app', 'debug')
                 STATIC_PATH = config.get('app', 'static_path')
                 COOKIE_SECRET = config.get('app', 'cookie_secret')
@@ -49,4 +52,5 @@ app_settings = {
     "static_path": STATIC_PATH,
     "login_url":"/login/",
     "cookie_secret": COOKIE_SECRET
+    "xheaders": XHEADERS
 }
