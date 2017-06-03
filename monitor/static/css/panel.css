@@ -24,6 +24,8 @@ html, body {
     font-size: 11pt;
     border-bottom: 1px solid gray;
     padding: 1px 3px;
+    display: inline-block;
+    width: 100%;
 }
 
 .panel-content {
@@ -32,8 +34,8 @@ html, body {
 
 .panel-controls {
     float: right;
+    height: 100%;
 }
 .panel-control {
     float: left;
 }
-/*float: left;*/
