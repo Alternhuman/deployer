@@ -6,6 +6,8 @@ from tornado import iostream
 from tornado import gen
 from tornado.ioloop import IOLoop
 import time
+import os
+import conf
 from tornado.httpclient import AsyncHTTPClient
 subprocess_opts = {'shell': True, 'stdout': process.Subprocess.STREAM}
 
@@ -63,7 +65,7 @@ async def get_data(*args, **kwargs):
 
     #response_dict["tx"] = int((await process.Subprocess("/sbin/ifconfig eth0 | grep \"TX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip())
 
-    cpu_info = (await process.Subprocess("./mpstat/mpstat -P ALL 1 1 | tail -n +4", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip().split('\n')
+    cpu_info = (await process.Subprocess(os.path.join(conf.BASE_DIR, "./mpstat/mpstat -P ALL 1 1 | tail -n +4"), **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip().split('\n')
 
     cpu_info = extract_cpu_info(cpu_info)
 
