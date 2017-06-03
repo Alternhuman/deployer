@@ -21,4 +21,4 @@ mkdir -p logs
 sudo supervisorctl reread
 sudo supervisorctl update
 
-sudo supervisorctl restart alex-hub
+sudo supervisorctl restart monitor:
