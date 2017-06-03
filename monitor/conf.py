@@ -1,6 +1,5 @@
-import six
 import os
-from six.moves import configparser
+import configparser
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_PATH = os.path.join(BASE_DIR, 'build')
@@ -51,6 +50,6 @@ app_settings = {
     "debug": DEBUG,
     "static_path": STATIC_PATH,
     "login_url":"/login/",
-    "cookie_secret": COOKIE_SECRET
-    "xheaders": XHEADERS
+    "cookie_secret": COOKIE_SECRET,
+    "xheaders": XHEADERS,
 }

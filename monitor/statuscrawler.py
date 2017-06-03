@@ -58,9 +58,10 @@ async def get_data(*args, **kwargs):
     load_average = {'1min': float(load_data[0].replace(',','.')), '5min': float(load_data[1].replace(',','.')), '15min': float(load_data[2].replace(',','.'))}
     response_dict["load_average"] = load_average
 
-    response_dict["rx"] = int((await process.Subprocess("ifconfig eth0 | grep \"RX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip())
+    # TODO: Replace with /proc/net/dev: https://serverfault.com/a/533523/284322
+    #response_dict["rx"] = int((await process.Subprocess("/sbin/ifconfig eth0 | grep \"RX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip())
 
-    response_dict["tx"] = int((await process.Subprocess("ifconfig eth0 | grep \"TX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip())
+    #response_dict["tx"] = int((await process.Subprocess("/sbin/ifconfig eth0 | grep \"TX bytes\" | awk '{ print $2 }' | cut -d\":\" -f2", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip())
 
     cpu_info = (await process.Subprocess("./mpstat/mpstat -P ALL 1 1 | tail -n +4", **subprocess_opts).stdout.read_until_close()).decode('utf-8').strip().split('\n')
 
