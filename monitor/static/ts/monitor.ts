@@ -2,12 +2,12 @@ import Panel from './Panel';
 function generateWSAddress(): string{
     const location = window.location;
     var protocol;
-    if(location.protocol == 'https'){
-        protocol = 'wss';
+    if(location.protocol == 'https:'){
+        protocol = 'wss:';
     }else{
-        protocol = 'ws';
+        protocol = 'ws:';
     }
-    return `${protocol}://${location.hostname}:${location.port}/ws/monitor`;
+    return `${protocol}//${location.hostname}:${location.port}/ws/monitor`;
 }
 
 function parseMonitorMessage(data: string) : MonitorMessage{
