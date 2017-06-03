@@ -1,0 +1,39 @@
+* {
+    box-sizing: border-box;
+}
+html, body {
+    margin: 0;
+}
+.panel {
+    position: relative;
+    margin-left: 3px;
+    margin-right: 3px;
+    border: 1px solid gray;
+    border-radius: 3px;
+}
+
+@media screen and (min-width: 992px){
+    .panel{ 
+        float: left;
+        width: 33.33333333%;
+        position: relative;
+    }
+}
+
+.panel-title {
+    font-size: 11pt;
+    border-bottom: 1px solid gray;
+    padding: 1px 3px;
+}
+
+.panel-content {
+    padding: 0px 10px;
+}
+
+.panel-controls {
+    float: right;
+}
+.panel-control {
+    float: left;
+}
+/*float: left;*/

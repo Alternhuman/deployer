@@ -1,0 +1,33 @@
+diff --git mpstat.c mpstat.c
+index 2cadc72..e769cfa 100644
+--- mpstat.c
++++ mpstat.c
+@@ -1883,7 +1883,8 @@ void rw_mpstat_loop(int dis_hdr, int rows)
+ 	memset(&alrm_act, 0, sizeof(alrm_act));
+ 	alrm_act.sa_handler = alarm_handler;
+ 	sigaction(SIGALRM, &alrm_act, NULL);
+-	alarm(interval);
++	usleep(300000);
++
+ 
+ 	/* Save the first stats collected. Will be used to compute the average */
+ 	mp_tstamp[2] = mp_tstamp[0];
+@@ -1905,8 +1906,6 @@ void rw_mpstat_loop(int dis_hdr, int rows)
+ 		sigaction(SIGINT, &int_act, NULL);
+ 	}
+ 
+-	pause();
+-
+ 	if (sigint_caught)
+ 		/* SIGINT signal caught during first interval: Exit immediately */
+ 		return;
+@@ -1991,9 +1990,6 @@ void rw_mpstat_loop(int dis_hdr, int rows)
+ 	if (DISPLAY_JSON_OUTPUT(flags)) {
+ 		printf("\n\t\t\t]\n\t\t}\n\t]\n}}\n");
+ 	}
+-	else {
+-		write_stats_avg(curr, dis_hdr);
+-	}
+ }
+ 
+ /*

@@ -1,0 +1,19 @@
+{
+  "name": "monitor",
+  "version": "0.0.1",
+  "description": "A simple status monitor for Linux servers",
+  "main": "index.js",
+  "author": "Diego Martín",
+  "license": "MIT",
+  "dependencies": {
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.28.4",
+    "style-loader": "^0.18.1",
+    "ts-loader": "^2.1.0",
+    "typescript": "^2.3.4",
+    "webpack": "^2.6.1"
+  },
+  "scripts": {
+    "start": "webpack --progress --colors --watch"
+  }
+}

@@ -70,3 +70,4 @@ deployer/uploads/*
 *.vpp~*
 *.vpp\~*
 doc/doxygen.old/
+node_modules
