@@ -9,3 +9,15 @@ pip install -r requirements.txt
 yarn install
 
 yarn run build
+
+git submodule update --init --recursive
+
+pushd mpstat
+./configure && make mpstat
+popd
+
+mkdir -p logs
+sudo supervisorctl reread
+sudo supervisorctl update
+
+sudo supervisorctl restart alex-hub
