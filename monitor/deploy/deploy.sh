@@ -13,7 +13,7 @@ yarn run build
 git submodule update --init --recursive
 
 pushd mpstat
-patch mpstat.c ../mpstat.patch
+patch -f mpstat.c ../mpstat.patch
 ./configure && make mpstat
 popd
 
