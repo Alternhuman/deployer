@@ -1,4 +1,5 @@
 import Panel from './Panel';
+
 const graphHtmlString = `<svg height="100%" width="100%" viewBox="0 0 1000 1000" version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none" style="max-height:200px;">
@@ -19,7 +20,7 @@ const htmlString = (panelTitle: string) => `<div class="panel">
                 Type
             </span>
             <span class="panel-control">
-                Collapsepanels
+                Collapse
             </span>
         </div>
     </div>
@@ -28,23 +29,9 @@ const htmlString = (panelTitle: string) => `<div class="panel">
     </div>
 </div>`;
 
-const CPUColors = [
-    '#FF6E00',
-    '#EE1D00',
-    '#8AE234',
-    '#3465A4',
-    '#3465A4',
-];
-
-export default class CPUPanel extends Panel {
-    protected data: CPU[][];
-    protected element: HTMLElement;
-    protected parent: HTMLElement;
-    protected svg: HTMLElement;
-    protected rate : number = 100;
-    readonly svgSize : number = 1000;
-    protected maxValue: number;
-
+export default class MemoryPanel extends Panel {
+    private data: Memory[];
+    
     constructor(parent: HTMLElement, title: string, maxValue: number = 100){
         super(parent, title, maxValue);
         this.parent = parent;
@@ -64,33 +51,16 @@ export default class CPUPanel extends Panel {
         this.reset = this.reset.bind(this);
 
         this.bindEvents();
-
         this.render();
     }
 
-    /**
-     * Appends a new entry to the data
-     */
-    appendData(d: CPU[]){
+    appendData(d: Memory){
         this.data.unshift(d);
         this.render();
     }
 
-    /**
-     * Sets up event handling
-     */
-    bindEvents(){
-        const resetControl: HTMLButtonElement = <HTMLButtonElement>this.element.getElementsByClassName('panel-control-reset')[0];
-        resetControl.onclick = this.reset;
-    }
-
-    /**
-     * Removes the currently displayed data
-     */
     reset(){
-        this.data.forEach(d => {
-            d.length = 0;
-        });
+        this.data.length = 0;
         this.render();
     }
 
@@ -98,17 +68,21 @@ export default class CPUPanel extends Panel {
         if(!this.data.length){
             return;
         }
+        
         const increment = this.svgSize / this.rate;
-        let cpus = Array(this.data[0].length);
-        this.data.forEach((c, i) => {
-            c.forEach((d, j)=>{
-                cpus[j] = cpus[j] || [];
-                cpus[j].push(`${this.svgSize - i*increment},${this.svgSize - this.svgSize/this.maxValue * (d.usr+d.sys)}`);
-            })
+        const points = this.data.map((m: Memory, i)=>{
+            return {
+                "MemFree": `${this.svgSize - i*increment}, ${this.svgSize - this.svgSize*(m.MemTotal-m.MemFree-m.Cached)/m.MemTotal}`,
+            }
         });
-        let pointsStrs = cpus.map((c, i) => {
-            return `<polyline points="${c.join(' ')}" style="fill:none;stroke:${CPUColors[i%CPUColors.length]};stroke-width:3"/>`;
-        })
+
+        //const pointsStrs : string[] = [];
+        let memFreePoints = [];
+        for(const k of points){
+            memFreePoints.push(k.MemFree);
+        }
+        let pointsStrs = [`<polyline points="${memFreePoints.join(' ')}" style="fill:none;stroke:blue;stroke-width:3" />;stroke-width:3"`]
         this.svg.innerHTML = pointsStrs.join("\n");
+    
     }
 }
