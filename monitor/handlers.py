@@ -15,8 +15,7 @@ class IndexHandler(web.RequestHandler):
         """
         Checks if the user is logged and sends the index files
         (basic HTML, CSS and JS).
-        If the user is not already logged in, it is redirected 
-        to the main page. 
+        If the user is not already logged in, it is redirected to the main page. 
         """
         if not self.current_user:
             self.render(os.path.join(conf.TEMPLATES_DIR, 'index.html'))
@@ -25,4 +24,3 @@ class IndexHandler(web.RequestHandler):
             self.render(os.path.join(conf.TEMPLATES_DIR, 'index.html'))
             #user = tornado.escape.xhtml_escape(self.current_user)
             #self.render("index.jade", user=user)
-

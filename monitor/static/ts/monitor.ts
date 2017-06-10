@@ -1,6 +1,7 @@
 import Panel from './Panel';
 import CPUPanel from './CPUPanel';
 import MemoryPanel from './MemoryPanel';
+import NetworkPanel from './NetworkPanel';
 
 function generateWSAddress(): string{
     const location = window.location;
@@ -26,16 +27,20 @@ function onMonitorMessage(ev: MessageEvent){
     const cpuAll : CPU = monitorData.cpu.filter(c => c['cpu'] == 'all')[0];
     panels[0].appendData(monitorData.cpu);
     panels[1].appendData(monitorData.memory);
+    panels[2].appendData(monitorData.network);
 }
 
 function start() : void {
     ws = new WebSocket(generateWSAddress());
     ws.onopen = ()=>console.log("Connection open");
     ws.onmessage = onMonitorMessage;
-    var panelCPU = new CPUPanel(document.getElementById("container"), 'CPU');
-    var memoryPanel = new MemoryPanel(document.getElementById("container"), 'Memory');
+    const container : HTMLDivElement = <HTMLDivElement>document.getElementById("container");
+    const panelCPU = new CPUPanel(container, 'CPU');
+    const memoryPanel = new MemoryPanel(container, 'Memory');
+    const networkPanel = new NetworkPanel(container, 'Network');
     panels.push(panelCPU)
     panels.push(memoryPanel);
+    panels.push(networkPanel);
 }
 
 window.onload = start;

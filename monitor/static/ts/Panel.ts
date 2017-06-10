@@ -17,4 +17,27 @@ export default abstract class Panel {
     }
 
     abstract reset() : void;
+    abstract render(): void;
 }
+
+export const htmlString = (panelTitle: string) => `<div class="panel">
+    <div class="panel-title">
+        <span>${panelTitle}</span>
+        <div class="panel-controls">
+            <span class="panel-control">
+                Timeline
+            </span>
+            <button class="panel-control panel-control-reset">
+                Reset
+            </button>
+            <span class="panel-control">
+                Type
+            </span>
+            <span class="panel-control">
+                Collapse
+            </span>
+        </div>
+    </div>
+    <div class="panel-content">
+    </div>
+</div>`;

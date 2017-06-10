@@ -1,20 +1,18 @@
+import argparse
+import json
 import logging
 import os
 import signal
 import sys
-import json
 
-import argparse
-
-from tornado.web import Application
+from tornado import ioloop, web, websocket
 from tornado.httpserver import HTTPServer
-from tornado import web, websocket, ioloop
 from tornado.ioloop import PeriodicCallback
+from tornado.web import Application
 
-from statuscrawler import get_data
 import conf
 import handlers
-
+from statuscrawler import get_data
 
 io_loop = ioloop.IOLoop.instance()
 
@@ -45,7 +43,7 @@ def stop_callback(force=False):
     """
     global callback_fn
     if callback_fn is not None:
-        if force or len(open_ws) == 0:
+        if force or not open_ws:
             callback_fn.stop()
 
 class WebSocketIndexHandler(websocket.WebSocketHandler):
@@ -67,7 +65,7 @@ def shutdown():
     io_loop.stop()
     stop_callback()
 
-def sigint_handler(signal, frame):
+def sigint_handler(*args):
     io_loop.add_callback(shutdown)
 
 

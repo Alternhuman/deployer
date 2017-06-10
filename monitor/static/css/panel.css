@@ -6,8 +6,8 @@ html, body {
 }
 .panel {
     position: relative;
-    margin-left: 3px;
-    margin-right: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
     border: 1px solid gray;
     border-radius: 3px;
 }

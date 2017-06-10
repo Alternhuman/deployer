@@ -1,10 +1,12 @@
+"""
+Global configuration values. Default values will be overriden by the ones set in the configuration file, if it exists.
+"""
 import os
 import configparser
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_PATH = os.path.join(BASE_DIR, 'build')
-CONF_FILE_SEARCHPATHS = ['/etc/monitor', os.getcwd(), 
-os.path.dirname(os.path.abspath(__file__))]
+CONF_FILE_SEARCHPATHS = ['/etc/monitor', os.getcwd(), os.path.dirname(os.path.abspath(__file__))]
 
 CONF_FILE_NAME = 'monitor.conf'
 
@@ -16,7 +18,7 @@ XHEADERS = False
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
-default_values = {
+DEFAULT_VALUES = {
     "PORT": PORT,
     "DEBUG": DEBUG,
     "STATIC_PATH": STATIC_PATH,
@@ -25,10 +27,10 @@ default_values = {
     "XHEADERS": XHEADERS
 }
 
-for fn in map(lambda x: os.path.join(x, CONF_FILE_NAME), CONF_FILE_SEARCHPATHS): 
+for fn in map(lambda x: os.path.join(x, CONF_FILE_NAME), CONF_FILE_SEARCHPATHS):
     if os.path.isfile(fn):
         try:
-            config = configparser.SafeConfigParser(default_values, allow_no_value=False)
+            config = configparser.SafeConfigParser(DEFAULT_VALUES, allow_no_value=False)
 
             with open(fn, 'r') as f:
                 config.readfp(f)
@@ -42,8 +44,6 @@ for fn in map(lambda x: os.path.join(x, CONF_FILE_NAME), CONF_FILE_SEARCHPATHS):
         except IOError as i:
             print("Warning! The configuration file could not be read. Defaults will be used as fallback")
             #logging.warning("Warning! The configuration file could not be read. Defaults will be used as fallback")
-        except Exception as e:
-            print("Unknown exception in configuration parser %s" % e)
             #logging.warning("Unknown exception in configuration parser %s" % e)
 
 app_settings = {

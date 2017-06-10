@@ -21,6 +21,20 @@ interface CPU {
     nice: number;
 }
 
+interface Network {
+    Iface: string;
+    MTU: number;
+    "RX-OK": number;
+    "RX-ERR": number;
+    "RX-DRP": number;
+    "RX-OVR": number;
+    "TX-OK": number;
+    "TX-ERR": number;
+    "TX-DRP": number;
+    "TX-OVR": number;
+    "Flg": string;
+}
+
 interface MonitorMessage {
     time: number;
     tx: number;
@@ -33,4 +47,5 @@ interface MonitorMessage {
         '15min': number;
     }
     cpu: Array<CPU>;
+    network: Array<Network>;
 }
